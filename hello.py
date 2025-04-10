@@ -15,18 +15,9 @@ if not api_key:
 # Configure the API key
 genai.configure(api_key=api_key)
 
-# --- Configuration ---
-# Make sure to set your GOOGLE_API_KEY environment variable
-# Or configure it directly:
-# genai.configure(api_key="YOUR_API_KEY")
-# if not os.getenv('GOOGLE_API_KEY'):
-#     print("Please set the GOOGLE_API_KEY environment variable.")
-#     exit()
-# else: # configure() is implicitly called if the env var is set
-#     pass
 
-image_path = "image.jpg" # Replace with your image path
-prompt_text = "What is in this image? Describe it in detail."
+image_path = "Text.png" # Replace with your image path
+prompt_text = "Look at the image, extract only lithuanian words and give me their translation. Write original Lithuanian words in infinitive form. You act as an API agent, so you must not give me any additional comments. Answer in a JSON format"
 
 # --- Load the Image ---
 try:
@@ -40,7 +31,7 @@ except Exception as e:
 
 # --- Choose the Model ---
 # Use a model that supports vision input
-model = genai.GenerativeModel('gemini-1.5-pro-latest')
+model = genai.GenerativeModel('gemini-2.0-flash')
 # Or for the newer models (check availability):
 # model = genai.GenerativeModel('gemini-1.5-pro-latest')
 
