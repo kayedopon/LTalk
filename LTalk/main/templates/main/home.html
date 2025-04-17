@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Word Sets</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('image-upload').addEventListener('change', function() {
+                document.getElementById('upload-form').submit();
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <main>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" id="image-upload" style="display: none;" accept="image/*">
+            <label for="image-upload" class="add-button">Upload</label>
+        </form>
+        <div id="result"></div>
+        
+        {% if result %}
+            <div id="result">{{ result|safe }}</div>
+        {% endif %}
+    </main>
+</body>
+</html>
