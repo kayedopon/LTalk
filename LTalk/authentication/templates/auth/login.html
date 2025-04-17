@@ -1,28 +1,40 @@
-<div class="title-block"><p>{{title}}</p></div>
-    <div class="form-block">
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li class="message">{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        <form action="" method="POST">
-            {% csrf_token %}
-            <div class="input-box">
-                <label class="input-label" for="">Email</label>
-                <input class="input-field" type="email" name="email" placeholder="youremail@gmail.com">
-            </div>
-            <div class="input-box">
-                <label class="input-label" for="">Password</label>
-                <input class="input-field" type="password" name="password" placeholder="Password">
-            </div>
-            <div class="input-box" id="login-button">
-                <button type="submit">Login</button>
-            </div>
-        </form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="title-block"><p>{{ title }}</p></div>
+        <div class="form-block">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="message">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="input-box">
+                    <label class="input-label" for="id_email">Email</label>
+                    <input class="input-field" type="email" name="email" id="id_email" placeholder="youremail@gmail.com" required>
+                </div>
+                <div class="input-box">
+                    <label class="input-label" for="id_password">Password</label>
+                    <input class="input-field" type="password" name="password" id="id_password" placeholder="Password" required>
+                </div>
+                <div class="input-box" id="login-button">
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-block">
+            <p>Don't have an account? <a href="{% url 'registration' %}">Register</a></p>
+        </div>
     </div>
-    <div class="link-block">
-        <p>Don't have an account?<a href="{% url 'registration' %}"> Register</a></p>
-    </div>
-</div>
+</body>
+</html>
