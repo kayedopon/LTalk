@@ -1,8 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout, login, password_validation
+from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth.decorators import login_required
 from .models import User
 
+def clean_passwords(request, ps1, ps2):
+    if ps1 and ps2:
+        if ps1 != ps2:
+            messages.error(request, "Passwords do not match.") 
+            return False
+    return True
 
 def registrationPage(request):
     page = "registration"
@@ -13,16 +20,17 @@ def registrationPage(request):
     if request.method == 'POST':
         email = request.POST["email"]
         username = request.POST["username"]
-        password = request.POST["password1"]
+        password1 = request.POST["password1"]
+        password2 = request.POST["password2"]
 
-        user = User.objects.filter(email=email)
-        if len(user) == 0:
-            user = User.objects.create_user(email=email, username=username, password=password)
-            user = authenticate(request, email=email, password=password)
-            login(request, user)
-            return redirect("home")
-        else:
-            messages.error(request, "User already exist")
+        if clean_passwords(request, password1, password2):
+            if not User.objects.filter(email=email).exists():
+                user = User.objects.create_user(email=email, username=username, password=password1)
+                user = authenticate(request, email=email, password=password1)
+                login(request, user)
+                return redirect("home")
+            else:
+                messages.error(request, "User already exist")
 
     context = {"page": page, "title": page.title()}
     return render(request, "auth/registration.html", context=context)
@@ -53,6 +61,7 @@ def loginPage(request):
     context = {"page": page, "title": page.title()}
     return render(request, "auth/login.html", context=context)
 
+@login_required(login_url='login')
 def logoutUser(request):
     logout(request)
     return redirect('login')
