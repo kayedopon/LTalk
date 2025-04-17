@@ -1,0 +1,41 @@
+
+<div class="title-block"><p>{{title}}</p></div>
+<div class="form-block">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="message">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        
+        <div class="input-box">
+            <label class="input-label" for="">Username</label>
+            <input class="input-field" type="text" name="username" maxlength="30" required="" id="id_username">
+        </div>
+        
+        <div class="input-box">
+            <label class="input-label" for="">Email</label>
+            <input class="input-field" type="email" name="email" maxlength="50" autofocus="" required="" id="id_email">
+        </div>
+        
+        <div class="input-box">
+            <label class="input-label" for="">Password</label>
+            <input class="input-field" type="password" name="password1" autocomplete="new-password" required="" id="id_password1">
+        </div>
+        
+        <!-- <div class="input-box">
+            <label class="input-label" for="">Password confirmation</label>
+            <input class="input-field" type="password" name="password2" autocomplete="new-password" required="" id="id_password2">
+        </div> -->
+        
+        <div class="input-box" id="login-button">
+            <button type="submit">Sign up</button>
+        </div>
+    </form>
+</div>
+<div class="link-block">
+    <p>Already have an account?<a href="{% url 'login' %}"> Login</a></p>
+</div>
