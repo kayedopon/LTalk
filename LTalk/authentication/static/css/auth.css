@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.auth-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 450px;
+    max-width: 90%;
+}
+.title-block p {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.input-box {
+    margin-bottom: 20px;
+}
+.input-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+.input-field:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.messages {
+    background: #ffe0e0;
+    border: 1px solid #ffb0b0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    list-style: none;
+    margin-bottom: 15px;
+    color: #d8000c;
+    font-size: 14px;
+}
+.message {
+    margin: 0;
+}
+#login-button button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+#login-button button:hover {
+    background-color: #0056b3;
+}
+.link-block {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+.link-block a {
+    color: #007bff;
+    text-decoration: none;
+}
+.link-block a:hover {
+    text-decoration: underline;
+}
