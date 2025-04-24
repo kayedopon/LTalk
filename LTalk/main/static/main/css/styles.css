@@ -1,53 +1,80 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
     padding: 20px;
+    background-color: #f5f5f5;
 }
 
-header {
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.upload-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+}
+
+.upload-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+}
+
+.upload-button:hover {
+    background-color: #45a049;
+}
+
+.words-list {
+    list-style: none;
+    padding: 0;
+}
+
+.word-item {
+    background-color: #f8f9fa;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
 }
 
-.search-bar input {
-    padding: 5px 10px;
-    font-size: 16px;
-}
-
-.add-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-}
-
-.profile-icon {
-    font-size: 24px;
-}
-
-.word-set {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.progress-circle {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.word {
     font-weight: bold;
+    color: #2c3e50;
+}
+
+.infinitive {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.translation {
+    color: #34495e;
+}
+
+.error-message {
+    color: #dc3545;
+    padding: 10px;
+    background-color: #f8d7da;
+    border-radius: 5px;
+    margin-bottom: 1rem;
 }
