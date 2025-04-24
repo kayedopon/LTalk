@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="title-block"><p>{{ title }}</p></div>
+        <div class="form-block">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="message">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                
+                <div class="input-box">
+                    <label class="input-label" for="id_username">Username</label>
+                    <input class="input-field" type="text" name="username" maxlength="30" required id="id_username" placeholder="yourusername">
+                </div>
+                
+                <div class="input-box">
+                    <label class="input-label" for="id_email">Email</label>
+                    <input class="input-field" type="email" name="email" maxlength="50" required id="id_email" placeholder="youremail@gmail.com">
+                </div>
+                
+                <div class="input-box">
+                    <label class="input-label" for="id_password1">Password</label>
+                    <input class="input-field" type="password" name="password1" autocomplete="new-password" required id="id_password1" placeholder="Enter password">
+                </div>
+                
+                <div class="input-box">
+                    <label class="input-label" for="id_password2">Confirm Password</label>
+                    <input class="input-field" type="password" name="password2" autocomplete="new-password" required id="id_password2" placeholder="Repeat password">
+                </div>
+                
+                <div class="input-box" id="login-button">
+                    <button type="submit">Sign up</button>
+                </div>
+            </form>
+        </div>
+        <div class="link-block">
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>
