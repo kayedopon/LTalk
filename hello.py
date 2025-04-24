@@ -16,7 +16,7 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 
-image_path = "Text.png" # Replace with your image path
+image_path = "image.jpg" # Replace with your image path
 prompt_text = "Look at the image, extract only lithuanian words and give me their translation. Write original Lithuanian words in infinitive form. You act as an API agent, so you must not give me any additional comments. Answer in a JSON format"
 
 # --- Load the Image ---

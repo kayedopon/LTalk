@@ -23,8 +23,18 @@
         </form>
         <div id="result"></div>
         
-        {% if result %}
-            <div id="result">{{ result|safe }}</div>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        {% if words %}
+            <ul>
+                {% for item in words %}
+                    <li>
+                        <strong>{{ item.original }}</strong> ({{ item.infinitive }}) — {{ item.translation }}
+                    </li>
+                {% endfor %}
+            </ul>
         {% endif %}
     </main>
 </body>
