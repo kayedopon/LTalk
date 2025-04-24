@@ -13,7 +13,7 @@
         <h1>LTalk Image Word Extractor</h1>
 
         <div class="upload-section">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" id="form1" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" name="image" accept="image/*" required id="image-input" style="display: none" />
                 <label for="image-input" class="upload-button">Choose Image</label>
@@ -24,18 +24,6 @@
         <div id="result">
             {% if error %}
                 <div class="error-message">{{ error }}</div>
-            {% endif %}
-
-            {% if words %}
-                <ul class="words-list">
-                    {% for item in words %}
-                        <li class="word-item">
-                            <span class="word">{{ item.word }}</span>
-                            <span class="infinitive">({{ item.infinitive }})</span>
-                            <span class="translation">{{ item.translation }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
             {% endif %}
         </div>
     </div>

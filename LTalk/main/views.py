@@ -1,6 +1,11 @@
 from django.shortcuts import render
+from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+
+from .models import Word, WordSet
 
 import google.generativeai as genai
 import PIL.Image
@@ -26,9 +31,25 @@ prompt_text = ("Look at the image, extract only lithuanian words and give me the
                "with objects containing 'word', 'translation', and 'infinitive' fields. "
                "Example format: [{\"word\":\"word\",\"translation\":\"translation\",\"infinitive\":\"infinitive\"}]")
 
+@login_required(login_url='login')
 @csrf_exempt
 def home(request):
-    if request.method == 'POST':
+   if request.method == 'POST':
+      title = request.POST["wordset_title"]
+      description = request.POST["wordset_description"]
+      wordset = WordSet.objects.create(user=request.user, title=title, description=description)
+      data = json.loads(request.POST["words_json"])
+      for word in data:
+         original = word["word"]
+         translation = word["translation"]
+         if not Word.objects.filter(word=original).exists():
+            word = Word.objects.create(word=original, translation=translation)
+            wordset.words.add(word)
+         wordset.words.add(Word.objects.get(word=original))
+   return render(request, "home.html")
+
+@require_http_methods(["POST"])
+def photo_processing(request):
         if 'image' not in request.FILES:
             return HttpResponseBadRequest("No image file uploaded.")
 
@@ -78,5 +99,3 @@ def home(request):
                 "error": "Processing error",
                 "message": str(e)
             }, status=500)
-
-    return render(request, "home.html")

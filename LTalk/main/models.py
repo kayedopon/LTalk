@@ -27,7 +27,7 @@ class Perfomance(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.score
+        return str(self.score)
     
 
 class WordProgress(models.Model):
