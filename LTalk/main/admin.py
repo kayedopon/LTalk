@@ -11,8 +11,8 @@ class WordSetAdmin(admin.ModelAdmin):
 
 @admin.register(Word)
 class WordAdmin(admin.ModelAdmin):
-    list_display = ('word', 'translation', )
-    search_fields = ('word', 'translation')
+    list_display = ('word', 'infinitive', 'translation', )
+    search_fields = ('word', 'infinitive', 'translation')
     filter_horizontal = ('wordsets',)
 
 
