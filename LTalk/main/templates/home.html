@@ -1,0 +1,207 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Word Sets</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('image-upload').addEventListener('change', function() {
+                document.getElementById('upload-form').submit();
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <main>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" id="image-upload" style="display: none;" accept="image/*">
+            <label for="image-upload" class="add-button">Upload</label>
+        </form>
+        <div id="result"></div>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        {% if words %}
+            <ul>
+                {% for item in words %}
+                    <li>
+                        <strong>{{ item.original }}</strong> ({{ item.infinitive }}) — {{ item.translation }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTalk - Image Word Extractor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+        }
+
+        .upload-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .upload-button:hover {
+            background-color: #45a049;
+        }
+
+        .words-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .word-item {
+            background-color: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .infinitive {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .translation {
+            color: #34495e;
+        }
+
+        .error-message {
+            color: #dc3545;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <script>
+        function displayResult(result) {
+            const resultDiv = document.getElementById('result');
+            if (result.error) {
+                resultDiv.innerHTML = `<div class="error-message">${result.error}</div>`;
+                return;
+            }
+            
+            const wordsList = document.createElement('ul');
+            wordsList.className = 'words-list';
+            
+            result.words.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'word-item';
+                li.innerHTML = `
+                    <span class="word">${item.word}</span>
+                    <span class="infinitive">(${item.infinitive})</span>
+                    <span class="translation">${item.translation}</span>
+                `;
+                wordsList.appendChild(li);
+            });
+            
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(wordsList);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                
+                try {
+                    const response = await fetch('', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    displayResult(result);
+                } catch (error) {
+                    displayResult({ error: 'An error occurred while processing your request.' });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>LTalk Image Word Extractor</h1>
+        
+        <div class="upload-section">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="image" accept="image/*" required id="image-input" style="display: none" />
+                <label for="image-input" class="upload-button">Choose Image</label>
+                <button type="submit" class="upload-button">Process Image</button>
+            </form>
+        </div>
+
+        <div id="result">
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            {% if words %}
+                <ul class="words-list">
+                    {% for item in words %}
+                        <li class="word-item">
+                            <span class="word">{{ item.word }}</span>
+                            <span class="infinitive">({{ item.infinitive }})</span>
+                            <span class="translation">{{ item.translation }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

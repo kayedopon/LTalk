@@ -1,45 +1,82 @@
-import json
 from django.shortcuts import render
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+
 import google.generativeai as genai
 import PIL.Image
-import os
 from dotenv import load_dotenv
-from pydantic import BaseModel
+import os
+import json
 
+# Load environment variables from .env file
 load_dotenv()
+
+# Access the API key
 api_key = os.getenv('GOOGLE_API_KEY')
+if not api_key:
+    raise Exception("Please set the GOOGLE_API_KEY in your .env file.")
+
+# Configure the API key
 genai.configure(api_key=api_key)
 
-class TranslationResponse(BaseModel):
-    words: list[dict[str, str]]  # Each word is a dictionary with 'original', 'infinitive', and 'translation'
+# ...existing code...
 
+prompt_text = ("Look at the image, extract only lithuanian words and give me their translation. "
+               "Write original Lithuanian words in infinitive form. Format the response as a JSON array "
+               "with objects containing 'word', 'translation', and 'infinitive' fields. "
+               "Example format: [{\"word\":\"word\",\"translation\":\"translation\",\"infinitive\":\"infinitive\"}]")
+
+@csrf_exempt
 def home(request):
-    words = None
-    error = None
-    if request.method == 'POST' and request.FILES.get('image'):
-        image_file = request.FILES['image']
+    if request.method == 'POST':
+        if 'image' not in request.FILES:
+            return HttpResponseBadRequest("No image file uploaded.")
+
+        file = request.FILES['image']
         try:
-            img = PIL.Image.open(image_file)
-            prompt_text = (
-                "Look at the image, extract only Lithuanian words and provide their details. "
-                "For each word, include the original Lithuanian word, its infinitive form, and its English translation. "
-                "You act as an API agent, so you must not give me any additional comments."
-            )
-            client = genai.Client(api_key=api_key)
-            response = client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=[prompt_text, img],
-                config={
-                    'response_mime_type': 'application/json',
-                    'response_schema': TranslationResponse,
-                },
-            )
-            try:
-                parsed_response: TranslationResponse = response.parsed
-                words = parsed_response.words
-                print(words)
-            except Exception as e:
-                error = f"Failed to parse Gemini response: {e}"
+            img = PIL.Image.open(file)
         except Exception as e:
-            error = f"Error: {e}"
-    return render(request, 'main/home.html', {'words': words, 'error': error})
+            return HttpResponseBadRequest(f"Error loading image: {e}")
+
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        try:
+            response = model.generate_content([prompt_text, img])
+            
+            # Clean up the response text to ensure valid JSON
+            response_text = response.text.strip()
+            if not response_text.startswith('['):
+                # If response isn't in expected JSON format, try to extract JSON portion
+                import re
+                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(0)
+                else:
+                    # Create a structured error response
+                    return JsonResponse({
+                        "error": "Invalid response format",
+                        "raw_response": response_text
+                    }, status=500)
+
+            # Parse the JSON response
+            words_data = json.loads(response_text)
+            
+            # Validate the structure
+            if not isinstance(words_data, list):
+                raise ValueError("Response is not a list")
+            
+            # Return the processed data
+            return JsonResponse({"words": words_data})
+
+        except json.JSONDecodeError as e:
+            return JsonResponse({
+                "error": "JSON parsing error",
+                "message": str(e),
+                "raw_response": response.text
+            }, status=500)
+        except Exception as e:
+            return JsonResponse({
+                "error": "Processing error",
+                "message": str(e)
+            }, status=500)
+
+    return render(request, "home.html")
