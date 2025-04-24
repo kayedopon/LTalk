@@ -1,3 +1,36 @@
+// This function prepares the words data as a JSON string for submission
+function prepareWordsJSON() {
+    const items = document.querySelectorAll('.word-item');
+    const words = Array.from(items).map(item => ({
+        word: item.getAttribute('data-word'),
+        infinitive: item.getAttribute('data-infinitive'),
+        translation: item.getAttribute('data-translation'),
+    }));
+
+    document.getElementById('words-json').value = JSON.stringify(words);
+}
+
+// This function handles word deletion when a user clicks on the delete button
+function removeWord(button) {
+    const wordItem = button.closest('.word-item');
+    if (wordItem) {
+        wordItem.remove();
+    }
+}
+
+// This function retrieves the CSRF token from cookies
+function getCSRFToken() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [key, value] = cookie.trim().split('=');
+        if (key === 'csrftoken') {
+            return decodeURIComponent(value);
+        }
+    }
+    return '';
+}
+
+// This function sends the form data and displays the result
 function displayResult(result) {
     const resultDiv = document.getElementById('result');
     if (result.error) {
@@ -21,7 +54,6 @@ function displayResult(result) {
                       <input type="text" name="wordset_description" id="wordset-description" class="wordset-input" placeholder="Short description (optional)">`;
 
     wordsList.className = 'words-list';
-
 
     result.words.forEach(item => {
         const li = document.createElement('li');
@@ -50,6 +82,7 @@ function displayResult(result) {
     resultDiv.appendChild(form);
 }
 
+// DOMContentLoaded listener to handle the form submission asynchronously
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('form1');
     form.addEventListener('submit', async (e) => {
@@ -68,57 +101,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-function getCSRFToken() {
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-        const [key, value] = cookie.trim().split('=');
-        if (key === 'csrftoken') {
-            return decodeURIComponent(value);
-        }
-    }
-    return '';
-}
-
-function removeWord(button) {
-    const wordItem = button.closest('.word-item');
-    if (wordItem) {
-        wordItem.remove();
-    }
-}
-
-function createWordset() {
-    prepareWordsJSON();
-
-    const jsonData = document.getElementById('words-json').value;
-
-    fetch('', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: jsonData
-    });
-}
-
-function prepareWordsJSON() {
-    const items = document.querySelectorAll('.word-item');
-    const words = Array.from(items).map(item => ({
-        word: item.getAttribute('data-word'),
-        infinitive: item.getAttribute('data-infinitive'),
-        translation: item.getAttribute('data-translation'),
-    }));
-
-    document.getElementById('words-json').value = JSON.stringify(words);
-}
-
-function getCSRFToken() {
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-        const [key, value] = cookie.trim().split('=');
-        if (key === 'csrftoken') {
-            return decodeURIComponent(value);
-        }
-    }
-    return '';
-}
