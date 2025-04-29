@@ -9,6 +9,7 @@ class WordViewSet(ModelViewSet):
    
     serializer_class = WordSerializer
     queryset = Word.objects.all()
+    http_method_names = ['get', 'head', 'options']
 
 
 class WordSetViewSet(ModelViewSet):
