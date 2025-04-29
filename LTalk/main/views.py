@@ -33,34 +33,9 @@ prompt_text = ("Look at the image, extract only lithuanian words and give me the
 
 @login_required(login_url='login')
 def home(request):
-    if request.method == 'POST':
-        title = request.POST["wordset_title"]
-        description = request.POST["wordset_description"]
-        
-        wordset = WordSet.objects.create(
-            user=request.user,
-            title=title,
-            description=description
-        )
 
-        data = json.loads(request.POST["words_json"])
-        
-        for word in data:
-            original = word["word"]
-            infinitive = word["infinitive"]
-            translation = word["translation"]
 
-            if not Word.objects.filter(word=original).exists():
-                word_obj = Word.objects.create(
-                    word=original,
-                    infinitive=infinitive,
-                    translation=translation
-                )
-                wordset.words.add(word_obj)
-
-            wordset.words.add(Word.objects.get(word=original))
-
-    return render(request, "home.html")
+    return render(request, "main/home.html")
 
 @require_http_methods(["POST"])
 def photo_processing(request):

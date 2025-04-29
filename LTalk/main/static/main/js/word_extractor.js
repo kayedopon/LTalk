@@ -10,6 +10,41 @@ function prepareWordsJSON() {
     document.getElementById('words-json').value = JSON.stringify(words);
 }
 
+// This function send data to endpoint where wordset will be created
+async function sendWordSet() {
+    const csrfToken = getCSRFToken();
+
+    const data = {
+        title: document.getElementById('wordset-title').value,
+        description: document.getElementById('wordset-description').value,
+        words: JSON.parse(document.getElementById('words-json').value)
+    };
+
+    try {
+        const response = await fetch('/api/wordset/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        console.log(response);
+
+        if (response.ok) {
+            displayResult(result); // here we should redirect user to wordlist
+        } else {
+            displayResult({ error: result.detail || 'An error occurred while processing your request.' });
+        }
+    } catch (error) {
+        console.error('Request failed:', error);
+        displayResult({ error: 'An error occurred while processing your request.' });
+    }
+}
+
+
 // This function handles word deletion when a user clicks on the delete button
 function removeWord(button) {
     const wordItem = button.closest('.word-item');
@@ -43,7 +78,10 @@ function displayResult(result) {
     form.method = 'post';
     const wordsList = document.createElement('ul');
     form.onsubmit = (e) => {
+        e.preventDefault();
         prepareWordsJSON();
+        sendWordSet();
+
         return true;
     };
 
