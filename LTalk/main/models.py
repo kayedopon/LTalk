@@ -47,8 +47,8 @@ class Exercise(models.Model):
     ]
     wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='exercises')
     type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
-    question = models.TextField()
-    correct_answer = models.TextField()
+    question = models.JSONField()
+    correct_answer = models.JSONField()
 
     def __str__(self):
         return f"{self.get_type_display()} for {self.wordset.title}"

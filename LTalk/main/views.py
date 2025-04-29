@@ -113,3 +113,6 @@ def photo_processing(request):
                 "error": "Processing error",
                 "message": str(e)
             }, status=500)
+        
+def wordset_list(request):
+    return render(request, "wordset_list.html")
