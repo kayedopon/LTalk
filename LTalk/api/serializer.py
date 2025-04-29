@@ -55,6 +55,7 @@ class WordProgressSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         correct = validated_data.get('correct_attempts')
         incorrect = validated_data.get('incorrect_attempts')
+
         if correct == 1:
             instance.correct_attempts += 1
         elif incorrect == 1:
@@ -62,7 +63,6 @@ class WordProgressSerializer(serializers.ModelSerializer):
 
         instance.is_learned = instance.correct_attempts > instance.incorrect_attempts
         instance.save()
-
         return instance
     
     
