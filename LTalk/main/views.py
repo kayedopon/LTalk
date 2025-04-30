@@ -33,34 +33,35 @@ prompt_text = ("Look at the image, extract only lithuanian words and give me the
 
 @login_required(login_url='login')
 def home(request):
+    wordsets = WordSet.objects.filter(user=request.user)
+    return render(request, "home.html", {"wordsets": wordsets})
+
+@login_required(login_url='login')
+def create_set(request):
     if request.method == 'POST':
-        title = request.POST["wordset_title"]
-        description = request.POST["wordset_description"]
-        
-        wordset = WordSet.objects.create(
-            user=request.user,
-            title=title,
-            description=description
-        )
+        title = request.POST.get("wordset_title")
+        description = request.POST.get("wordset_description")
+        words_json = request.POST.get("words_json")
 
-        data = json.loads(request.POST["words_json"])
-        
-        for word in data:
-            original = word["word"]
-            infinitive = word["infinitive"]
-            translation = word["translation"]
+        if title and description and words_json:
+            wordset = WordSet.objects.create(
+                user=request.user,
+                title=title,
+                description=description
+            )
 
-            if not Word.objects.filter(word=original).exists():
-                word_obj = Word.objects.create(
+            data = json.loads(words_json)
+            for word in data:
+                original = word["word"]
+                infinitive = word["infinitive"]
+                translation = word["translation"]
+
+                word_obj, created = Word.objects.get_or_create(
                     word=original,
-                    infinitive=infinitive,
-                    translation=translation
+                    defaults={"infinitive": infinitive, "translation": translation}
                 )
                 wordset.words.add(word_obj)
-
-            wordset.words.add(Word.objects.get(word=original))
-
-    return render(request, "home.html")
+    return render(request, "create_set.html")
 
 @require_http_methods(["POST"])
 def photo_processing(request):

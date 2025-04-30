@@ -1,31 +1,28 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTalk - Image Word Extractor</title>
-    {% load static %}
+    <title>Your Word Sets</title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
-    <script src="{% static 'main/js/word_extractor.js' %}" defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>LTalk Image Word Extractor</h1>
-
-        <div class="upload-section">
-            <form method="post" id="form1" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" name="image" accept="image/*" required id="image-input" style="display: none" />
-                <label for="image-input" class="upload-button">Choose Image</label>
-                <button type="submit" class="upload-button">Process Image</button>
-            </form>
-        </div>
-
-        <div id="result">
-            {% if error %}
-                <div class="error-message">{{ error }}</div>
-            {% endif %}
-        </div>
+        <a href="{% url 'create_set' %}" class="upload-button">Add Word Set</a>
+        <h1>Your Word Sets</h1>
+        {% if wordsets %}
+            <ul>
+                {% for ws in wordsets %}
+                    <li>
+                        <a href="#">{{ ws.title }}</a>
+                        <span style="color: #888;">({{ ws.description }})</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have no word sets yet.</p>
+        {% endif %}
+        
     </div>
 </body>
 </html>
