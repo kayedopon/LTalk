@@ -76,13 +76,11 @@ class ExerciseProgressSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'answered_at']
 
     def validate_user_answer(self, value):
-        """You can add any validation for the user_answer here"""
         if not value:
             raise serializers.ValidationError("User answer cannot be empty.")
         return value
     
     def validate(self, data):
-        """Custom validation for the entire object if needed"""
         if 'is_correct' not in data:
             raise serializers.ValidationError("The correctness of the answer ('is_correct') must be provided.")
         return data
