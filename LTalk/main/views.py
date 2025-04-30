@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -61,6 +61,8 @@ def create_set(request):
                     defaults={"infinitive": infinitive, "translation": translation}
                 )
                 wordset.words.add(word_obj)
+            # Redirect to home after successful creation
+            return redirect('home')
     return render(request, "create_set.html")
 
 @require_http_methods(["POST"])
