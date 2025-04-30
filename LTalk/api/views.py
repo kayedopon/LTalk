@@ -5,7 +5,7 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
-from .serializer import ExerciseProgressSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
+from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
 from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
 
 
@@ -26,6 +26,12 @@ class WordProgressViewSet(ModelViewSet):
 
     serializer_class = WordProgressSerializer
     queryset = WordProgress.objects.all()
+
+
+class ExerciseViewSet(ModelViewSet):
+
+    serializer_class = ExerciseSerializer
+    queryset = Exercise.objects.all()
     
 
 class SubmitExerciseAPIView(APIView):
@@ -56,16 +62,19 @@ class SubmitExerciseAPIView(APIView):
                 incorrect += 1
             else:
                 correct += 1
+            print(f"Looking for correct_answer: '{correct_answer}'")
+            for w in related_words:
+                print(f"Word translation:'{w.word}' '{w.translation}'")
+            word = related_words.filter(translation__iexact=correct_answer).first()
+            wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
 
-            for word in related_words:
-                wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
-                if question_is_correct:
-                    wp.correct_attempts += 1
-                else:
-                    wp.incorrect_attempts += 1
+            if question_is_correct:
+                wp.correct_attempts += 1
+            else:
+                wp.incorrect_attempts += 1
 
-                wp.is_learned = wp.correct_attempts > wp.incorrect_attempts
-                wp.save()
+            wp.is_learned = wp.correct_attempts > wp.incorrect_attempts
+            wp.save()
 
         progress = ExerciseProgress.objects.create(
             user=user,
