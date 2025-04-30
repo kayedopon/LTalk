@@ -21,15 +21,6 @@ class Word(models.Model):
     def __str__(self):
         return self.word
     
-class Perfomance(models.Model):
-    wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='performances')
-    score = models.IntegerField(blank=False, null=False)
-    evaluation_date = models.DateTimeField(auto_now_add=True)
-    notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return str(self.score)
-    
 
 class WordProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,15 +33,26 @@ class WordProgress(models.Model):
 class Exercise(models.Model):
     EXERCISE_TYPES = [
         ('flashcard', 'Flash Card'),
-        ('fill_blank', 'Fill in the blank'),
         ('multiple_choice', 'Multiple Choice'),
     ]
     wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='exercises')
     type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
-    question = models.JSONField()
-    correct_answer = models.JSONField()
+    questions = models.JSONField()
+    correct_answers = models.JSONField()
 
     def __str__(self):
         return f"{self.get_type_display()} for {self.wordset.title}"
+
+
+class ExerciseProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercise_progress')
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name='progress_entries')
+    user_answer = models.JSONField(blank=True, null=True)
+    is_correct = models.BooleanField(default=False)
+    answered_at = models.DateTimeField(auto_now_add=True)
+    grade = models.CharField()
+
+    def __str__(self):
+        return f"{self.user} - {self.exercise} - {'Correct' if self.is_correct else 'Incorrect'}"
 
 
