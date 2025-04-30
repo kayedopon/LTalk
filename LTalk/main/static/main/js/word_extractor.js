@@ -101,3 +101,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form1');
+    const imageInput = document.getElementById('image-input');
+    const fileNameSpan = document.getElementById('file-name');
+
+    imageInput.addEventListener('change', function() {
+        if (imageInput.files.length > 0) {
+            fileNameSpan.textContent = imageInput.files[0].name;
+        } else {
+            fileNameSpan.textContent = '';
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        // Show loading message
+        document.getElementById('result').innerHTML = '<div class="loading-message">Loading words...</div>';
+
+        try {
+            const response = await fetch('/photo-processing', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            displayResult(result);
+        } catch (error) {
+            displayResult({ error: 'An error occurred while processing your request.' });
+        }
+    });
+});
