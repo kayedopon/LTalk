@@ -159,26 +159,11 @@ class SubmitExerciseAPIView(APIView):
         for key, _ in exercise.questions.items():
             user_answer = user_answers.get(key)
             correct_answer = exercise.correct_answers[key]
-
             question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
-
-            
-            if not question_is_correct:
-                is_correct = False
-                incorrect += 1
-            else:
-                correct += 1
 
             word = related_words.filter(translation__iexact=correct_answer).first()
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
-
-            if question_is_correct:
-                wp.correct_attempts += 1
-            else:
-                wp.incorrect_attempts += 1
-
-            wp.is_learned = wp.correct_attempts > wp.incorrect_attempts
-            wp.save()
+            wp.update_progress(question_is_correct)
 
         progress = ExerciseProgress.objects.create(
             user=user,

@@ -29,6 +29,17 @@ class WordProgress(models.Model):
     incorrect_attempts = models.IntegerField(default=0)
     is_learned = models.BooleanField(default=False)
 
+    def update_progress(self, correct: bool):
+        if correct:
+            self.correct_attempts += 1
+        else:
+            self.incorrect_attempts += 1
+
+        total = self.correct_attempts + self.incorrect_attempts
+        ratio = self.correct_attempts / total if total > 0 else 0
+        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.7
+        self.save()
+
 
 class Exercise(models.Model):
     EXERCISE_TYPES = [

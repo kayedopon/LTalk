@@ -75,15 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function recordAnswer(isCorrect) {
         const questionKey = Object.keys(exercise.questions)[currentQuestionIndex];
-        // For flashcards, the "answer" we submit is what was on the back
-        userAnswers[questionKey] = exercise.correct_answers[questionKey];
-
+        // Submit what the user actually did
         if (isCorrect) {
+            userAnswers[questionKey] = exercise.correct_answers[questionKey];
             correctAnswersCount++;
         } else {
+            // Use a special value or leave blank to indicate incorrect
+            userAnswers[questionKey] = ""; // or null
             incorrectAnswersCount++;
         }
-
         currentQuestionIndex++;
         showNextCard();
     }
