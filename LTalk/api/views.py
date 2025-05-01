@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
@@ -150,5 +151,109 @@ class SubmitExerciseAPIView(APIView):
             return user_answer == correct_answer
         
         return False
+
+
+import google.generativeai as genai
+import PIL.Image
+from dotenv import load_dotenv
+import os
+import json
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the API key
+api_key = os.getenv('GOOGLE_API_KEY')
+if not api_key:
+    raise Exception("Please set the GOOGLE_API_KEY in your .env file.")
+
+# Configure the API key
+genai.configure(api_key=api_key)
+
+# ...existing code...
+
+prompt_text = ("Look at the image, extract only lithuanian words and give me their translation. "
+               "Write original Lithuanian words in infinitive form. Format the response as a JSON array "
+               "with objects containing 'word', 'translation', and 'infinitive' fields. "
+               "Example format: [{\"word\":\"word\",\"translation\":\"translation\",\"infinitive\":\"infinitive\"}]")
+
+
+class ProcessPhotoAPIView(APIView):
+    http_method_names = ['post']
+    parser_classes = [MultiPartParser, FormParser]
+
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'image': {
+                        'type': 'string',
+                        'format': 'binary',
+                        'description': 'Image file to process'
+                    }
+                }
+            }
+        },
+        responses={
+            200: OpenApiResponse(
+                description="Returns extracted Lithuanian words",
+                examples=[
+                    {
+                        "words": [
+                            {"word": "obuolys", "translation": "apple", "infinitive": "obuolys"}
+                        ]
+                    }
+                ]
+            ),
+            400: OpenApiResponse(description="Invalid image or bad format")
+        },
+        description="Extract Lithuanian words from an image"
+    )
+    def post(self, request):
+        if 'image' not in request.FILES:
+            return Response({"error": "No image file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
+        file = request.FILES['image']
+        try:
+            img = PIL.Image.open(file)
+        except Exception as e:
+            return Response({"error": f"Error loading image: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        try:
+            response = model.generate_content([prompt_text, img])
+            response_text = response.text.strip()
+
+            if not response_text.startswith('['):
+                import re
+                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(0)
+                else:
+                    return Response({
+                        "error": "Invalid response format",
+                        "raw_response": response_text
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            words_data = json.loads(response_text)
+            if not isinstance(words_data, list):
+                raise ValueError("Response is not a list")
+
+            return Response({"words": words_data}, status=status.HTTP_200_OK)
+
+        except json.JSONDecodeError as e:
+            return Response({
+                "error": "JSON parsing error",
+                "message": str(e),
+                "raw_response": response.text
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response({
+                "error": "Processing error",
+                "message": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 

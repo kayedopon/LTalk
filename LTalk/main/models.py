@@ -5,7 +5,7 @@ from authentication.models import User
 class WordSet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wordsets')
     title = models.CharField(max_length=35, blank=False, null=False)
-    description = models.CharField(max_length=200, blank=False, null=False)
+    description = models.CharField(max_length=200, blank=True, null=True)
     public = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 

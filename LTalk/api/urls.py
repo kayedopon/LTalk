@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import WordViewSet, WordSetViewSet, SubmitExerciseAPIView, WordProgressViewSet, ExerciseViewSet
+from .views import ProcessPhotoAPIView, WordViewSet, WordSetViewSet, SubmitExerciseAPIView, WordProgressViewSet, ExerciseViewSet
 
 from rest_framework import routers
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -16,4 +16,5 @@ urlpatterns = [
     path('exercise/<int:exercise_id>/submit/', SubmitExerciseAPIView.as_view(), name='submit-exercise'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path("docs/", SpectacularSwaggerView.as_view(url_name="schema")),
+    path('process-photo/', ProcessPhotoAPIView.as_view(), name='process_photo'),
 ]

@@ -31,7 +31,6 @@ async function sendWordSet() {
         });
 
         const result = await response.json();
-        console.log(response);
 
         if (response.ok) {
             displayResult(result); // here we should redirect user to wordlist
@@ -122,25 +121,6 @@ function displayResult(result) {
 // DOMContentLoaded listener to handle the form submission asynchronously
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('form1');
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-
-        try {
-            const response = await fetch('/photo-processing', {
-                method: 'POST',
-                body: formData,
-            });
-            const result = await response.json();
-            displayResult(result);
-        } catch (error) {
-            displayResult({ error: 'An error occurred while processing your request.' });
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('form1');
     const imageInput = document.getElementById('image-input');
     const fileNameSpan = document.getElementById('file-name');
 
@@ -160,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('result').innerHTML = '<div class="loading-message">Loading words...</div>';
 
         try {
-            const response = await fetch('/photo-processing', {
+            const response = await fetch('api/process-photo/', {
                 method: 'POST',
                 body: formData,
             });
