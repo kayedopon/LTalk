@@ -67,6 +67,26 @@ class ExerciseSerializer(serializers.ModelSerializer):
         model = Exercise
         fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']
         read_only_fields = ['id']
+
+    
+    def validate(self, data):
+        questions = data.get('questions')
+        correct_answers = data.get('correct_answers')
+
+        if not isinstance(questions, dict):
+            raise serializers.ValidationError({'questions': "Must be a dictionary."})
+        if not isinstance(correct_answers, dict):
+            raise serializers.ValidationError({'correct_answers': "Must be a dictionary."})
+
+        if not questions:
+            raise serializers.ValidationError({'questions': "Cannot be empty."})
+        if not correct_answers:
+            raise serializers.ValidationError({'correct_answers': "Cannot be empty."})
+
+        if set(questions.keys()) != set(correct_answers.keys()):
+            raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match.")
+
+        return data
     
 
 class ExerciseProgressSerializer(serializers.ModelSerializer):
