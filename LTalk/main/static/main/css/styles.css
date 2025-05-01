@@ -250,3 +250,66 @@ body {
     height: 50px;
     text-align: center;
 }
+
+
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.wordset-description {
+    text-align: center;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.words-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.word-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.word-card:hover {
+    transform: translateY(-3px);
+}
+
+.word-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.infinitive-text {
+    font-size: 1rem;
+    color: #666;
+    margin: 5px 0;
+}
+
+.translation-text {
+    font-size: 1rem;
+    color: #4CAF50;
+}
+
+.back-button-wrapper {
+    text-align: center;
+    margin-top: 30px;
+}

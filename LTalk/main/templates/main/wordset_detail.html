@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ wordset.title }} - Details</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="section-title">{{ wordset.title }}</h1>
+        {% if wordset.description %}
+            <p class="wordset-description">{{ wordset.description }}</p>
+        {% endif %}
+        <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
+        <p><strong>Visibility:</strong> {{ wordset.public|yesno:"Public,Private" }}</p>
+    
+        <h2 class="section-subtitle">Words in this Set</h2>
+    
+        {% if wordset.words.all %}
+        <div class="words-grid">
+            {% for word in wordset.words.all %}
+            <div class="word-card">
+                <div class="word-text">{{ word.word }}</div>
+                <div class="infinitive-text">{{ word.infinitive }}</div>
+                <div class="translation-text">{{ word.translation }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="no-words">No words in this set.</p>
+        {% endif %}
+    
+        <div class="back-button-wrapper">
+            <a href="{% url 'home' %}" class="upload-button">← Back to Word Sets</a>
+        </div>
+    </div>
+</body>
+</html>

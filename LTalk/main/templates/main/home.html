@@ -14,7 +14,7 @@
             <ul class="wordsets-list">
                 {% for ws in wordsets %}
                     <li class="word-set">
-                        <a href="#" class="word-set-title">{{ ws.title }}</a>
+                        <a href="{% url 'wordset_detail' ws.id %}" class="word-set-title">{{ ws.title }}</a>
                         <div class="word-set-details">
                             <span class="word-count">{{ ws.word_count|default:75 }} words</span>
                             <div class="progress-circle" style="background: conic-gradient(#4CAF50 {{ ws.progress|default:75 }}%, #ddd {{ ws.progress|default:75 }}%);">
