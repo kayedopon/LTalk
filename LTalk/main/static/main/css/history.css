@@ -1,0 +1,71 @@
+/* Container and title styling (already handled in main styles.css) */
+
+/* Type selector styles */
+.type-selector {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.type-button {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.type-button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.type-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Exercise progress block */
+.progress-list {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.progress-list h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #2c3e50;
+    text-align: center;
+}
+
+/* Individual progress entries */
+.progress-entry {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 6px;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.progress-entry .correct {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.progress-entry .incorrect {
+    color: #dc3545;
+    font-weight: bold;
+}
