@@ -39,29 +39,6 @@ def home(request):
 @login_required(login_url='login')
 def create_set(request):
     if request.method == 'POST':
-        title = request.POST.get("wordset_title")
-        description = request.POST.get("wordset_description")
-        words_json = request.POST.get("words_json")
-
-        if title and description and words_json:
-            wordset = WordSet.objects.create(
-                user=request.user,
-                title=title,
-                description=description
-            )
-
-            data = json.loads(words_json)
-            for word in data:
-                original = word["word"]
-                infinitive = word["infinitive"]
-                translation = word["translation"]
-
-                word_obj, created = Word.objects.get_or_create(
-                    word=original,
-                    defaults={"infinitive": infinitive, "translation": translation}
-                )
-                wordset.words.add(word_obj)
-            # Redirect to home after successful creation
             return redirect('home')
     return render(request, "create_set.html")
 
