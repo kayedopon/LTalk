@@ -62,7 +62,9 @@ class WordProgressSerializer(serializers.ModelSerializer):
     
 
 class ExerciseSerializer(serializers.ModelSerializer):
-
+    questions = serializers.JSONField()
+    correct_answers = serializers.JSONField()
+    
     class Meta:
         model = Exercise
         fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']

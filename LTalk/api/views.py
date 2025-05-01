@@ -26,15 +26,18 @@ class WordProgressViewSet(ModelViewSet):
 
     serializer_class = WordProgressSerializer
     queryset = WordProgress.objects.all()
+    http_method_names = ['get', 'head', 'options']
 
 
 class ExerciseViewSet(ModelViewSet):
 
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
+    http_method_names = ['get', 'post', 'head', 'options']
     
 
 class SubmitExerciseAPIView(APIView):
+    http_method_names = ['post']
     def post(self, request, exercise_id):
         exercise = get_object_or_404(Exercise, id=exercise_id)
         user = request.user
@@ -62,9 +65,7 @@ class SubmitExerciseAPIView(APIView):
                 incorrect += 1
             else:
                 correct += 1
-            print(f"Looking for correct_answer: '{correct_answer}'")
-            for w in related_words:
-                print(f"Word translation:'{w.word}' '{w.translation}'")
+
             word = related_words.filter(translation__iexact=correct_answer).first()
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
 
