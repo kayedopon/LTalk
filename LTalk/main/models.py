@@ -37,6 +37,7 @@ class WordProgress(models.Model):
     incorrect_attempts = models.IntegerField(default=0)
     is_learned = models.BooleanField(default=False)
 
+
     def update_progress(self, correct: bool):
         if correct:
             self.correct_attempts += 1

@@ -12,6 +12,12 @@ from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSeri
 from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
 from django.db import transaction
 
+import google.generativeai as genai
+import PIL.Image
+from dotenv import load_dotenv
+import os
+import json
+
 
 class WordViewSet(ModelViewSet):
    
@@ -161,10 +167,16 @@ class SubmitExerciseAPIView(APIView):
             correct_answer = exercise.correct_answers[key]
             question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
 
+            if question_is_correct:
+                correct += 1
+            else:
+                incorrect += 1
+
             word = related_words.filter(translation__iexact=correct_answer).first()
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
             wp.update_progress(question_is_correct)
 
+        print(correct, incorrect)
         progress = ExerciseProgress.objects.create(
             user=user,
             exercise=exercise,
@@ -192,12 +204,6 @@ class SubmitExerciseAPIView(APIView):
         
         return False
 
-
-import google.generativeai as genai
-import PIL.Image
-from dotenv import load_dotenv
-import os
-import json
 
 # Load environment variables from .env file
 load_dotenv()
