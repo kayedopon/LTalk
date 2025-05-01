@@ -9,6 +9,14 @@ class WordSet(models.Model):
     public = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def learned_percent(self, user):
+        words = self.words.all()
+        total = words.count()
+        if total == 0:
+            return 0
+        learned = words.filter(wordprogress__user=user, wordprogress__is_learned=True).count()
+        return int((learned / total) * 100)
+
     def __str__(self):
         return self.title
 

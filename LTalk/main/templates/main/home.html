@@ -19,8 +19,14 @@
                             <div class="word-set-details">
                                 <span class="word-count">{{ ws.words.count }} words</span> <!-- Use actual count -->
                                 <!-- Progress calculation needs backend logic -->
-                                <div class="progress-circle" style="background: conic-gradient(#4CAF50 {{ ws.progress|default:75 }}%, #ddd {{ ws.progress|default:75 }}%);">
-                                    <span>{{ ws.progress|default:75}}%</span>
+                                <div
+                                    class="progress-circle"
+                                    style="background: conic-gradient(#4CAF50 {{ ws.progress }}%, #ddd {{ ws.progress }}%);"
+                                    aria-label="Learned {{ ws.progress }} percent"
+                                    title="Learned {{ ws.progress }}% of words"
+                                    data-progress="{{ ws.progress }}"
+                                >
+                                    <span>{{ ws.progress }}%</span>
                                 </div>
                             </div>
                         </div>

@@ -34,6 +34,8 @@ prompt_text = ("Look at the image, extract only lithuanian words and give me the
 @login_required(login_url='login')
 def home(request):
     wordsets = WordSet.objects.filter(user=request.user)
+    for ws in wordsets:
+        ws.progress = ws.learned_percent(request.user)
     return render(request, "home.html", {"wordsets": wordsets})
 
 @login_required(login_url='login')
