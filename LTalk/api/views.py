@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 
 from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
 from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
+from django.db import transaction
 
 
 class WordViewSet(ModelViewSet):
@@ -36,7 +37,61 @@ class ExerciseViewSet(ModelViewSet):
 
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
+    # Allow POST for creation
     http_method_names = ['get', 'post', 'head', 'options']
+
+    # Filter exercises by wordset and type if query parameters are provided
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        wordset_id = self.request.query_params.get('wordset')
+        exercise_type = self.request.query_params.get('type')
+
+        if wordset_id:
+            queryset = queryset.filter(wordset_id=wordset_id)
+        if exercise_type:
+            queryset = queryset.filter(type=exercise_type)
+
+        # Ensure only exercises belonging to the user's wordsets are returned
+        # (Assuming WordSet has a 'user' field)
+        queryset = queryset.filter(wordset__user=self.request.user)
+        return queryset
+
+    @transaction.atomic # Ensure atomicity
+    def perform_create(self, serializer):
+        wordset = serializer.validated_data['wordset']
+        exercise_type = serializer.validated_data['type']
+
+        # Prevent creating duplicate exercises for the same wordset and type
+        existing_exercise = Exercise.objects.filter(
+            wordset=wordset,
+            type=exercise_type
+        ).first()
+
+        if existing_exercise:
+             # Instead of raising error, maybe return the existing one?
+             # Or handle this in the serializer's validate method.
+             # For now, let serializer handle potential duplicates if unique_together is set.
+             # If not, this check prevents duplicates.
+             # We'll let the serializer save if no exact duplicate found by filter.
+             pass # Let serializer proceed, it might raise validation error if needed
+
+        # Auto-generate questions/answers if not provided, specifically for flashcards
+        if exercise_type == 'flashcard' and not serializer.validated_data.get('questions'):
+            words = wordset.words.all()
+            questions = {}
+            correct_answers = {}
+            for i, word in enumerate(words):
+                questions[str(i)] = {"front": word.word, "back": word.translation}
+                correct_answers[str(i)] = word.translation # Correct answer is the translation
+
+            # Save generated data back to serializer instance
+            serializer.instance = serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
+        else:
+             # For other types or if questions are provided, save normally
+             serializer.save()
     
 
 class SubmitExerciseAPIView(APIView):
@@ -104,26 +159,11 @@ class SubmitExerciseAPIView(APIView):
         for key, _ in exercise.questions.items():
             user_answer = user_answers.get(key)
             correct_answer = exercise.correct_answers[key]
-
             question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
-
-            
-            if not question_is_correct:
-                is_correct = False
-                incorrect += 1
-            else:
-                correct += 1
 
             word = related_words.filter(translation__iexact=correct_answer).first()
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
-
-            if question_is_correct:
-                wp.correct_attempts += 1
-            else:
-                wp.incorrect_attempts += 1
-
-            wp.is_learned = wp.correct_attempts > wp.incorrect_attempts
-            wp.save()
+            wp.update_progress(question_is_correct)
 
         progress = ExerciseProgress.objects.create(
             user=user,

@@ -9,6 +9,14 @@ class WordSet(models.Model):
     public = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def learned_percent(self, user):
+        words = self.words.all()
+        total = words.count()
+        if total == 0:
+            return 0
+        learned = words.filter(wordprogress__user=user, wordprogress__is_learned=True).count()
+        return int((learned / total) * 100)
+
     def __str__(self):
         return self.title
 
@@ -28,6 +36,17 @@ class WordProgress(models.Model):
     correct_attempts = models.IntegerField(default=0)
     incorrect_attempts = models.IntegerField(default=0)
     is_learned = models.BooleanField(default=False)
+
+    def update_progress(self, correct: bool):
+        if correct:
+            self.correct_attempts += 1
+        else:
+            self.incorrect_attempts += 1
+
+        total = self.correct_attempts + self.incorrect_attempts
+        ratio = self.correct_attempts / total if total > 0 else 0
+        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.7
+        self.save()
 
 
 class Exercise(models.Model):
