@@ -62,19 +62,32 @@ class WordProgressSerializer(serializers.ModelSerializer):
     
 
 class ExerciseSerializer(serializers.ModelSerializer):
-    questions = serializers.JSONField()
-    correct_answers = serializers.JSONField()
+    # Make fields optional for creation if type is flashcard
+    questions = serializers.JSONField(required=False)
+    correct_answers = serializers.JSONField(required=False)
 
     class Meta:
         model = Exercise
         fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']
         read_only_fields = ['id']
+        # Optional: Add unique_together constraint if needed
+        # unique_together = ('wordset', 'type')
 
-    
+
     def validate(self, data):
+        exercise_type = data.get('type')
         questions = data.get('questions')
         correct_answers = data.get('correct_answers')
+        wordset = data.get('wordset')
 
+        # If creating a flashcard exercise and questions/answers are missing, it's okay (view handles it)
+        if self.instance is None and exercise_type == 'flashcard' and not questions and not correct_answers:
+             if not wordset or not wordset.words.exists():
+                  raise serializers.ValidationError("Cannot create flashcard exercise for an empty wordset.")
+             # Validation passes here, view will generate content
+             return data
+
+        # Standard validation if not a flashcard or if data is provided
         if not isinstance(questions, dict):
             raise serializers.ValidationError({'questions': "Must be a dictionary."})
         if not isinstance(correct_answers, dict):
@@ -87,6 +100,10 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
         if set(questions.keys()) != set(correct_answers.keys()):
             raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match.")
+
+        # Optional: Check for existing exercise if unique_together is not set
+        # if self.instance is None and Exercise.objects.filter(wordset=wordset, type=exercise_type).exists():
+        #     raise serializers.ValidationError("An exercise of this type already exists for this wordset.")
 
         return data
     

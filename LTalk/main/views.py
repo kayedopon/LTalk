@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
-from .models import Word, WordSet
+from .models import Word, WordSet, Exercise
 
 import google.generativeai as genai
 import PIL.Image
@@ -41,3 +41,14 @@ def create_set(request):
     if request.method == 'POST':
             return redirect('home')
     return render(request, "create_set.html")
+
+@login_required(login_url='login')
+def flashcard_practice(request, wordset_id):
+    wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
+    # We don't necessarily need to fetch the Exercise here,
+    # the frontend JS will handle fetching/creating it via the API.
+    context = {
+        'wordset': wordset,
+        'wordset_id': wordset_id, # Pass ID for JS
+    }
+    return render(request, "flashcard.html", context)
