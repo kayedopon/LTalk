@@ -15,10 +15,10 @@
         <div class="upload-section">
             <form method="post" id="form1" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="file" name="image" accept="image/*" required id="image-input" style="display: none" />
+                <input type="file" name="image" accept="image/*" required id="image-input" class="hidden-input" />
                 <label for="image-input" class="upload-button">Choose Image</label>
-                <button type="submit" class="upload-button">Process Image</button>
-                <span id="file-name" style="margin-left:10px;"></span>
+                <button type="submit" class="upload-button" style="margin-top: 10px;">Process Image</button>
+                <span id="file-name"></span>
             </form>
         </div>
 
