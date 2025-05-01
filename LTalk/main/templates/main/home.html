@@ -7,22 +7,26 @@
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
 </head>
 <body>
-    <div class="container">
-        <a href="{% url 'create_set' %}" class="upload-button">Add Word Set</a>
+    <div class="home-container">
+        <a href="{% url 'create_set' %}" class="btn btn-primary upload-button">Add Word Set</a>
         <h1>Your Word Sets</h1>
         {% if wordsets %}
-            <ul>
+            <ul class="wordsets-list">
                 {% for ws in wordsets %}
-                    <li>
-                        <a href="#">{{ ws.title }}</a>
-                        <span style="color: #888;">({{ ws.description }})</span>
+                    <li class="word-set">
+                        <a href="#" class="word-set-title">{{ ws.title }}</a>
+                        <div class="word-set-details">
+                            <span class="word-count">{{ ws.word_count|default:75 }} words</span>
+                            <div class="progress-circle" style="background: conic-gradient(#4CAF50 {{ ws.progress|default:75 }}%, #ddd {{ ws.progress|default:75 }}%);">
+                                <span>{{ ws.progress|default:75}}%</span>
+                            </div>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>You have no word sets yet.</p>
+            <p class="no-wordsets">You have no word sets yet.</p>
         {% endif %}
-        
     </div>
 </body>
 </html>
