@@ -14,12 +14,25 @@
             <ul class="wordsets-list">
                 {% for ws in wordsets %}
                     <li class="word-set">
-                        <a href="{% url 'wordset_detail' ws.id %}" class="word-set-title">{{ ws.title }}</a>
-                        <div class="word-set-details">
-                            <span class="word-count">{{ ws.word_count|default:75 }} words</span>
-                            <div class="progress-circle" style="background: conic-gradient(#4CAF50 {{ ws.progress|default:75 }}%, #ddd {{ ws.progress|default:75 }}%);">
-                                <span>{{ ws.progress|default:75}}%</span>
+                        <div class="word-set-info"> <!-- Wrap title and details -->
+                            <a href="{% url 'wordset_detail' ws.id %}" class="word-set-title">{{ ws.title }}</a>
+                            <div class="word-set-details">
+                                <span class="word-count">{{ ws.words.count }} words</span> <!-- Use actual count -->
+                                <!-- Progress calculation needs backend logic -->
+                                <div
+                                    class="progress-circle"
+                                    style="background: conic-gradient(#4CAF50 {{ ws.progress }}%, #ddd {{ ws.progress }}%);"
+                                    aria-label="Learned {{ ws.progress }} percent"
+                                    title="Learned {{ ws.progress }}% of words"
+                                    data-progress="{{ ws.progress }}"
+                                >
+                                    <span>{{ ws.progress }}%</span>
+                                </div>
                             </div>
+                        </div>
+                        <div class="word-set-actions"> <!-- Add actions section -->
+                            <a href="{% url 'flashcard_practice' ws.id %}" class="btn btn-secondary">Practice Flashcards</a>
+                            <!-- Add other actions like edit, delete, multiple choice later -->
                         </div>
                     </li>
                 {% endfor %}
