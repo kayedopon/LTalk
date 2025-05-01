@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+
 from django.shortcuts import get_object_or_404
 
 from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
@@ -37,7 +39,52 @@ class ExerciseViewSet(ModelViewSet):
     
 
 class SubmitExerciseAPIView(APIView):
-    http_method_names = ['post']
+    http_method_names = ['post', 'get']
+
+    @extend_schema(
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'user_answers': {
+                        'type': 'object',
+                        'description': 'A dictionary of user answers keyed by question identifier.',
+                        'additionalProperties': {
+                            'type': 'string',
+                            'description': 'User’s answer to a specific question.'
+                        },
+                        'example': {
+                            "question_1": "Answer 1",
+                            "question_2": "Answer 2"
+                        }
+                    }
+                }
+            }
+        },
+        responses={
+            200: OpenApiResponse(
+                response=ExerciseProgressSerializer,
+                description="Returns exercise progress"
+            ),
+            400: OpenApiResponse(
+                description="Bad Request, if 'user_answers' is missing"
+            ),
+        },
+        description="Submit answers for an exercise"
+    )
+
+    def get(self, request, *args, **kwargs):
+        expected_json = {
+            "user_answers": {
+                "1": "manzana",
+                "2": "perro"
+            }
+        }
+        return Response({
+            "description": "This endpoint allows submitting exercise answers.",
+            "expected_json": expected_json
+        })
+
     def post(self, request, exercise_id):
         exercise = get_object_or_404(Exercise, id=exercise_id)
         user = request.user
@@ -88,6 +135,7 @@ class SubmitExerciseAPIView(APIView):
             "exercise_progress": [ExerciseProgressSerializer(progress).data],
             "is_correct": is_correct
         }, status=status.HTTP_200_OK)
+        
 
     def check_answer(self, user_answer, correct_answer, exercise_type):
         """Check if the user's answer matches the correct answer for the given exercise type"""

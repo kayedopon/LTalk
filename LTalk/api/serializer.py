@@ -64,7 +64,7 @@ class WordProgressSerializer(serializers.ModelSerializer):
 class ExerciseSerializer(serializers.ModelSerializer):
     questions = serializers.JSONField()
     correct_answers = serializers.JSONField()
-    
+
     class Meta:
         model = Exercise
         fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']
@@ -104,5 +104,5 @@ class ExerciseProgressSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         if 'is_correct' not in data:
-            raise serializers.ValidationError("The correctness of the answer ('is_correct') must be provided.")
+            raise serializers.ValidationError("The field 'is_correct' must be provided.")
         return data
