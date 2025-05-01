@@ -78,7 +78,6 @@ function displayResult(result) {
     form.method = 'post';
     const wordsList = document.createElement('ul');
     form.onsubmit = (e) => {
-        e.preventDefault();
         prepareWordsJSON();
         sendWordSet();
 
