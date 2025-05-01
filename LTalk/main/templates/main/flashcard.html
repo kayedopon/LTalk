@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flashcard Practice - {{ wordset.title }}</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Flashcard Practice: {{ wordset.title }}</h1>
+        <div id="flashcard-area">
+            <div class="loading">Loading flashcards...</div>
+            <!-- Flashcard will be inserted here by JS -->
+        </div>
+        <div id="controls-area" class="controls" style="display: none;">
+             <button id="incorrect-btn" class="incorrect-btn">Incorrect</button>
+             <button id="correct-btn" class="correct-btn">Correct</button>
+        </div>
+         <div id="summary" class="finished" style="display: none;">
+            Practice Complete!
+            <p>Correct: <span id="correct-count">0</span></p>
+            <p>Incorrect: <span id="incorrect-count">0</span></p>
+            <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Pass data to JavaScript -->
+    <script>
+        const wordsetId = {{ wordset_id }};
+        const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
+    </script>
+    <script src="{% static 'main/js/flashcard.js' %}" defer></script>
+</body>
+</html>
