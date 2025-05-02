@@ -15,6 +15,7 @@
         <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
         <p><strong>Visibility:</strong> {{ wordset.public|yesno:"Public,Private" }}</p>
         <div class="word-set-actions"> 
+            <a href="{% url 'fill_in_the_gap_practice' wordset.id %}" class="btn btn-secondary">Practice Fill Gap</a>
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Practice Flashcards</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
         </div>

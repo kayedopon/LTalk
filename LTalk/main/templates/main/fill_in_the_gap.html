@@ -1,0 +1,43 @@
+<!-- filepath: c:\studies\vgtu\1_year\oop\LTalk\LTalk\LTalk\main\templates\main\fill_in_the_gap.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fill in the Gap - {{ wordset.title }}</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/fill_gap.css' %}"> <!-- Add specific CSS -->
+</head>
+<body>
+    <div class="container">
+        <h1>Fill in the Gap: {{ wordset.title }}</h1>
+
+        <div id="exercise-area">
+            <div class="loading">Loading exercise...</div>
+            <!-- Exercise content will be inserted here by JS -->
+            <div id="question-display" style="display: none;">
+                <p id="sentence-template" class="sentence"></p>
+                <input type="text" id="user-answer-input" placeholder="Type the missing word">
+                <button id="submit-answer-btn" class="btn btn-primary">Submit Answer</button>
+            </div>
+            <div id="feedback-area" class="feedback" style="display: none;"></div>
+            <div id="explanation-area" class="explanation" style="display: none;"></div>
+        </div>
+
+         <div id="summary-area" class="finished" style="display: none;">
+            Exercise Complete!
+            <p>Final Grade: <span id="final-grade">N/A</span></p>
+            <div id="final-explanation" class="explanation"></div> <!-- Area for final explanation if needed -->
+            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Back to Word Set</a>
+            <a href="{% url 'fill_in_the_gap_practice' wordset.id %}" class="btn btn-primary">Try Again</a>
+        </div>
+    </div>
+
+    <!-- Pass data to JavaScript -->
+    <script>
+        const wordsetId = {{ wordset_id }};
+        const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
+    </script>
+    <script src="{% static 'main/js/fill_gap.js' %}" defer></script>
+</body>
+</html>

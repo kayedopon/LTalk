@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework import status
+from rest_framework import status, serializers
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
@@ -17,6 +17,9 @@ import PIL.Image
 from dotenv import load_dotenv
 import os
 import json
+from random import sample
+from .gemini_utils import generate_fill_in_gap_exercise, get_gemini_explanation # Import helpers
+from django.db import models
 
 
 class WordViewSet(ModelViewSet):
@@ -112,46 +115,62 @@ class ExerciseViewSet(ModelViewSet):
             correct_answers[str(i)] = word.translation
         return questions, correct_answers
 
-    @transaction.atomic # Ensure atomicity
+    def _generate_fill_in_gap_data(self, wordset, num_questions=5):
+        """Generates questions and answers for fill-in-the-gap."""
+        words = list(wordset.words.all())
+        if not words:
+            return {}, {}
+
+        # Select a sample of words
+        selected_words = sample(words, min(len(words), num_questions))
+
+        questions = {}
+        correct_answers = {}
+        q_index = 1
+        for word in selected_words:
+            generated_data = generate_fill_in_gap_exercise(word.infinitive)
+            if generated_data:
+                q_key = str(q_index)
+                questions[q_key] = {"sentence_template": generated_data['sentence_template']}
+                correct_answers[q_key] = generated_data['correct_form']
+                q_index += 1
+
+        return questions, correct_answers
+
+    @transaction.atomic
     def perform_create(self, serializer):
         wordset = serializer.validated_data['wordset']
         exercise_type = serializer.validated_data['type']
-        user = self.request.user
+        user = self.request.user # Needed for potential future use
 
-        # Check if a flashcard exercise already exists. If so, we might not need to create another.
-        # The get_queryset logic above should handle returning the existing one with updated words.
-        # However, the JS logic tries GET then POST, so POST might still be called.
-        # We can decide whether to return the existing one or create a new one.
-        # For simplicity, let's prevent creating duplicates explicitly here if needed.
-        existing_exercise = Exercise.objects.filter(
-            wordset=wordset,
-            type=exercise_type,
-            # Optionally filter by user if exercises are user-specific, but they seem tied to wordset
-        ).first()
-
-        # If an exercise exists, maybe we don't need to create a new one.
-        # The JS will fetch it via GET, and get_queryset will add dynamic questions.
-        # If we *always* want a new history entry, then creating is fine.
-        # Let's assume creating is okay for now, but this might lead to multiple Exercise objects.
+        # Prevent creating duplicates if an exercise of the same type exists? Optional.
+        # existing_exercise = Exercise.objects.filter(wordset=wordset, type=exercise_type).first()
         # if existing_exercise:
-        #    serializer.instance = existing_exercise # Hacky: reuse instance? Not ideal.
-        #    return # Or raise validation error?
+        #     # Return existing or raise error? Depends on desired behavior.
+        #     # For now, allow multiple exercises of the same type.
+        #     pass
 
-        # Generate questions/answers ONLY if they are not provided AND type is flashcard
-        if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
-            # Get only unlearned words for the current user
+        questions = serializer.validated_data.get('questions')
+        correct_answers = serializer.validated_data.get('correct_answers')
+
+        # Generate data if not provided and type requires it
+        if exercise_type == 'flashcard' and not questions:
+            # Generate flashcard data (using existing or adapted logic)
+            # Assuming _get_unlearned_words and _generate_flashcard_data exist
             unlearned_words = self._get_unlearned_words(wordset, user)
             questions, correct_answers = self._generate_flashcard_data(unlearned_words)
+            serializer.save(questions=questions, correct_answers=correct_answers)
 
-            # Save the exercise instance with the generated (filtered) data
-            serializer.save(
-                questions=questions,
-                correct_answers=correct_answers
-                # user=user # Associate user if Exercise model changes
-            )
+        elif exercise_type == 'fill_in_the_gap' and not questions:
+            # Generate fill-in-the-gap data
+            questions, correct_answers = self._generate_fill_in_gap_data(wordset)
+            if not questions: # Handle case where generation failed or no words
+                 raise serializers.ValidationError("Could not generate fill-in-the-gap questions for this wordset.")
+            serializer.save(questions=questions, correct_answers=correct_answers)
+
         else:
-             # For other types or if questions are provided, save normally
-             serializer.save() # user=user if needed
+            # Save normally if data was provided or type doesn't need generation
+            serializer.save()
     
 
 class SubmitExerciseAPIView(APIView):
@@ -201,62 +220,105 @@ class SubmitExerciseAPIView(APIView):
             "expected_json": expected_json
         })
 
+    @transaction.atomic # Wrap in transaction
     def post(self, request, exercise_id):
         exercise = get_object_or_404(Exercise, id=exercise_id)
         user = request.user
+        user_answers_dict = request.data.get('user_answers') # Expecting {'q_key': 'answer'}
 
-        user_answers = request.data.get('user_answers')  
-        if not user_answers:
-            return Response({"error": "'user_answers' is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not user_answers_dict or not isinstance(user_answers_dict, dict):
+            return Response({"error": "'user_answers' must be a dictionary."}, status=status.HTTP_400_BAD_REQUEST)
 
-       
-        is_correct = True  
-        correct = 0
-        incorrect = 0
-        
-        related_words = exercise.wordset.words.all()
+        overall_correct = True
+        total_questions = len(exercise.questions)
+        correct_count = 0
+        progress_entries = [] # Store progress entries to return
 
-        for key, _ in exercise.questions.items():
-            user_answer = user_answers.get(key)
-            correct_answer = exercise.correct_answers[key]
-            question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
+        # Use prefetch_related for efficiency if accessing wordset.words often
+        exercise = Exercise.objects.prefetch_related('wordset__words').get(id=exercise_id)
+        word_map = {w.infinitive: w for w in exercise.wordset.words.all()} # Map for easier lookup if needed
 
-            if question_is_correct:
-                correct += 1
+        for q_key, question_data in exercise.questions.items():
+            user_answer = user_answers_dict.get(q_key)
+            correct_answer = exercise.correct_answers.get(q_key)
+            explanation = None # Reset explanation for this question
+
+            if user_answer is None or correct_answer is None:
+                # Handle missing answer or question data - maybe skip or mark incorrect
+                question_is_correct = False
+                overall_correct = False
+                # explanation = "Question data missing or answer not provided." # Keep explanation None here
             else:
-                incorrect += 1
-                is_correct = False
+                question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
 
-            word = related_words.filter(translation__iexact=correct_answer).first()
-            wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
-            wp.update_progress(question_is_correct)
+                if question_is_correct:
+                    correct_count += 1
+                else:
+                    overall_correct = False
+                    # Get explanation only if incorrect and it's fill_in_the_gap
+                    if exercise.type == 'fill_in_the_gap':
+                         sentence_template = question_data.get('sentence_template', '')
+                         # Ensure all required args are passed to get_gemini_explanation
+                         explanation = get_gemini_explanation(sentence_template, correct_answer, user_answer)
+                         last_explanation = explanation # Store the most recent explanation
+            related_word = None
+            if correct_answer: # Only proceed if we have a correct answer to look up
+                possible_words = exercise.wordset.words.filter(
+                    models.Q(translation__iexact=correct_answer) |
+                    models.Q(infinitive__iexact=correct_answer) |
+                    models.Q(word__iexact=correct_answer)
+                )
+                if possible_words.exists():
+                    related_word = possible_words.first()
 
-        print(correct, incorrect)
+            if related_word:
+                wp, _ = WordProgress.objects.get_or_create(user=user, word=related_word, defaults={'user': user, 'word': related_word})
+                wp.update_progress(question_is_correct) # Use the method from WordProgress model
+            else:
+                # Avoid printing excessive warnings if correct_answer was None initially
+                if correct_answer:
+                    print(f"Warning: Could not find related Word for answer '{correct_answer}' in exercise {exercise.id}, question key {q_key}")
+            # --- End WordProgress Update ---
+
+        # <<< --- ADD THIS MISSING CODE --- >>>
+        # Create a single ExerciseProgress entry for the entire submission attempt
         progress = ExerciseProgress.objects.create(
             user=user,
             exercise=exercise,
-            user_answer=user_answers,
-            is_correct=is_correct,
-            grade=f"{correct}/{correct + incorrect}" if (correct + incorrect) > 0 else "0/0"
+            user_answer=user_answers_dict, # Store all answers submitted
+            is_correct=overall_correct,
+            grade=f"{correct_count}/{total_questions}" if total_questions > 0 else "0/0",
+            # Store the last explanation generated if the overall result was incorrect
+            explanation=last_explanation if not overall_correct else None
         )
+        progress_entries.append(progress)
+
+        # Return the list of progress entries (currently just one)
         return Response({
-            "exercise_progress": [ExerciseProgressSerializer(progress).data],
-            "is_correct": is_correct
+            "exercise_progress": ExerciseProgressSerializer(progress_entries, many=True).data,
+            "overall_correct": overall_correct # Indicate if the whole attempt was correct
         }, status=status.HTTP_200_OK)
-        
 
     def check_answer(self, user_answer, correct_answer, exercise_type):
-        """Check if the user's answer matches the correct answer for the given exercise type"""
-        
+        """Check if the user's answer matches the correct answer."""
+        # Normalize answers (lowercase, strip whitespace) for comparison
+        user_answer_norm = str(user_answer).strip().lower() if user_answer is not None else ""
+        correct_answer_norm = str(correct_answer).strip().lower()
+
         if exercise_type == 'multiple_choice':
+            # Assuming correct_answer could be a list or single value
             if isinstance(correct_answer, list):
-                return user_answer in correct_answer 
+                return user_answer_norm in [str(ca).strip().lower() for ca in correct_answer]
             else:
-                return user_answer == correct_answer 
-        
+                return user_answer_norm == correct_answer_norm
         elif exercise_type == 'flashcard':
-            return user_answer == correct_answer
-        
+             # Flashcard 'correct' button means user_answer matches correct_answer implicitly
+             # The submitted user_answer for 'correct' should be the correct_answer itself.
+             return user_answer_norm == correct_answer_norm
+        elif exercise_type == 'fill_in_the_gap':
+             # Direct comparison for fill-in-the-gap
+             return user_answer_norm == correct_answer_norm
+
         return False
 
 

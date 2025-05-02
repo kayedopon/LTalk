@@ -114,8 +114,8 @@ class ExerciseSerializer(serializers.ModelSerializer):
 class ExerciseProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExerciseProgress
-        fields = ['id', 'user', 'exercise', 'user_answer', 'is_correct', 'answered_at', 'grade']
-        read_only_fields = ['id', 'answered_at']
+        fields = ['id', 'user', 'exercise', 'user_answer', 'is_correct', 'answered_at', 'grade', 'explanation']
+        read_only_fields = ['id', 'answered_at', 'explanation']
 
     def validate_user_answer(self, value):
         if not value:

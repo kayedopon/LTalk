@@ -54,6 +54,7 @@ class Exercise(models.Model):
     EXERCISE_TYPES = [
         ('flashcard', 'Flash Card'),
         ('multiple_choice', 'Multiple Choice'),
+        ('fill_in_the_gap', 'Fill in the Gap'),
     ]
     wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='exercises')
     type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
@@ -71,6 +72,7 @@ class ExerciseProgress(models.Model):
     is_correct = models.BooleanField(default=False)
     answered_at = models.DateTimeField(auto_now_add=True)
     grade = models.CharField()
+    explanation = models.TextField(blank=True, null=True) # To store Gemini's explanation
 
     def __str__(self):
         return f"{self.user} - {self.exercise} - {'Correct' if self.is_correct else 'Incorrect'}"

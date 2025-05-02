@@ -73,3 +73,12 @@ def exercise_history(request, id):
         "exercise_types": Exercise.EXERCISE_TYPES 
     }
     return render(request, 'exercise_history.html', context=context)
+
+@login_required(login_url='login')
+def fill_in_the_gap_practice(request, wordset_id):
+    wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
+    context = {
+        'wordset': wordset,
+        'wordset_id': wordset_id,
+    }
+    return render(request, "fill_in_the_gap.html", context)
