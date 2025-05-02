@@ -82,10 +82,6 @@ body {
     color: #4CAF50;
 }
 
-.word-set-title:hover {
-    text-decoration: underline;
-}
-
 .word-set-details {
     display: flex;
     align-items: center;

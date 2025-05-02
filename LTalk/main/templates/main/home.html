@@ -14,8 +14,8 @@
             <ul class="wordsets-list">
                 {% for ws in wordsets %}
                     <li class="word-set">
-                        <div class="word-set-info"> <!-- Wrap title and details -->
-                            <a href="{% url 'wordset_detail' ws.id %}" class="word-set-title">{{ ws.title }}</a>
+                        <div class="word-set-info" data-id="{{ ws.pk }}" style="cursor: pointer;"> <!-- Wrap title and details -->
+                            <h8 class="word-set-title">{{ ws.title }}</h8>
                             <div class="word-set-details">
                                 <span class="word-count">{{ ws.words.count }} words</span> <!-- Use actual count -->
                                 <!-- Progress calculation needs backend logic -->
@@ -37,5 +37,14 @@
             <p class="no-wordsets">You have no word sets yet.</p>
         {% endif %}
     </div>
+
+    <script>
+  document.querySelectorAll(".word-set-info").forEach(function(block) {
+    block.addEventListener("click", function() {
+      const id = this.getAttribute("data-id");
+      window.location.href = `/wordset/${id}/`;  
+    });
+  });
+</script>
 </body>
 </html>
