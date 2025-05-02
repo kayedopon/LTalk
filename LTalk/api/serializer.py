@@ -62,7 +62,6 @@ class WordProgressSerializer(serializers.ModelSerializer):
     
 
 class ExerciseSerializer(serializers.ModelSerializer):
-    # Make fields optional for creation if type is flashcard
     questions = serializers.JSONField(required=False)
     correct_answers = serializers.JSONField(required=False)
 
@@ -79,30 +78,34 @@ class ExerciseSerializer(serializers.ModelSerializer):
         questions = data.get('questions')
         correct_answers = data.get('correct_answers')
         wordset = data.get('wordset')
+        is_creating = self.instance is None
 
         # If creating a flashcard exercise and questions/answers are missing, it's okay (view handles it)
-        if self.instance is None and exercise_type == 'flashcard' and not questions and not correct_answers:
-             if not wordset or not wordset.words.exists():
-                  raise serializers.ValidationError("Cannot create flashcard exercise for an empty wordset.")
-             # Validation passes here, view will generate content
+        if is_creating and exercise_type == 'flashcard' and not questions and not correct_answers:
+             if not wordset:
+                  raise serializers.ValidationError("Wordset is required to create a flashcard exercise.")
              return data
 
         # Standard validation if not a flashcard or if data is provided
-        if not isinstance(questions, dict):
-            raise serializers.ValidationError({'questions': "Must be a dictionary."})
-        if not isinstance(correct_answers, dict):
-            raise serializers.ValidationError({'correct_answers': "Must be a dictionary."})
+        # Ensure questions/answers are dicts if provided
+        if questions is not None and not isinstance(questions, dict):
+             raise serializers.ValidationError({'questions': "Must be a dictionary if provided."})
+        if correct_answers is not None and not isinstance(correct_answers, dict):
+             raise serializers.ValidationError({'correct_answers': "Must be a dictionary if provided."})
 
-        if not questions:
-            raise serializers.ValidationError({'questions': "Cannot be empty."})
-        if not correct_answers:
-            raise serializers.ValidationError({'correct_answers': "Cannot be empty."})
+        # If questions/answers are provided (e.g., for non-flashcard types or explicit creation)
+        if questions is not None or correct_answers is not None:
+            if not questions: # Check if one is provided but not the other
+                 raise serializers.ValidationError({'questions': "Cannot be empty if correct_answers is provided."})
+            if not correct_answers:
+                 raise serializers.ValidationError({'correct_answers': "Cannot be empty if questions is provided."})
 
-        if set(questions.keys()) != set(correct_answers.keys()):
-            raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match.")
+            if set(questions.keys()) != set(correct_answers.keys()):
+                raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match when provided.")
 
         # Optional: Check for existing exercise if unique_together is not set
-        # if self.instance is None and Exercise.objects.filter(wordset=wordset, type=exercise_type).exists():
+        # This check might be better placed in the view's perform_create
+        # if is_creating and Exercise.objects.filter(wordset=wordset, type=exercise_type).exists():
         #     raise serializers.ValidationError("An exercise of this type already exists for this wordset.")
 
         return data
