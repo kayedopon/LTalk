@@ -38,6 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryArea.style.display = 'none';
     }
 
+    // Fisher-Yates (Knuth) Shuffle algorithm
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+    }
+
     function createFlashcard(frontText, backText) {
         const container = document.createElement('div');
         container.className = 'flashcard-container';
@@ -64,24 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const questionKey = Object.keys(exercise.questions)[currentQuestionIndex];
-        const questionData = exercise.questions[questionKey];
+        // Use the shuffled questions array directly
+        const questionData = questions[currentQuestionIndex];
+        // const questionKey = questionData.key; // We need the original key for userAnswers
 
         flashcardArea.innerHTML = ''; // Clear previous card
         currentCardElement = createFlashcard(questionData.front, questionData.back);
         flashcardArea.appendChild(currentCardElement);
         controlsArea.style.display = 'block'; // Show controls
     }
-
     function recordAnswer(isCorrect) {
-        const questionKey = Object.keys(exercise.questions)[currentQuestionIndex];
-        // Submit what the user actually did
+        // Use the key from the shuffled questions array
+        const questionKey = questions[currentQuestionIndex].key;
         if (isCorrect) {
             userAnswers[questionKey] = exercise.correct_answers[questionKey];
             correctAnswersCount++;
         } else {
-            // Use a special value or leave blank to indicate incorrect
-            userAnswers[questionKey] = ""; // or null
+            userAnswers[questionKey] = "";
             incorrectAnswersCount++;
         }
         currentQuestionIndex++;
@@ -123,11 +130,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (exercise && exercise.questions) {
-                questions = Object.values(exercise.questions);
+                // Convert questions object into an array of objects, preserving the key
+                questions = Object.entries(exercise.questions).map(([key, value]) => ({
+                    key: key, // Store the original key
+                    front: value.front,
+                    back: value.back
+                }));
+                console.log("Questions array before shuffle:", JSON.stringify(questions.map(q => q.front))); // Log before shuffle
                 if (questions.length === 0) {
                     displayError("This word set has no words to practice.");
                     return;
                 }
+                // Shuffle the questions array
+                shuffleArray(questions);
+                console.log("Questions array AFTER shuffle:", JSON.stringify(questions.map(q => q.front))); // Log after shuffle
                 showNextCard();
             } else {
                 throw new Error("Exercise data is missing questions.");
