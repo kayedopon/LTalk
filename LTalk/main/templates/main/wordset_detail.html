@@ -16,6 +16,7 @@
         <p><strong>Visibility:</strong> {{ wordset.public|yesno:"Public,Private" }}</p>
         <div class="word-set-actions"> 
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Practice Flashcards</a>
+            <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
         </div>
     
         <h2 class="section-subtitle">Words in this Set</h2>

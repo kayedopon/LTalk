@@ -171,6 +171,7 @@ class SubmitExerciseAPIView(APIView):
                 correct += 1
             else:
                 incorrect += 1
+                is_correct = False
 
             word = related_words.filter(translation__iexact=correct_answer).first()
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)

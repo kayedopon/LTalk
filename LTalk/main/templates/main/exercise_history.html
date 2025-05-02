@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise History - {{ wordset.title }}</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/history.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="history-header">
+            <div class="left-button">
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+            </div>
+            <h1 class="center-title">Exercise History: {{ wordset.title }}</h1>
+        </div>
+
+        <div class="type-selector" id="type-selector">
+            {% for type_code, type_label in exercise_types %}
+                <div class="type-button" data-type="{{ type_code }}">{{ type_label }}</div>
+            {% endfor %}
+        </div>
+        
+        {% for type_code, exercises in grouped_exercises.items %}
+            <div class="progress-list" data-type="{{ type_code }}">
+                <h3>{{ type_code|capfirst }} Attempts</h3>
+                {% for exercise in exercises %}
+                    {% for entry in exercise.progress_entries.all %}
+                        {% if entry.user == request.user %}
+                            <div class="progress-entry">
+                                <strong>{{ entry.answered_at|date:"Y-m-d H:i" }}</strong> -
+                                {{ exercise }}:
+                                    {% if entry.is_correct %}
+                                        <span class="correct">correct</span>
+                                    {% else %}
+                                    <span class="incorrect">incorrect</span>
+                                    {% endif %}
+                                </span>
+                                (Grade: {{ entry.grade }})
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+    </div>
+    <script src="{% static 'main/js/exercise_history.js' %}" defer></script>
+</body>
+</html>

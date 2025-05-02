@@ -55,3 +55,21 @@ def flashcard_practice(request, wordset_id):
 def wordset_detail(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
     return render(request, 'wordset_detail.html', {'wordset': wordset})
+
+from collections import defaultdict
+
+@login_required(login_url='login')
+def exercise_history(request, id):
+    wordset = get_object_or_404(WordSet, pk=id)
+    exercises = wordset.exercises.prefetch_related('progress_entries')
+    
+    grouped_exercises = defaultdict(list)
+    for exercise in exercises:
+        grouped_exercises[exercise.type].append(exercise)
+
+    context = {
+        "wordset": wordset,
+        "grouped_exercises": dict(grouped_exercises),
+        "exercise_types": Exercise.EXERCISE_TYPES 
+    }
+    return render(request, 'exercise_history.html', context=context)
