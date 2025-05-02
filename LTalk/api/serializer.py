@@ -69,7 +69,6 @@ class ExerciseSerializer(serializers.ModelSerializer):
         model = Exercise
         fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']
         read_only_fields = ['id']
-        # Optional: Add unique_together constraint if needed
         # unique_together = ('wordset', 'type')
 
 
@@ -86,7 +85,6 @@ class ExerciseSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Cannot create exercise for an empty wordset.")
             return data  # allow view to auto-generate
 
-        # Standard validation if not a flashcard or if data is provided
         # Ensure questions/answers are dicts if provided
         if questions is not None and not isinstance(questions, dict):
              raise serializers.ValidationError({'questions': "Must be a dictionary if provided."})
@@ -102,11 +100,6 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
             if set(questions.keys()) != set(correct_answers.keys()):
                 raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match when provided.")
-
-        # Optional: Check for existing exercise if unique_together is not set
-        # This check might be better placed in the view's perform_create
-        # if is_creating and Exercise.objects.filter(wordset=wordset, type=exercise_type).exists():
-        #     raise serializers.ValidationError("An exercise of this type already exists for this wordset.")
 
         return data
     

@@ -63,41 +63,31 @@ class ExerciseViewSet(ModelViewSet):
 
     serializer_class = ExerciseSerializer
     queryset = Exercise.objects.all()
-    # Allow POST for creation
     http_method_names = ['get', 'post', 'head', 'options']
 
-    # Filter exercises by wordset and type if query parameters are provided
     def get_queryset(self):
         queryset = super().get_queryset()
         wordset_id = self.request.query_params.get('wordset')
         exercise_type = self.request.query_params.get('type')
-        user = self.request.user # Get current user
+        user = self.request.user
 
         if wordset_id:
             queryset = queryset.filter(wordset_id=wordset_id)
         if exercise_type:
             queryset = queryset.filter(type=exercise_type)
 
-        # Ensure only exercises belonging to the user's wordsets are returned
         queryset = queryset.filter(wordset__user=user)
 
-        # If fetching flashcards, dynamically add filtered questions/answers
-        # Note: This modifies the queryset objects *before* serialization.
-        # This approach might be less clean than modifying the serializer's representation.
-        # Consider modifying the serializer or list/retrieve methods for a cleaner separation.
         if exercise_type == 'flashcard':
              for exercise in queryset:
                  filtered_words = self._get_unlearned_words(exercise.wordset, user)
                  questions, correct_answers = self._generate_flashcard_data(filtered_words)
-                 # Attach dynamically generated data to the instance for the serializer to pick up
-                 # This assumes the serializer fields are not read_only for this purpose.
-                 # If they are read_only, this won't work directly.
                  exercise.questions = questions
                  exercise.correct_answers = correct_answers
 
         return queryset
 
-    def create_questions(self, data):
+    def _create_questions(self, data):
         prompt_text = (
             "Use the given list of Lithuanian words with their English translations to generate multiple choice questions. "
             "Each question should use the Lithuanian word as the question and provide four English answer options: "
@@ -145,9 +135,8 @@ class ExerciseViewSet(ModelViewSet):
         """Helper to get words not yet learned by the user."""
         all_words = wordset.words.all()
         if not all_words.exists():
-            return Word.objects.none() # Return empty queryset if no words
+            return Word.objects.none() 
 
-        # Get progress for the user for words in this set
         progress_map = {
             wp.word_id: wp.is_learned
             for wp in WordProgress.objects.filter(user=user, word__in=all_words)
@@ -168,68 +157,54 @@ class ExerciseViewSet(ModelViewSet):
         for i, word in enumerate(words):
             questions[str(i)] = {"front": word.word, "back": word.translation}
             correct_answers[str(i)] = word.translation
-        return questions, correct_answers
-
+        return questions, correct_answers 
+    
     @transaction.atomic # Ensure atomicity
     def perform_create(self, serializer):
         wordset = serializer.validated_data['wordset']
         exercise_type = serializer.validated_data['type']
         user = self.request.user
 
-        # Check if a flashcard exercise already exists. If so, we might not need to create another.
-        # The get_queryset logic above should handle returning the existing one with updated words.
-        # However, the JS logic tries GET then POST, so POST might still be called.
-        # We can decide whether to return the existing one or create a new one.
-        # For simplicity, let's prevent creating duplicates explicitly here if needed.
         existing_exercise = Exercise.objects.filter(
             wordset=wordset,
             type=exercise_type,
-            # Optionally filter by user if exercises are user-specific, but they seem tied to wordset
-        ).first()
+        )
 
-        # If an exercise exists, maybe we don't need to create a new one.
-        # The JS will fetch it via GET, and get_queryset will add dynamic questions.
-        # If we *always* want a new history entry, then creating is fine.
-        # Let's assume creating is okay for now, but this might lead to multiple Exercise objects.
-        # if existing_exercise:
-        #    serializer.instance = existing_exercise # Hacky: reuse instance? Not ideal.
-        #    return # Or raise validation error?
+        if not existing_exercise.exists():
+            if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
+                # Get only unlearned words for the current user
+                unlearned_words = self._get_unlearned_words(wordset, user)
+                questions, correct_answers = self._generate_flashcard_data(unlearned_words)
 
-        # Auto-generate questions/answers if not provided, specifically for flashcards
-        if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
-            # Get only unlearned words for the current user
-            unlearned_words = self._get_unlearned_words(wordset, user)
-            questions, correct_answers = self._generate_flashcard_data(unlearned_words)
+                serializer.save(
+                    questions=questions,
+                    correct_answers=correct_answers
+                )
 
-            # Save the exercise instance with the generated (filtered) data
-            serializer.save(
-                questions=questions,
-                correct_answers=correct_answers
-                # user=user # Associate user if Exercise model changes
-            )
+            if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
+                words = wordset.words.all()
+                response = self._create_questions(words)
 
-        if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
-            words = wordset.words.all()
-            response = self.create_questions(words)
+                if response.status_code != 200:
+                    raise Exception("Failed to generate questions")
+                
+                questions_list = response.data.get('questions', [])
+                questions = {}
+                correct_answers = {}
 
-            if response.status_code != 200:
-                raise Exception("Failed to generate questions")
-            print('111')
-            questions_list = response.data.get('questions', [])
+                for i, item in enumerate(questions_list):
+                    questions[str(i)] = {
+                        "question": item["question"],
+                        "choices": item["choices"]
+                    }
+                    correct_answers[str(i)] = item["correct"]
 
-            questions = {}
-            correct_answers = {}
-
-            for i, item in enumerate(questions_list):
-                questions[str(i)] = {
-                    "question": item["question"],
-                    "choices": item["choices"]
-                }
-                correct_answers[str(i)] = item["correct"]
-            serializer.instance = serializer.save(
-                questions=questions,
-                correct_answers=correct_answers
-            )
+                serializer.instance = serializer.save(
+                    questions=questions,
+                    correct_answers=correct_answers
+                )
+            else:
+                serializer.save()
         else:
             serializer.save()
 

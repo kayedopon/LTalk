@@ -180,11 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const result = await response.json();
                 console.log("Submission successful:", result);
-                // Optionally update UI based on result.is_correct or progress
             } else {
                 const errorData = await response.json();
                 console.error("Submission failed:", errorData);
-                // Optionally display an error message on the summary page
+                
                 const summaryP = summaryArea.querySelector('p'); // Find a place to add error
                 if (summaryP) {
                     const errorDiv = document.createElement('div');
@@ -205,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners ---
     correctBtn.addEventListener('click', () => recordAnswer(true));
     incorrectBtn.addEventListener('click', () => recordAnswer(false));
 
