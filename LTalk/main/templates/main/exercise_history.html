@@ -9,7 +9,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Exercise History: {{ wordset.title }}</h1>
+        <div class="history-header">
+            <div class="left-button">
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+            </div>
+            <h1 class="center-title">Exercise History: {{ wordset.title }}</h1>
+        </div>
 
         <div class="type-selector" id="type-selector">
             {% for type_code, type_label in exercise_types %}
