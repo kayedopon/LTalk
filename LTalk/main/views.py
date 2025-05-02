@@ -52,6 +52,16 @@ def flashcard_practice(request, wordset_id):
     return render(request, "flashcard.html", context)
 
 @login_required(login_url='login')
+def m_choice_practice(request, id):
+    wordset = get_object_or_404(WordSet, id=id, user=request.user)
+
+    context = {
+        'wordset': wordset,
+        'wordset_id': id,
+    }
+    return render(request, "m_choice.html", context)
+
+@login_required(login_url='login')
 def wordset_detail(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
     return render(request, 'wordset_detail.html', {'wordset': wordset})
