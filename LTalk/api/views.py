@@ -107,34 +107,98 @@ class ExerciseViewSet(ModelViewSet):
             correct_answers[str(i)] = word.translation
         return questions, correct_answers
 
+    # Replace the _generate_fill_in_gap_data method in ExerciseViewSet in LTalk/api/views.py:
+
     def _generate_fill_in_gap_data(self, words):
-        """Generates fill-in-the-gap questions and answers"""
+        """Generates fill-in-the-gap questions and answers with rate limiting"""
         questions = {}
         correct_answers = {}
         
-        # No need for API key configuration here since it's done at module level
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        from main.models import SentenceTemplate
+        import time
+        import random
+        from datetime import datetime, timedelta
+        
+        # Rate limiting management
+        MAX_CALLS_PER_MINUTE = 15
+        SAFE_LIMIT = 12  # Stay a bit under the limit for safety
+        
+        # Keep track of API calls with timestamps
+        if not hasattr(self.__class__, '_api_call_timestamps'):
+            self.__class__._api_call_timestamps = []
+        
+        # Clean up old timestamps (older than 1 minute)
+        now = datetime.now()
+        one_minute_ago = now - timedelta(minutes=1)
+        self.__class__._api_call_timestamps = [
+            ts for ts in self.__class__._api_call_timestamps 
+            if ts > one_minute_ago
+        ]
+        
+        # Count recent API calls (within the last minute)
+        recent_calls = len(self.__class__._api_call_timestamps)
         
         for i, word in enumerate(words):
-            # Create a prompt to generate a Lithuanian sentence with a gap
+            # Check if we're approaching the rate limit
+            approaching_limit = recent_calls >= SAFE_LIMIT
+            
+            if approaching_limit:
+                # We're close to the rate limit, use a stored template if available
+                templates = SentenceTemplate.objects.filter(word=word)
+                
+                if templates.exists():
+                    # Use a stored template
+                    template = random.choice(list(templates))
+                    
+                    questions[str(i)] = {
+                        "sentence": template.sentence,
+                        "word": word.word,
+                        "infinitive": word.infinitive,
+                        "translation": word.translation
+                    }
+                    correct_answers[str(i)] = template.correct_form
+                    
+                    print(f"Using stored template for '{word.word}' (rate limit approaching)")
+                    continue
+                
+                # If no template is available and we're at the limit, wait
+                if recent_calls >= MAX_CALLS_PER_MINUTE:
+                    # Calculate how long to wait
+                    oldest_call = min(self.__class__._api_call_timestamps)
+                    wait_time = 60 - (now - oldest_call).total_seconds()
+                    if wait_time > 0:
+                        print(f"Rate limit reached, waiting {wait_time:.2f} seconds")
+                        time.sleep(wait_time + 1)  # Add 1 second buffer
+                    
+                    # Reset recent calls counter
+                    self.__class__._api_call_timestamps = []
+                    recent_calls = 0
+            
+            # Generate a new sentence via API
+            model = genai.GenerativeModel('gemini-2.0-flash')
+            
             prompt = f"""
-            Create a beginner-friendly sentence in Lithuanian using the word '{word.word}' (which means '{word.translation}' in English).
-            It should be very clear from the context what the word is.
-            The sentence should use this word in its proper grammatical form (not necessarily the basic form).
-            For example, if the word is a noun, the sentence should use different case than the basic form.
-            If the word is a verb, the sentence should use different tense or person than the basic form.
-            Replace the word with a gap indicated by '___'.
-            Format your response as a JSON object with the following structure:
+            Create a beginner-friendly, complete Lithuanian sentence using the word '{word.word}' (which means '{word.translation}' in English).
+            - The sentence must be clear and understandable, with enough context for a language learner.
+            - Use the word in a grammatically correct, but not basic, form (e.g., different case for nouns, different tense/person for verbs).
+            - Replace the word with a gap indicated by '___'.
+            - Do NOT return an empty or placeholder sentence.
+            - Do NOT return only the word or a fragment.
+            - Example output:
             {{
-                "sentence": "Example Lithuanian sentence with ___ (gap).",
-                "correct_form": "correctWord"
+                "sentence": "Man patinka keliauti su ___ per upę.",
+                "correct_form": "keltu"
             }}
-            Do not add any explanation to your response.
+            Format your response as a JSON object with the fields 'sentence' and 'correct_form'. Do not add any explanation.
             """
             
             try:
                 response = model.generate_content(prompt)
                 response_text = response.text.strip()
+                
+                # Record this API call for rate limiting
+                self.__class__._api_call_timestamps.append(datetime.now())
+                recent_calls += 1
                 
                 # Extract the JSON from the response
                 import re
@@ -144,6 +208,16 @@ class ExerciseViewSet(ModelViewSet):
                     sentence = data.get("sentence", "")
                     correct_form = data.get("correct_form", word.word)
                     
+                    # Store or update the template for future fallback
+                    if sentence and sentence != f"___ (using: {word.word}).":
+                        SentenceTemplate.objects.update_or_create(
+                            word=word,
+                            defaults={
+                                'sentence': sentence,
+                                'correct_form': correct_form
+                            }
+                        )
+                    
                     questions[str(i)] = {
                         "sentence": sentence,
                         "word": word.word,
@@ -152,7 +226,46 @@ class ExerciseViewSet(ModelViewSet):
                     }
                     correct_answers[str(i)] = correct_form
                 else:
-                    # Fallback if JSON extraction fails
+                    # JSON extraction failed, check for fallback from database
+                    template = SentenceTemplate.objects.filter(word=word).first()
+                    
+                    if template:
+                        # Use stored template as fallback
+                        questions[str(i)] = {
+                            "sentence": template.sentence,
+                            "word": word.word,
+                            "infinitive": word.infinitive,
+                            "translation": word.translation
+                        }
+                        correct_answers[str(i)] = template.correct_form
+                        print(f"Using stored template for '{word.word}' (parsing failed)")
+                    else:
+                        # No stored template, use basic fallback
+                        questions[str(i)] = {
+                            "sentence": f"___ (using: {word.word}).",
+                            "word": word.word,
+                            "infinitive": word.infinitive,
+                            "translation": word.translation
+                        }
+                        correct_answers[str(i)] = word.word
+            except Exception as e:
+                print(f"Error generating fill-in-gap question for '{word.word}': {e}")
+                
+                # Error occurred, check for fallback from database
+                template = SentenceTemplate.objects.filter(word=word).first()
+                
+                if template:
+                    # Use stored template as fallback
+                    questions[str(i)] = {
+                        "sentence": template.sentence, 
+                        "word": word.word,
+                        "infinitive": word.infinitive,
+                        "translation": word.translation
+                    }
+                    correct_answers[str(i)] = template.correct_form
+                    print(f"Using stored template for '{word.word}' (API error)")
+                else:
+                    # No stored template, use basic fallback
                     questions[str(i)] = {
                         "sentence": f"___ (using: {word.word}).",
                         "word": word.word,
@@ -160,18 +273,10 @@ class ExerciseViewSet(ModelViewSet):
                         "translation": word.translation
                     }
                     correct_answers[str(i)] = word.word
-            except Exception as e:
-                print(f"Error generating fill-in-gap question: {e}")
-                # Fallback in case of error
-                questions[str(i)] = {
-                    "sentence": f"___ (using: {word.word}).",
-                    "word": word.word,
-                    "infinitive": word.infinitive,
-                    "translation": word.translation
-                }
-                correct_answers[str(i)] = word.word
-                
+        
         return questions, correct_answers
+
+    # Update the perform_create method to limit the number of words processed at once:
 
     @transaction.atomic # Ensure atomicity
     def perform_create(self, serializer):
@@ -189,14 +294,19 @@ class ExerciseViewSet(ModelViewSet):
             # Get unlearned words for the current user
             unlearned_words = self._get_unlearned_words(wordset, user)
             
+            # Limit number of words to avoid rate limit issues
+            MAX_WORDS_PER_REQUEST = 12  # Adjust based on your needs - well under the 15/min limit
+            limited_words = list(unlearned_words)[:MAX_WORDS_PER_REQUEST]
+            
             # Generate fresh questions and answers
-            questions, correct_answers = self._generate_fill_in_gap_data(unlearned_words)
+            questions, correct_answers = self._generate_fill_in_gap_data(limited_words)
             
             # Save as a temporary exercise (timestamp is already removed by serializer.create)
             instance = serializer.save(
                 questions=questions,
                 correct_answers=correct_answers
             )
+        
             
             # If this is a timestamped request, we'll clean up old fill_in_gap exercises
             # to avoid database clutter (except for those with progress entries)
@@ -319,7 +429,7 @@ class SubmitExerciseAPIView(APIView):
             In a Lithuanian language learning exercise, the user was given this fill-in-the-gap sentence:
             '{sentence}'
             
-            The word they needed to use is '{infinitive}' (infinitive form).
+            The word they needed to use is '{infinitive}' (base form of the word).
             The correct form to fill the gap is '{correct_answer}'.
             User answered: '{user_answer}'
 
@@ -419,10 +529,24 @@ genai.configure(api_key=api_key)
 
 # ...existing code...
 
-prompt_text = ("Look at the image, extract only lithuanian words and give me their translation. "
-               "Write original Lithuanian words in infinitive form. Format the response as a JSON array "
-               "with objects containing 'word', 'translation', and 'infinitive' fields. "
-               "Example format: [{\"word\":\"word\",\"translation\":\"translation\",\"infinitive\":\"infinitive\"}]")
+prompt_text = (
+    "Look at the image, extract only Lithuanian words and give me their English translation. "
+    "For each word, return: "
+    "- the original word exactly as it appears, "
+    "- its English translation, "
+    "- and its basic form (lemma), without changing the part of speech. "
+    "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
+    "For nouns, return the nominative singular form in the 'infinitive' field. "
+    "For verbs, return the actual infinitive form. "
+    "For adjectives, use the masculine nominative singular form, and for other parts of speech, use the dictionary base form. "
+    "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
+    "Preserve the original part of speech. "
+    "Format the output as a JSON array of objects with the following fields: "
+    "'word' (original form), 'translation' (English meaning), and 'infinitive' (basic form). "
+    "Example: [{\"word\": \"stalo\", \"translation\": \"table\", \"infinitive\": \"stalas\"}, "
+    "{\"word\": \"eina\", \"translation\": \"goes\", \"infinitive\": \"eiti\"}]"
+)
+
 
 
 class ProcessPhotoAPIView(APIView):
