@@ -78,7 +78,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
         correct_answers = data.get('correct_answers')
         wordset = data.get('wordset')
         is_creating = self.instance is None
-
+        
         # If creating a flashcard exercise and questions/answers are missing, it's okay (view handles it)
         if self.instance is None and exercise_type in ['flashcard', 'multiple_choice'] and not questions and not correct_answers:
             if not wordset or not wordset.words.exists():
@@ -100,6 +100,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
             if set(questions.keys()) != set(correct_answers.keys()):
                 raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match when provided.")
+
 
         return data
     

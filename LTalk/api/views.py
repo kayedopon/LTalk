@@ -165,48 +165,47 @@ class ExerciseViewSet(ModelViewSet):
         exercise_type = serializer.validated_data['type']
         user = self.request.user
 
-        existing_exercise = Exercise.objects.filter(
-            wordset=wordset,
-            type=exercise_type,
-        )
+        # existing_exercise = Exercise.objects.filter(
+        #     wordset=wordset,
+        #     type=exercise_type,
+        # )
 
-        if not existing_exercise.exists():
-            if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
-                # Get only unlearned words for the current user
-                unlearned_words = self._get_unlearned_words(wordset, user)
-                questions, correct_answers = self._generate_flashcard_data(unlearned_words)
+        if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
+            # Get only unlearned words for the current user
+            print("ĄĄĄ")
+            unlearned_words = self._get_unlearned_words(wordset, user)
+            questions, correct_answers = self._generate_flashcard_data(unlearned_words)
 
-                serializer.save(
-                    questions=questions,
-                    correct_answers=correct_answers
-                )
+            serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
 
-            if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
-                words = wordset.words.all()
-                response = self._create_questions(words)
+        if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
+            words = wordset.words.all()
+            response = self._create_questions(words)
 
-                if response.status_code != 200:
-                    raise Exception("Failed to generate questions")
-                
-                questions_list = response.data.get('questions', [])
-                questions = {}
-                correct_answers = {}
+            if response.status_code != 200:
+                raise Exception("Failed to generate questions")
+            
+            questions_list = response.data.get('questions', [])
+            questions = {}
+            correct_answers = {}
 
-                for i, item in enumerate(questions_list):
-                    questions[str(i)] = {
-                        "question": item["question"],
-                        "choices": item["choices"]
-                    }
-                    correct_answers[str(i)] = item["correct"]
+            for i, item in enumerate(questions_list):
+                questions[str(i)] = {
+                    "question": item["question"],
+                    "choices": item["choices"]
+                }
+                correct_answers[str(i)] = item["correct"]
 
-                serializer.instance = serializer.save(
-                    questions=questions,
-                    correct_answers=correct_answers
-                )
-            else:
-                serializer.save()
+            serializer.instance = serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
         else:
             serializer.save()
+
 
 class SubmitExerciseAPIView(APIView):
     http_method_names = ['post', 'get']
