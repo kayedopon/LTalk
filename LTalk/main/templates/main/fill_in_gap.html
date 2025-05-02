@@ -125,6 +125,7 @@
     <script>
         const wordsetId = {{ wordset_id }};
         const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
+        const timestamp = {{ timestamp }}; // Pass timestamp for uniqueness
     </script>
     <script src="{% static 'main/js/fill_in_gap.js' %}" defer></script>
 </body>

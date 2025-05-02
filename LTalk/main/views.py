@@ -8,6 +8,7 @@ import PIL.Image
 from dotenv import load_dotenv
 import os
 import json
+import time
 
 # Load environment variables from .env file
 load_dotenv()
@@ -22,10 +23,24 @@ genai.configure(api_key=api_key)
 
 # ...existing code...
 
-prompt_text = ("Look at the image, extract only lithuanian words and give me their translation. "
-               "Write original Lithuanian words in infinitive form. Format the response as a JSON array "
-               "with objects containing 'word', 'translation', and 'infinitive' fields. "
-               "Example format: [{\"word\":\"word\",\"translation\":\"translation\",\"infinitive\":\"infinitive\"}]")
+prompt = (
+    "Look at the image, extract only Lithuanian words and give me their English translation. "
+    "For each word, return: "
+    "- the original word exactly as it appears, "
+    "- its English translation, "
+    "- and its basic form (lemma), without changing the part of speech. "
+    "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
+    "For nouns, return the nominative singular form in the 'infinitive' field. "
+    "For verbs, return the actual infinitive form. "
+    "For adjectives, use the masculine nominative singular form, and for other parts of speech, use the dictionary base form. "
+    "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
+    "Preserve the original part of speech. "
+    "Format the output as a JSON array of objects with the following fields: "
+    "'word' (original form), 'translation' (English meaning), and 'infinitive' (basic form). "
+    "Example: [{\"word\": \"stalo\", \"translation\": \"table\", \"infinitive\": \"stalas\"}, "
+    "{\"word\": \"eina\", \"translation\": \"goes\", \"infinitive\": \"eiti\"}]"
+)
+
 
 @login_required(login_url='login')
 def home(request):
@@ -54,10 +69,14 @@ def flashcard_practice(request, wordset_id):
 @login_required(login_url='login')
 def fill_in_gap_practice(request, wordset_id):
     wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
+    # Add timestamp to ensure a new exercise is created each time
+    timestamp = int(time.time())
+    
     # The frontend JS will handle fetching/creating the exercise via the API
     context = {
         'wordset': wordset,
         'wordset_id': wordset_id, # Pass ID for JS
+        'timestamp': timestamp, # Pass timestamp to ensure uniqueness
     }
     return render(request, "main/fill_in_gap.html", context)
 

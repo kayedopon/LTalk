@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.innerHTML = `
             <div class="question-sentence">${sentence}</div>
-            <div class="question-hint">Word: ${questionData.infinitive} (${questionData.translation})</div>
+            <div class="question-hint">Word: ${questionData.word} (${questionData.translation})</div>
         `;
         
         return container;
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchOrCreateExercise() {
         showLoading();
         try {
-            // Always create a new exercise for each session
+            // Always create a new exercise for each session with a unique timestamp
             const response = await fetch('/api/exercise/', {
                 method: 'POST',
                 headers: {
@@ -257,7 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     wordset: wordsetId,
-                    type: 'fill_in_gap'
+                    type: 'fill_in_gap',
+                    timestamp: timestamp || Date.now() // Use provided timestamp or generate one
                 })
             });
 

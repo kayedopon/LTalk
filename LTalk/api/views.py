@@ -68,16 +68,11 @@ class ExerciseViewSet(ModelViewSet):
         queryset = queryset.filter(wordset__user=user)
 
         # If fetching flashcards, dynamically add filtered questions/answers
-        # Note: This modifies the queryset objects *before* serialization.
-        # This approach might be less clean than modifying the serializer's representation.
-        # Consider modifying the serializer or list/retrieve methods for a cleaner separation.
         if exercise_type == 'flashcard':
              for exercise in queryset:
                  filtered_words = self._get_unlearned_words(exercise.wordset, user)
                  questions, correct_answers = self._generate_flashcard_data(filtered_words)
                  # Attach dynamically generated data to the instance for the serializer to pick up
-                 # This assumes the serializer fields are not read_only for this purpose.
-                 # If they are read_only, this won't work directly.
                  exercise.questions = questions
                  exercise.correct_answers = correct_answers
 
@@ -123,8 +118,11 @@ class ExerciseViewSet(ModelViewSet):
         for i, word in enumerate(words):
             # Create a prompt to generate a Lithuanian sentence with a gap
             prompt = f"""
-            Create a short simple sentence in Lithuanian using the word '{word.word}' (which means '{word.translation}' in English).
-            The sentence should use this word in its proper grammatical form (not necessarily the infinitive '{word.infinitive}').
+            Create a beginner-friendly sentence in Lithuanian using the word '{word.word}' (which means '{word.translation}' in English).
+            It should be very clear from the context what the word is.
+            The sentence should use this word in its proper grammatical form (not necessarily the basic form).
+            For example, if the word is a noun, the sentence should use different case than the basic form.
+            If the word is a verb, the sentence should use different tense or person than the basic form.
             Replace the word with a gap indicated by '___'.
             Format your response as a JSON object with the following structure:
             {{
@@ -180,15 +178,54 @@ class ExerciseViewSet(ModelViewSet):
         wordset = serializer.validated_data['wordset']
         exercise_type = serializer.validated_data['type']
         user = self.request.user
-
+        
+        # For fill_in_gap exercises, we'll always generate fresh content
+        # and avoid permanent database storage if possible
+        if exercise_type == 'fill_in_gap':
+            # Check if there's a timestamp in the request, which indicates
+            # the user wants a fresh exercise
+            has_timestamp = 'timestamp' in self.request.data
+            
+            # Get unlearned words for the current user
+            unlearned_words = self._get_unlearned_words(wordset, user)
+            
+            # Generate fresh questions and answers
+            questions, correct_answers = self._generate_fill_in_gap_data(unlearned_words)
+            
+            # Save as a temporary exercise (timestamp is already removed by serializer.create)
+            instance = serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
+            
+            # If this is a timestamped request, we'll clean up old fill_in_gap exercises
+            # to avoid database clutter (except for those with progress entries)
+            if has_timestamp:
+                # Find old fill_in_gap exercises without progress and delete them
+                old_exercises = Exercise.objects.filter(
+                    wordset__user=user,
+                    type='fill_in_gap',
+                    wordset=wordset
+                ).exclude(
+                    id=instance.id  # Don't delete the one we just created
+                ).exclude(
+                    progress_entries__isnull=False  # Don't delete exercises with progress
+                )
+                
+                # Delete exercises older than a day (to avoid race conditions with active sessions)
+                import datetime
+                one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
+                old_exercises.filter(id__lt=instance.id - 100).delete()
+            
+            return
+            
+        # For other exercise types (flashcard, etc.)    
         # Get only unlearned words for the current user
         unlearned_words = self._get_unlearned_words(wordset, user)
         
         # Generate questions/answers based on exercise type
         if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
             questions, correct_answers = self._generate_flashcard_data(unlearned_words)
-        elif exercise_type == 'fill_in_gap' and 'questions' not in serializer.validated_data:
-            questions, correct_answers = self._generate_fill_in_gap_data(unlearned_words)
         else:
             # For other types or if questions are provided, use what's provided
             serializer.save()

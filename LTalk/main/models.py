@@ -46,7 +46,7 @@ class WordProgress(models.Model):
 
         total = self.correct_attempts + self.incorrect_attempts
         ratio = self.correct_attempts / total if total > 0 else 0
-        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.7
+        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.51
         self.save()
 
 
