@@ -46,7 +46,7 @@ class WordProgress(models.Model):
 
         total = self.correct_attempts + self.incorrect_attempts
         ratio = self.correct_attempts / total if total > 0 else 0
-        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.7
+        self.is_learned = self.correct_attempts >= 3 and ratio >= 0.6
         self.save()
 
 
@@ -54,6 +54,7 @@ class Exercise(models.Model):
     EXERCISE_TYPES = [
         ('flashcard', 'Flash Card'),
         ('multiple_choice', 'Multiple Choice'),
+        ('fill_in_gap', 'Fill in the Gap'),
     ]
     wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='exercises')
     type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
@@ -76,3 +77,14 @@ class ExerciseProgress(models.Model):
         return f"{self.user} - {self.exercise} - {'Correct' if self.is_correct else 'Incorrect'}"
 
 
+class SentenceTemplate(models.Model):
+    word = models.ForeignKey(Word, on_delete=models.CASCADE)
+    sentence = models.TextField()
+    correct_form = models.CharField(max_length=100)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('word',)
+        
+    def __str__(self):
+        return f"Template for {self.word.word}"

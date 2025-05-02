@@ -1,0 +1,12 @@
+{% extends 'wordset_detail.html' %}
+{% block content %}
+<div class="container">
+    <h1>Delete Word Set</h1>
+    <p>Are you sure you want to delete the word set "{{ wordset.title }}"? This action cannot be undone.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, delete</button>
+        <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

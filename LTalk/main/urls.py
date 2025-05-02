@@ -1,12 +1,14 @@
 from django.urls import path
-from .views import home, create_set, flashcard_practice, wordset_detail, exercise_history, m_choice_practice
+from .views import home, create_set, flashcard_practice, wordset_detail, exercise_history, fill_in_gap_practice, delete_wordset, m_choice_practice
 
 urlpatterns = [
     path('', home, name='home'),
     path('create-set', create_set, name='create_set'),
     path('wordset/<int:wordset_id>/flashcard/', flashcard_practice, name='flashcard_practice'),
+    path('wordset/<int:wordset_id>/fill-in-gap/', fill_in_gap_practice, name='fill_in_gap_practice'),
     path('wordset/<int:id>/multiple-choice', m_choice_practice, name='m_choice_practice'),
     path('wordset/<int:id>/', wordset_detail, name='wordset_detail'),
-    path('wordset/<int:id>/history', exercise_history, name='exercise_history')
+    path('wordset/<int:id>/history', exercise_history, name='exercise_history'),
+    path('wordset/<int:id>/delete/', delete_wordset, name='delete_wordset')
     
 ]

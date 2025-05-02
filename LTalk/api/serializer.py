@@ -64,13 +64,18 @@ class WordProgressSerializer(serializers.ModelSerializer):
 class ExerciseSerializer(serializers.ModelSerializer):
     questions = serializers.JSONField(required=False)
     correct_answers = serializers.JSONField(required=False)
+    timestamp = serializers.IntegerField(required=False, write_only=True)
 
     class Meta:
         model = Exercise
-        fields = ['id', 'wordset', 'type', 'questions', 'correct_answers']
+        fields = ['id', 'wordset', 'type', 'questions', 'correct_answers', 'timestamp']
         read_only_fields = ['id']
         # unique_together = ('wordset', 'type')
 
+    def create(self, validated_data):
+        # Remove timestamp field if present as it's not part of the model
+        validated_data.pop('timestamp', None)
+        return super().create(validated_data)
 
     def validate(self, data):
         exercise_type = data.get('type')
