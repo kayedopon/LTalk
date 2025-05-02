@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple Choice</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Multiple Choice Practice: {{ wordset.title }}</h1>
+
+        <div id="m_choice-area">
+            <div class="loading">Loading Questions...</div>
+            
+            <div id="question-block" style="display: none;">
+                <div id="question-text" class="question-text"></div>
+                <div id="options" class="options">
+                    
+                </div>
+                <div id="feedback" class="feedback" style="display: none;"></div>
+                <button id="next-btn" class="btn btn-secondary" style="display: none;">Next</button>
+            </div>
+        </div>
+
+        <!-- <div id="controls-area" class="controls" style="display: none;">
+            
+        </div> -->
+
+        <div id="summary" class="finished" style="display: none;">
+            <h2>Practice Complete!</h2>
+            <p>Correct: <span id="correct-count">0</span></p>
+            <p>Incorrect: <span id="incorrect-count">0</span></p>
+            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+        </div>
+    </div>
+
+    <script>
+        const wordsetId = {{ wordset_id }};
+        const csrfToken = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'main/js/m_choice.js' %}" defer></script>
+</body>
+</html>

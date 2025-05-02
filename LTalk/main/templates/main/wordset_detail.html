@@ -15,7 +15,8 @@
         <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
         <p><strong>Visibility:</strong> {{ wordset.public|yesno:"Public,Private" }}</p>
         <div class="word-set-actions"> 
-            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Practice Flashcards</a>
+            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
+            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-secondary">Mupltiple Choice</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
         </div>
     
