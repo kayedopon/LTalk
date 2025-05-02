@@ -102,3 +102,11 @@ def exercise_history(request, id):
         "exercise_types": Exercise.EXERCISE_TYPES 
     }
     return render(request, 'exercise_history.html', context=context)
+
+@login_required(login_url='login')
+def delete_wordset(request, id):
+    wordset = get_object_or_404(WordSet, pk=id, user=request.user)
+    if request.method == 'POST':
+        wordset.delete()
+        return redirect('home')
+    return render(request, 'confirm_delete.html', {'wordset': wordset})

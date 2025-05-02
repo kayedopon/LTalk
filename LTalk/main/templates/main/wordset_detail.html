@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>{{ wordset.title }} - Details</title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -18,6 +19,12 @@
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Practice Flashcards</a>
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
+            <form method="post" action="{% url 'delete_wordset' wordset.id %}" style="display:inline-block;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="background-color: #dc3545; border: none;" onclick="return confirm('Are you sure you want to delete this word set? This action cannot be undone.');">
+                    <i class="fas fa-trash"></i> Delete Word Set
+                </button>
+            </form>
         </div>
     
         <h2 class="section-subtitle">Words in this Set</h2>
