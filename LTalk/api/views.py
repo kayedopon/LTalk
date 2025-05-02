@@ -19,6 +19,20 @@ import os
 import json
 
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the API key
+api_key = os.getenv('GOOGLE_API_KEY')
+if not api_key:
+    raise Exception("Please set the GOOGLE_API_KEY in your .env file.")
+
+# Configure the API key
+genai.configure(api_key=api_key)
+
+model = genai.GenerativeModel('gemini-2.0-flash')
+
+
 class WordViewSet(ModelViewSet):
    
     serializer_class = WordSerializer
@@ -62,6 +76,50 @@ class ExerciseViewSet(ModelViewSet):
         queryset = queryset.filter(wordset__user=self.request.user)
         return queryset
 
+    def create_questions(self, data):
+        prompt_text = (
+            "Use the given list of Lithuanian words with their English translations to generate multiple choice questions. "
+            "Each question should use the Lithuanian word as the question and provide four English answer options: "
+            "one correct translation and three plausible but incorrect distractors. "
+            "Format the response as a JSON array of objects with the following fields: "
+            "'question' (Lithuanian word), 'choices' (list of 4 English answers), and 'correct' (correct English translation). "
+            "Example format: ['1':{\"question\": \"eiti\", \"choices\": [\"to walk\", \"to sleep\", \"to eat\", \"to read\"], \"correct\": \"to walk\"}]\n\n"
+            "Here is the list of words:\n"
+        )
+
+        word_list = [{"word": word.word, "translation": word.translation} for word in data]
+        word_list_str = json.dumps(word_list, ensure_ascii=False, indent=2)
+
+        full_prompt = prompt_text + word_list_str
+        try:
+            response = model.generate_content(full_prompt)
+            response_text = response.text.strip()
+
+            if not response_text.startswith('['):
+                import re
+                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(0)
+                else:
+                    return Response({
+                        "error": "Invalid response format",
+                        "raw_response": response_text
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            questions = json.loads(response_text)
+            print(questions)
+            if not isinstance(questions, list):
+                raise ValueError("Response is not a list")
+
+            return Response({"questions": questions}, status=status.HTTP_200_OK)
+
+        except json.JSONDecodeError as e:
+            return Response({
+                "error": "JSON parsing error",
+                "message": str(e),
+                "raw_response": response.text
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @transaction.atomic # Ensure atomicity
     def perform_create(self, serializer):
         wordset = serializer.validated_data['wordset']
@@ -95,9 +153,33 @@ class ExerciseViewSet(ModelViewSet):
                 questions=questions,
                 correct_answers=correct_answers
             )
+
+        if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
+            words = wordset.words.all()
+            response = self.create_questions(words)
+
+            if response.status_code != 200:
+                raise Exception("Failed to generate questions")
+
+            questions_list = response.data.get('questions', [])
+
+            questions = {}
+            correct_answers = {}
+
+            for i, item in enumerate(questions_list):
+                questions[str(i)] = {
+                    "question": item["question"],
+                    "choices": item["choices"]
+                }
+                correct_answers[str(i)] = item["correct"]
+
+            serializer.instance = serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
+
         else:
-             # For other types or if questions are provided, save normally
-             serializer.save()
+            serializer.save()
     
 
 class SubmitExerciseAPIView(APIView):
@@ -177,7 +259,6 @@ class SubmitExerciseAPIView(APIView):
             wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
             wp.update_progress(question_is_correct)
 
-        print(correct, incorrect)
         progress = ExerciseProgress.objects.create(
             user=user,
             exercise=exercise,
@@ -206,16 +287,7 @@ class SubmitExerciseAPIView(APIView):
         return False
 
 
-# Load environment variables from .env file
-load_dotenv()
 
-# Access the API key
-api_key = os.getenv('GOOGLE_API_KEY')
-if not api_key:
-    raise Exception("Please set the GOOGLE_API_KEY in your .env file.")
-
-# Configure the API key
-genai.configure(api_key=api_key)
 
 # ...existing code...
 
@@ -267,7 +339,6 @@ class ProcessPhotoAPIView(APIView):
         except Exception as e:
             return Response({"error": f"Error loading image: {e}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        model = genai.GenerativeModel('gemini-2.0-flash')
         try:
             response = model.generate_content([prompt_text, img])
             response_text = response.text.strip()

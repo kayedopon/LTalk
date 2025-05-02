@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return decodeURIComponent(value);
             }
         }
-        return ''; // Fallback if not found (should be passed from template)
+        return '';
     }
 
     function displayError(message) {
