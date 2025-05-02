@@ -81,13 +81,13 @@ class ExerciseSerializer(serializers.ModelSerializer):
         wordset = data.get('wordset')
 
         # If creating a flashcard exercise and questions/answers are missing, it's okay (view handles it)
-        if self.instance is None and exercise_type == 'flashcard' and not questions and not correct_answers:
-             if not wordset or not wordset.words.exists():
-                  raise serializers.ValidationError("Cannot create flashcard exercise for an empty wordset.")
-             # Validation passes here, view will generate content
-             return data
+        if self.instance is None and exercise_type in ['flashcard', 'multiple_choice'] and not questions and not correct_answers:
+            if not wordset or not wordset.words.exists():
+                raise serializers.ValidationError("Cannot create exercise for an empty wordset.")
+            return data  # allow view to auto-generate
 
         # Standard validation if not a flashcard or if data is provided
+        
         if not isinstance(questions, dict):
             raise serializers.ValidationError({'questions': "Must be a dictionary."})
         if not isinstance(correct_answers, dict):

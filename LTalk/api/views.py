@@ -94,6 +94,7 @@ class ExerciseViewSet(ModelViewSet):
         try:
             response = model.generate_content(full_prompt)
             response_text = response.text.strip()
+            
 
             if not response_text.startswith('['):
                 import re
@@ -107,7 +108,6 @@ class ExerciseViewSet(ModelViewSet):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             questions = json.loads(response_text)
-            print(questions)
             if not isinstance(questions, list):
                 raise ValueError("Response is not a list")
 
@@ -130,6 +130,7 @@ class ExerciseViewSet(ModelViewSet):
             wordset=wordset,
             type=exercise_type
         ).first()
+        print(exercise_type)
 
         if existing_exercise:
              # Instead of raising error, maybe return the existing one?
@@ -160,7 +161,7 @@ class ExerciseViewSet(ModelViewSet):
 
             if response.status_code != 200:
                 raise Exception("Failed to generate questions")
-
+            print('111')
             questions_list = response.data.get('questions', [])
 
             questions = {}
@@ -172,7 +173,6 @@ class ExerciseViewSet(ModelViewSet):
                     "choices": item["choices"]
                 }
                 correct_answers[str(i)] = item["correct"]
-
             serializer.instance = serializer.save(
                 questions=questions,
                 correct_answers=correct_answers
