@@ -54,6 +54,7 @@ class Exercise(models.Model):
     EXERCISE_TYPES = [
         ('flashcard', 'Flash Card'),
         ('multiple_choice', 'Multiple Choice'),
+        ('fill_in_gap', 'Fill in the Gap'),
     ]
     wordset = models.ForeignKey(WordSet, on_delete=models.CASCADE, related_name='exercises')
     type = models.CharField(max_length=20, choices=EXERCISE_TYPES)

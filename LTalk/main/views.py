@@ -49,7 +49,17 @@ def flashcard_practice(request, wordset_id):
         'wordset': wordset,
         'wordset_id': wordset_id, # Pass ID for JS
     }
-    return render(request, "flashcard.html", context)
+    return render(request, "main/flashcard.html", context)
+
+@login_required(login_url='login')
+def fill_in_gap_practice(request, wordset_id):
+    wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
+    # The frontend JS will handle fetching/creating the exercise via the API
+    context = {
+        'wordset': wordset,
+        'wordset_id': wordset_id, # Pass ID for JS
+    }
+    return render(request, "main/fill_in_gap.html", context)
 
 @login_required(login_url='login')
 def wordset_detail(request, id):

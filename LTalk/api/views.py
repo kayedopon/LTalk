@@ -112,46 +112,93 @@ class ExerciseViewSet(ModelViewSet):
             correct_answers[str(i)] = word.translation
         return questions, correct_answers
 
+    def _generate_fill_in_gap_data(self, words):
+        """Generates fill-in-the-gap questions and answers"""
+        questions = {}
+        correct_answers = {}
+        
+        # No need for API key configuration here since it's done at module level
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
+        for i, word in enumerate(words):
+            # Create a prompt to generate a Lithuanian sentence with a gap
+            prompt = f"""
+            Create a short simple sentence in Lithuanian using the word '{word.word}' (which means '{word.translation}' in English).
+            The sentence should use this word in its proper grammatical form (not necessarily the infinitive '{word.infinitive}').
+            Replace the word with a gap indicated by '___'.
+            Format your response as a JSON object with the following structure:
+            {{
+                "sentence": "Example Lithuanian sentence with ___ (gap).",
+                "correct_form": "correctWord"
+            }}
+            Do not add any explanation to your response.
+            """
+            
+            try:
+                response = model.generate_content(prompt)
+                response_text = response.text.strip()
+                
+                # Extract the JSON from the response
+                import re
+                json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                if json_match:
+                    data = json.loads(json_match.group(0))
+                    sentence = data.get("sentence", "")
+                    correct_form = data.get("correct_form", word.word)
+                    
+                    questions[str(i)] = {
+                        "sentence": sentence,
+                        "word": word.word,
+                        "infinitive": word.infinitive,
+                        "translation": word.translation
+                    }
+                    correct_answers[str(i)] = correct_form
+                else:
+                    # Fallback if JSON extraction fails
+                    questions[str(i)] = {
+                        "sentence": f"___ (using: {word.word}).",
+                        "word": word.word,
+                        "infinitive": word.infinitive,
+                        "translation": word.translation
+                    }
+                    correct_answers[str(i)] = word.word
+            except Exception as e:
+                print(f"Error generating fill-in-gap question: {e}")
+                # Fallback in case of error
+                questions[str(i)] = {
+                    "sentence": f"___ (using: {word.word}).",
+                    "word": word.word,
+                    "infinitive": word.infinitive,
+                    "translation": word.translation
+                }
+                correct_answers[str(i)] = word.word
+                
+        return questions, correct_answers
+
     @transaction.atomic # Ensure atomicity
     def perform_create(self, serializer):
         wordset = serializer.validated_data['wordset']
         exercise_type = serializer.validated_data['type']
         user = self.request.user
 
-        # Check if a flashcard exercise already exists. If so, we might not need to create another.
-        # The get_queryset logic above should handle returning the existing one with updated words.
-        # However, the JS logic tries GET then POST, so POST might still be called.
-        # We can decide whether to return the existing one or create a new one.
-        # For simplicity, let's prevent creating duplicates explicitly here if needed.
-        existing_exercise = Exercise.objects.filter(
-            wordset=wordset,
-            type=exercise_type,
-            # Optionally filter by user if exercises are user-specific, but they seem tied to wordset
-        ).first()
-
-        # If an exercise exists, maybe we don't need to create a new one.
-        # The JS will fetch it via GET, and get_queryset will add dynamic questions.
-        # If we *always* want a new history entry, then creating is fine.
-        # Let's assume creating is okay for now, but this might lead to multiple Exercise objects.
-        # if existing_exercise:
-        #    serializer.instance = existing_exercise # Hacky: reuse instance? Not ideal.
-        #    return # Or raise validation error?
-
-        # Generate questions/answers ONLY if they are not provided AND type is flashcard
+        # Get only unlearned words for the current user
+        unlearned_words = self._get_unlearned_words(wordset, user)
+        
+        # Generate questions/answers based on exercise type
         if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
-            # Get only unlearned words for the current user
-            unlearned_words = self._get_unlearned_words(wordset, user)
             questions, correct_answers = self._generate_flashcard_data(unlearned_words)
-
-            # Save the exercise instance with the generated (filtered) data
-            serializer.save(
-                questions=questions,
-                correct_answers=correct_answers
-                # user=user # Associate user if Exercise model changes
-            )
+        elif exercise_type == 'fill_in_gap' and 'questions' not in serializer.validated_data:
+            questions, correct_answers = self._generate_fill_in_gap_data(unlearned_words)
         else:
-             # For other types or if questions are provided, save normally
-             serializer.save() # user=user if needed
+            # For other types or if questions are provided, use what's provided
+            serializer.save()
+            return
+
+        # Save the exercise instance with the generated data
+        serializer.save(
+            questions=questions,
+            correct_answers=correct_answers
+        )
     
 
 class SubmitExerciseAPIView(APIView):
@@ -167,7 +214,7 @@ class SubmitExerciseAPIView(APIView):
                         'description': 'A dictionary of user answers keyed by question identifier.',
                         'additionalProperties': {
                             'type': 'string',
-                            'description': 'User’s answer to a specific question.'
+                            'description': 'User\'s answer to a specific question.'
                         },
                         'example': {
                             "question_1": "Answer 1",
@@ -201,50 +248,6 @@ class SubmitExerciseAPIView(APIView):
             "expected_json": expected_json
         })
 
-    def post(self, request, exercise_id):
-        exercise = get_object_or_404(Exercise, id=exercise_id)
-        user = request.user
-
-        user_answers = request.data.get('user_answers')  
-        if not user_answers:
-            return Response({"error": "'user_answers' is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-       
-        is_correct = True  
-        correct = 0
-        incorrect = 0
-        
-        related_words = exercise.wordset.words.all()
-
-        for key, _ in exercise.questions.items():
-            user_answer = user_answers.get(key)
-            correct_answer = exercise.correct_answers[key]
-            question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
-
-            if question_is_correct:
-                correct += 1
-            else:
-                incorrect += 1
-                is_correct = False
-
-            word = related_words.filter(translation__iexact=correct_answer).first()
-            wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
-            wp.update_progress(question_is_correct)
-
-        print(correct, incorrect)
-        progress = ExerciseProgress.objects.create(
-            user=user,
-            exercise=exercise,
-            user_answer=user_answers,
-            is_correct=is_correct,
-            grade=f"{correct}/{correct + incorrect}" if (correct + incorrect) > 0 else "0/0"
-        )
-        return Response({
-            "exercise_progress": [ExerciseProgressSerializer(progress).data],
-            "is_correct": is_correct
-        }, status=status.HTTP_200_OK)
-        
-
     def check_answer(self, user_answer, correct_answer, exercise_type):
         """Check if the user's answer matches the correct answer for the given exercise type"""
         
@@ -256,8 +259,114 @@ class SubmitExerciseAPIView(APIView):
         
         elif exercise_type == 'flashcard':
             return user_answer == correct_answer
+            
+        elif exercise_type == 'fill_in_gap':
+            # For fill-in-the-gap, we allow some flexibility in checking
+            if not user_answer or not correct_answer:
+                return False
+            # Simple case-insensitive comparison for basic checking
+            return user_answer.lower().strip() == correct_answer.lower().strip()
         
         return False
+        
+    def _generate_feedback(self, question_data, user_answer, correct_answer):
+        """Generate feedback for incorrect answers using Gemini"""
+        try:
+            model = genai.GenerativeModel('gemini-2.0-flash')
+            sentence = question_data.get('sentence', '')
+            word = question_data.get('word', '')
+            infinitive = question_data.get('infinitive', '')
+            translation = question_data.get('translation', '')
+            
+            prompt = f"""
+            In a Lithuanian language learning exercise, the user was given this fill-in-the-gap sentence:
+            '{sentence}'
+            
+            The word they needed to use is '{infinitive}' (infinitive form).
+            The correct form to fill the gap is '{correct_answer}'.
+            User answered: '{user_answer}'
+
+            Please provide a helpful explanation (2-3 sentences) about:
+            1. Why their answer is incorrect 
+            2. What grammatical rules apply here
+            3. How to correctly form this word from the infinitive
+
+            Focus on Lithuanian grammar and word form. Be clear and educational.
+            """
+            
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            print(f"Error generating feedback: {e}")
+            return f"The correct answer is '{correct_answer}'."
+
+    def post(self, request, exercise_id):
+        exercise = get_object_or_404(Exercise, id=exercise_id)
+        user = request.user
+
+        user_answers = request.data.get('user_answers')  
+        if not user_answers:
+            return Response({"error": "'user_answers' is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        is_correct = True  
+        correct = 0
+        incorrect = 0
+        feedback = {}
+        
+        related_words = exercise.wordset.words.all()
+        
+        # Determine if this is a partial submission (single answer) or a complete submission
+        is_partial = len(user_answers) < len(exercise.questions)
+
+        # Process only the submitted answers
+        for key, user_answer in user_answers.items():
+            if key not in exercise.questions:
+                continue
+                
+            question_data = exercise.questions[key]
+            correct_answer = exercise.correct_answers[key]
+            question_is_correct = self.check_answer(user_answer, correct_answer, exercise.type)
+
+            if question_is_correct:
+                correct += 1
+            else:
+                incorrect += 1
+                is_correct = False
+                # Generate feedback for fill_in_gap exercises
+                if exercise.type == 'fill_in_gap':
+                    feedback[key] = self._generate_feedback(question_data, user_answer, correct_answer)
+
+            # Find the word by matching either word or translation
+            if exercise.type == 'fill_in_gap':
+                word = related_words.filter(word__iexact=question_data.get('word', '')).first()
+            else:
+                word = related_words.filter(translation__iexact=correct_answer).first()
+                
+            if word:
+                wp, _ = WordProgress.objects.get_or_create(user=user, word=word)
+                wp.update_progress(question_is_correct)
+
+        # Only create ExerciseProgress for complete submissions
+        if not is_partial:
+            progress = ExerciseProgress.objects.create(
+                user=user,
+                exercise=exercise,
+                user_answer=user_answers,
+                is_correct=is_correct,
+                grade=f"{correct}/{correct + incorrect}" if (correct + incorrect) > 0 else "0/0"
+            )
+            response_data = {
+                "exercise_progress": [ExerciseProgressSerializer(progress).data],
+                "is_correct": is_correct,
+                "feedback": feedback
+            }
+        else:
+            # For partial submissions, just return feedback
+            response_data = {
+                "feedback": feedback
+            }
+            
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 # Load environment variables from .env file
