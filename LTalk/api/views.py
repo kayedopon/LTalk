@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
@@ -59,6 +60,32 @@ class WordSetViewSet(ModelViewSet):
                 Coalesce('created', Value(datetime.min, output_field=DateTimeField()))
             )
         ).order_by('-sort_time')
+    
+    @action(detail=True, methods=['post'], url_path='duplicate')
+    def duplicate_wordset(self, request, pk=None):
+        original = WordSet.objects.filter(pk=pk).first()
+
+        if not original:
+            return Response({"detail": "WordSet not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if not original.public:
+            return Response({"detail": "This word set is private."}, status=status.HTTP_403_FORBIDDEN)
+
+        if not original.public:
+            return Response({"error": "This word set is private."}, status=status.HTTP_403_FORBIDDEN)
+
+        new_wordset = WordSet.objects.create(
+            user=request.user,
+            title=f"{original.title}",
+            description=original.description,
+            public=False 
+        )
+
+        for word in original.words.all():
+            new_wordset.words.add(word)
+
+        serializer = self.get_serializer(new_wordset)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class WordProgressViewSet(ModelViewSet):
@@ -68,11 +95,7 @@ class WordProgressViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
 
 
-# ...existing code...
 
-# ...existing code...
-from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
-# ...existing code...
 
 class ExerciseViewSet(ModelViewSet):
 
