@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h8 class="word-set-title">${wordset.title}</h8>
                     <div class="word-set-details">
                         <span class="word-count">${wordset.words.length} words</span>
-                        <span class="creator-name">by ${wordset.user.username}</span>
                     </div>
                 </div>
             `;

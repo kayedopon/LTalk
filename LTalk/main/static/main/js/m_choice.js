@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error fetching or creating exercise:", error);
-            displayError(`Error loading flashcards: ${error.message}`);
+            displayError(`Error loading questions`);
         }
     }
 

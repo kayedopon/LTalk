@@ -11,17 +11,7 @@
         <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
         <h1>Explore Public Word Sets</h1>
             <ul id="wordsets-list" class="wordsets-list">
-                <!-- {% for ws in wordsets %}
-                    <li class="word-set">
-                        <div class="word-set-info" data-id="{{ ws.pk }}" style="cursor: pointer;">
-                            <h8 class="word-set-title">{{ ws.title }}</h8>
-                            <div class="word-set-details">
-                                <span class="word-count">{{ ws.words.count }} words</span>
-                                <span class="creator-name">by {{ ws.user.username }}</span>
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %} -->
+                
             </ul>
             <div id="loading" style="display: none;">Loading...</div>
             <p class="no-wordsets" style="display: none;">No public word sets found.</p>

@@ -65,24 +65,26 @@ class WordSetViewSet(ModelViewSet):
     def duplicate_wordset(self, request, pk=None):
         original = WordSet.objects.filter(pk=pk).first()
 
-        if not original:
-            return Response({"detail": "WordSet not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        if not original.public:
-            return Response({"detail": "This word set is private."}, status=status.HTTP_403_FORBIDDEN)
-
         if not original.public:
             return Response({"error": "This word set is private."}, status=status.HTTP_403_FORBIDDEN)
 
+        # Prevent multiple duplications
+        already_duplicated = WordSet.objects.filter(user=request.user, duplicated_from=original).exists()
+        if already_duplicated:
+            return Response(
+                {"error": "You have already duplicated this word set."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         new_wordset = WordSet.objects.create(
             user=request.user,
-            title=f"{original.title}",
+            title=original.title,
             description=original.description,
-            public=False 
+            public=False,
+            duplicated_from=original
         )
 
-        for word in original.words.all():
-            new_wordset.words.add(word)
+        new_wordset.words.set(original.words.all())
 
         serializer = self.get_serializer(new_wordset)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

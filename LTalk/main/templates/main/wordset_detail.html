@@ -26,12 +26,11 @@
             </span>
         </p>
         <div class="word-set-actions"> 
+            {% if user == wordset.user%}
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
             <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-secondary">Mupltiple Choice</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
-
-            {% if user == wordset.user%}
             <form method="post" action="{% url 'delete_wordset' wordset.id %}" style="display:inline-block;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger" style="background-color: #dc3545; border: none;" onclick="return confirm('Are you sure you want to delete this word set? This action cannot be undone.');">

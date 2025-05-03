@@ -44,13 +44,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': getCSRFToken() 
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.error || "Unknown error");
+                }
+                return data;
+            });
+        })
         .then(data => {
-            window.location.href = `/wordset/${data.id}/`;
+            if (data)
+            {
+                window.location.href = `/wordset/${data.id}/`;
+            }
+            
         })
         .catch(error => {
-            console.error("Failed to duplicate:", error);
-            alert("Something went wrong.");
+            alert(error);
         });
     }
 
