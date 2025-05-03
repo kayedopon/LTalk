@@ -1,21 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     let apiUrl = `/api/wordset/?page=1&scope=others`;
+    let searchQuery = '';
     const searchInput = document.getElementById('search-input');
     const wordsetsList = document.getElementById('wordsets-list');
     const loadingIndicator = document.getElementById('loading');
     const noWordsetsMsg = document.querySelector('.no-wordsets');
 
     searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim();
-        wordsetsList.innerHTML = ''; // Clear previous results
+        searchQuery = searchInput.value.trim(); 
+        wordsetsList.innerHTML = ''; 
 
-        if (query === '') {
+        if (searchQuery === '') {
             apiUrl = `/api/wordset/?page=1&scope=others`;
             getWordSets();
             return;
         }
 
-        fetch(`/api/wordset/?scope=others&search=${encodeURIComponent(query)}`)
+        fetch(`/api/wordset/?scope=others&search=${encodeURIComponent(searchQuery)}`)
             .then(response => response.json())
             .then(data => {
                 wordsetsList.innerHTML = '';
@@ -39,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function getWordSets() {
         if (!apiUrl) return;
         loadingIndicator.style.display = 'block';
-
+    
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 loadingIndicator.style.display = 'none';
-
+    
                 if (data.results.length > 0) {
                     generateWordSet(data);
                     noWordsetsMsg.style.display = 'none';
