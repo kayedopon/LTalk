@@ -417,3 +417,9 @@ body {
     margin-top: 15px;
     font-size: 18px;
 }
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}

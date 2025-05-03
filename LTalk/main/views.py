@@ -104,3 +104,6 @@ def delete_wordset(request, id):
         wordset.delete()
         return redirect('home')
     return render(request, 'confirm_delete.html', {'wordset': wordset})
+
+def explore_sets(request):
+    return render(request, "explore_sets.html",)

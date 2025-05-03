@@ -8,7 +8,10 @@
 </head>
 <body>
     <div class="home-container">
-        <a href="{% url 'create_set' %}" class="btn btn-primary upload-button">Add Word Set</a>
+        <div class="button-group">
+            <a href="{% url 'create_set' %}" class="btn btn-primary upload-button">Add Word Set</a>
+            <a href="{% url 'explore_sets' %}" class="btn btn-primary upload-button">Explore other sets</a>
+        </div>
         <h1>Your Word Sets</h1>
         {% if wordsets %}
             <ul class="wordsets-list">
