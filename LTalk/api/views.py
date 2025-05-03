@@ -127,11 +127,17 @@ class ExerciseViewSet(ModelViewSet):
         queryset = queryset.filter(wordset__user=user)
 
         if exercise_type == 'flashcard':
-             for exercise in queryset:
-                 filtered_words = self._get_unlearned_words(exercise.wordset, user)
-                 questions, correct_answers = self._generate_flashcard_data(filtered_words)
-                 exercise.questions = questions
-                 exercise.correct_answers = correct_answers
+            for exercise in queryset:
+                filtered_words = self._get_unlearned_words(exercise.wordset, user)
+                questions, correct_answers = self._generate_flashcard_data(filtered_words)
+                exercise.questions = questions
+                exercise.correct_answers = correct_answers
+
+        elif exercise_type == "multiple_choice":
+            for exercise in queryset:
+                questions, correct_answers = self._generate_m_choice_data(exercise.wordset.words.all())
+                exercise.questions = questions
+                exercise.correct_answers = correct_answers
 
         return queryset
 
@@ -211,6 +217,24 @@ class ExerciseViewSet(ModelViewSet):
             correct_answers[str(i)] = word.translation
         return questions, correct_answers
 
+    def _generate_m_choice_data(self, words):
+        """Generates questions and answers dicts from a queryset of words."""
+        response = self._create_questions(words)
+
+        if response.status_code != 200:
+            raise Exception("Failed to generate questions")
+        
+        questions_list = response.data.get('questions', [])
+        questions = {}
+        correct_answers = {}
+
+        for i, item in enumerate(questions_list):
+            questions[str(i)] = {
+                "question": item["question"],
+                "choices": item["choices"]
+            }
+            correct_answers[str(i)] = item["correct"]
+        return questions, correct_answers
     # Replace the _generate_fill_in_gap_data method in ExerciseViewSet in LTalk/api/views.py:
 
     def _generate_fill_in_gap_data(self, words):
@@ -459,21 +483,7 @@ class ExerciseViewSet(ModelViewSet):
 
         if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
             words = wordset.words.all()
-            response = self._create_questions(words)
-
-            if response.status_code != 200:
-                raise Exception("Failed to generate questions")
-            
-            questions_list = response.data.get('questions', [])
-            questions = {}
-            correct_answers = {}
-
-            for i, item in enumerate(questions_list):
-                questions[str(i)] = {
-                    "question": item["question"],
-                    "choices": item["choices"]
-                }
-                correct_answers[str(i)] = item["correct"]
+            questions, correct_answers = self._generate_m_choice_data(words)
 
             serializer.instance = serializer.save(
                 questions=questions,
