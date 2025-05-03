@@ -1,50 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max, Value, DateTimeField
+from django.db.models.functions import Coalesce, Greatest
 
-from .models import Word, WordSet, Exercise, WordProgress
+from .models import WordSet, Exercise, WordProgress
 
-import google.generativeai as genai
-import PIL.Image
-from dotenv import load_dotenv
-import os
-import json
 import time
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Access the API key
-api_key = os.getenv('GOOGLE_API_KEY')
-if not api_key:
-    raise Exception("Please set the GOOGLE_API_KEY in your .env file.")
-
-# Configure the API key
-genai.configure(api_key=api_key)
-
-# ...existing code...
-
-# prompt = (
-#     "Look at the image, extract only Lithuanian words and give me their English translation. "
-#     "For each word, return: "
-#     "- the original word exactly as it appears, "
-#     "- its English translation, "
-#     "- and its basic form (lemma), without changing the part of speech. "
-#     "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-#     "For nouns, return the nominative singular form in the 'infinitive' field. "
-#     "For verbs, return the actual infinitive form. "
-#     "For adjectives, use the masculine nominative singular form, and for other parts of speech, use the dictionary base form. "
-#     "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
-#     "Preserve the original part of speech. "
-#     "Format the output as a JSON array of objects with the following fields: "
-#     "'word' (original form), 'translation' (English meaning), and 'infinitive' (basic form). "
-#     "Example: [{\"word\": \"stalo\", \"translation\": \"table\", \"infinitive\": \"stalas\"}, "
-#     "{\"word\": \"eina\", \"translation\": \"goes\", \"infinitive\": \"eiti\"}]"
-# )
+from datetime import datetime
 
 
 @login_required(login_url='login')
 def home(request):
-    wordsets = WordSet.objects.filter(user=request.user)
+    wordsets = WordSet.objects.filter(user=request.user).annotate(
+            latest_exercise=Max('exercises__progress_entries__answered_at'),
+            sort_time=Greatest(
+                Coalesce(Max('exercises__progress_entries__answered_at'), Value(datetime.min, output_field=DateTimeField())),
+                Coalesce('created', Value(datetime.min, output_field=DateTimeField()))
+            )
+    ).order_by('-sort_time')
+    
     for ws in wordsets:
         ws.progress = ws.learned_percent(request.user)
     return render(request, "home.html", {"wordsets": wordsets})

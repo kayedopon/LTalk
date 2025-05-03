@@ -7,6 +7,8 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from django.shortcuts import get_object_or_404
+from django.db.models import Max, Value, DateTimeField
+from django.db.models.functions import Coalesce, Greatest
 
 from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
 from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
@@ -17,6 +19,7 @@ import PIL.Image
 from dotenv import load_dotenv
 import os
 import json
+from datetime import datetime
 
 
 # Load environment variables from .env file
@@ -29,7 +32,6 @@ if not api_key:
 
 # Configure the API key
 genai.configure(api_key=api_key)
-
 model = genai.GenerativeModel('gemini-2.0-flash')
 
 
@@ -43,8 +45,16 @@ class WordViewSet(ModelViewSet):
 class WordSetViewSet(ModelViewSet):
 
     serializer_class = WordSetSerializer
-    queryset = WordSet.objects.all()
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'delete']
+    
+    def get_queryset(self):
+        return WordSet.objects.filter(user=self.request.user).annotate(
+            latest_exercise=Max('exercises__progress_entries__answered_at'),
+            sort_time=Greatest(
+                Coalesce(Max('exercises__progress_entries__answered_at'), Value(datetime.min, output_field=DateTimeField())),
+                Coalesce('created', Value(datetime.min, output_field=DateTimeField()))
+            )
+        ).order_by('-sort_time')
 
 
 class WordProgressViewSet(ModelViewSet):
