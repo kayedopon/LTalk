@@ -67,8 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
         optionsContainer.innerHTML = '';
         feedback.style.display = 'none';
         nextBtn.style.display = 'none';
+
+
+        const shuffledChoices = [...questionData.choices];
+        shuffleArray(shuffledChoices);
     
-        questionData.choices.forEach(choice => {
+        shuffledChoices.forEach(choice => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.textContent = choice;
@@ -139,13 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (exercise && exercise.questions) {
-                questions = Object.values(exercise.questions); // Get array of question objects
+                questions = Object.entries(exercise.questions).map(([key, q]) => ({
+                    ...q,
+                    key
+                }));// Get array of question objects
                 if (questions.length === 0) {
                      displayError("This word set has no words to practice.");
                      return;
                 }
-                shuffleArray(questions);
-                console.log("Questions array AFTER shuffle:", JSON.stringify(questions.map(q => q)));
+                console.log("Questions array AFTER shuffle:", JSON.stringify(questions.map(q => q.question)));
                 showNextQuestion();
             } else {
                 throw new Error("Exercise data is missing questions.");

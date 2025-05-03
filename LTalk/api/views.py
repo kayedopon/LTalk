@@ -485,7 +485,7 @@ class ExerciseViewSet(ModelViewSet):
             words = wordset.words.all()
             questions, correct_answers = self._generate_m_choice_data(words)
 
-            serializer.instance = serializer.save(
+            serializer.save(
                 questions=questions,
                 correct_answers=correct_answers
             )
@@ -601,7 +601,7 @@ class SubmitExerciseAPIView(APIView):
         user_answers = request.data.get('user_answers')  
         if not user_answers:
             return Response({"error": "'user_answers' is required."}, status=status.HTTP_400_BAD_REQUEST)
-
+        print(user_answers)
         is_correct = True  
         correct = 0
         incorrect = 0
