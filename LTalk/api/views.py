@@ -48,6 +48,10 @@ class WordSetViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'delete']
     
     def get_queryset(self):
+        scope = self.request.query_params.get("scope")
+        if scope == 'others':
+            return WordSet.objects.filter(public=True).exclude(user=self.request.user).order_by('-created')
+
         return WordSet.objects.filter(user=self.request.user).annotate(
             latest_exercise=Max('exercises__progress_entries__answered_at'),
             sort_time=Greatest(

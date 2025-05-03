@@ -10,9 +10,8 @@
     <div class="home-container">
         <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
         <h1>Explore Public Word Sets</h1>
-        {% if wordsets %}
-            <ul class="wordsets-list">
-                {% for ws in wordsets %}
+            <ul id="wordsets-list" class="wordsets-list">
+                <!-- {% for ws in wordsets %}
                     <li class="word-set">
                         <div class="word-set-info" data-id="{{ ws.pk }}" style="cursor: pointer;">
                             <h8 class="word-set-title">{{ ws.title }}</h8>
@@ -22,11 +21,10 @@
                             </div>
                         </div>
                     </li>
-                {% endfor %}
+                {% endfor %} -->
             </ul>
-        {% else %}
-            <p class="no-wordsets">No public word sets found.</p>
-        {% endif %}
+            <div id="loading" style="display: none;">Loading...</div>
+            <p class="no-wordsets" style="display: none;">No public word sets found.</p>
     </div>
 
     <script>
@@ -37,5 +35,7 @@
             });
         });
     </script>
+
+    <script src="{% static 'main/js/explore_sets.js' %}"></script>
 </body>
 </html>
