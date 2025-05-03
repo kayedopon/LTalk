@@ -46,8 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            wordsetElement.getElementsByClassName('word-set-info')
+            wordsetElement.addEventListener("click", function() {
+                window.location.href = `/wordset/${wordset.id}/?from_explore=true`;  
+            });
+
             document.getElementById('wordsets-list').appendChild(wordsetElement);
         });
+
+
     }
 
     getWordSets();

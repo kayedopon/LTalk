@@ -26,16 +26,6 @@
             <div id="loading" style="display: none;">Loading...</div>
             <p class="no-wordsets" style="display: none;">No public word sets found.</p>
     </div>
-
-    <script>
-        document.querySelectorAll(".word-set-info").forEach(function(block) {
-            block.addEventListener("click", function() {
-                const id = this.getAttribute("data-id");
-                window.location.href = `/wordset/${id}/`;
-            });
-        });
-    </script>
-
     <script src="{% static 'main/js/explore_sets.js' %}"></script>
 </body>
 </html>

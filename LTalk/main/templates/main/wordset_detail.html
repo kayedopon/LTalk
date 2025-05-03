@@ -55,7 +55,7 @@
         {% endif %}
     
         <div class="back-button-wrapper">
-            <a href="{% url 'home' %}" class="upload-button">← Back to Word Sets</a>
+            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">← Back to Word Sets</a>
         </div>
     </div>
 
