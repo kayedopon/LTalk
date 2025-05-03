@@ -84,10 +84,10 @@ class ExerciseSerializer(serializers.ModelSerializer):
         wordset = data.get('wordset')
         is_creating = self.instance is None
         
-        # If creating a flashcard exercise and questions/answers are missing, it's okay (view handles it)
-        if self.instance is None and exercise_type in ['flashcard', 'multiple_choice'] and not questions and not correct_answers:
-            if not wordset or not wordset.words.exists():
-                raise serializers.ValidationError("Cannot create exercise for an empty wordset.")
+        # If creating a flashcard or fill_in_gap exercise and questions/answers are missing, it's okay (view handles it)
+        if self.instance is None and exercise_type in ['flashcard', 'multiple_choice', 'fill_in_gap'] and not questions and not correct_answers:
+            if not wordset:
+                raise serializers.ValidationError("Cannot create exercise without a wordset.")
             return data  # allow view to auto-generate
 
         # Ensure questions/answers are dicts if provided
@@ -96,16 +96,10 @@ class ExerciseSerializer(serializers.ModelSerializer):
         if correct_answers is not None and not isinstance(correct_answers, dict):
              raise serializers.ValidationError({'correct_answers': "Must be a dictionary if provided."})
 
-        # If questions/answers are provided (e.g., for non-flashcard types or explicit creation)
-        if questions is not None or correct_answers is not None:
-            if not questions: # Check if one is provided but not the other
-                 raise serializers.ValidationError({'questions': "Cannot be empty if correct_answers is provided."})
-            if not correct_answers:
-                 raise serializers.ValidationError({'correct_answers': "Cannot be empty if questions is provided."})
-
+        # If questions/answers are provided and not empty, ensure they match
+        if questions and correct_answers:
             if set(questions.keys()) != set(correct_answers.keys()):
                 raise serializers.ValidationError("Keys of 'questions' and 'correct_answers' must match when provided.")
-
 
         return data
     

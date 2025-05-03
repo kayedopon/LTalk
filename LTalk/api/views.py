@@ -145,9 +145,13 @@ class ExerciseViewSet(ModelViewSet):
         # Filter words: include if no progress exists or if progress shows not learned
         unlearned_word_ids = [
             word.id for word in all_words
-            if progress_map.get(word.id, False) is False # Include if key not found (False) or value is False
+            if word.id not in progress_map or progress_map[word.id] is False
         ]
 
+        # If no unlearned words but there are words in the set, return all words
+        if not unlearned_word_ids and all_words.exists():
+            return all_words
+        
         return all_words.filter(id__in=unlearned_word_ids)
 
     def _generate_flashcard_data(self, words):
@@ -344,12 +348,21 @@ class ExerciseViewSet(ModelViewSet):
             # Get unlearned words for the current user
             unlearned_words = self._get_unlearned_words(wordset, user)
             
+            # If no unlearned words found, use all words in the set
+            if not unlearned_words.exists() and wordset.words.exists():
+                unlearned_words = wordset.words.all()
+            
             # Limit number of words to avoid rate limit issues
             MAX_WORDS_PER_REQUEST = 12  # Adjust based on your needs - well under the 15/min limit
             limited_words = list(unlearned_words)[:MAX_WORDS_PER_REQUEST]
             
-            # Generate fresh questions and answers
-            questions, correct_answers = self._generate_fill_in_gap_data(limited_words)
+            # If we still have no words, create a basic empty structure
+            if not limited_words:
+                questions = {"0": {"sentence": "No words available in this set."}}
+                correct_answers = {"0": ""}
+            else:
+                # Generate fresh questions and answers
+                questions, correct_answers = self._generate_fill_in_gap_data(limited_words)
             
             # Save as a temporary exercise (timestamp is already removed by serializer.create)
             instance = serializer.save(
@@ -376,10 +389,6 @@ class ExerciseViewSet(ModelViewSet):
                 import datetime
                 one_day_ago = datetime.datetime.now() - datetime.timedelta(days=1)
                 old_exercises.filter(id__lt=instance.id - 100).delete()
-            serializer.save(
-                questions=questions,
-                correct_answers=correct_answers
-            )
             
             return
             
@@ -387,9 +396,18 @@ class ExerciseViewSet(ModelViewSet):
         # Get only unlearned words for the current user
         unlearned_words = self._get_unlearned_words(wordset, user)
         
+        # If no unlearned words found, use all words in the set
+        if not unlearned_words.exists() and wordset.words.exists():
+            unlearned_words = wordset.words.all()
+        
         # Generate questions/answers based on exercise type
         if exercise_type == 'flashcard' and 'questions' not in serializer.validated_data:
             questions, correct_answers = self._generate_flashcard_data(unlearned_words)
+            serializer.save(
+                questions=questions,
+                correct_answers=correct_answers
+            )
+            return
 
         if exercise_type == 'multiple_choice' and not serializer.validated_data.get('questions'):
             words = wordset.words.all()
