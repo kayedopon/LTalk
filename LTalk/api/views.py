@@ -50,10 +50,18 @@ class WordSetViewSet(ModelViewSet):
     
     def get_queryset(self):
         scope = self.request.query_params.get("scope")
-        if scope == 'others':
-            return WordSet.objects.filter(public=True).exclude(user=self.request.user).order_by('-created')
+        search = self.request.query_params.get("search", "").strip()
 
-        return WordSet.objects.filter(user=self.request.user).annotate(
+        queryset = WordSet.objects.all()
+
+
+        if scope == 'others':
+            queryset = queryset.filter(public=True).exclude(user=self.request.user)
+            if search:
+                return queryset.filter(title__icontains=search).order_by('-created')
+            return queryset
+
+        return queryset.filter(user=self.request.user).annotate(
             latest_exercise=Max('exercises__progress_entries__answered_at'),
             sort_time=Greatest(
                 Coalesce(Max('exercises__progress_entries__answered_at'), Value(datetime.min, output_field=DateTimeField())),

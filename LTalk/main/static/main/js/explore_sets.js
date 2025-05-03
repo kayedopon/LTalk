@@ -1,70 +1,93 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     let apiUrl = `/api/wordset/?page=1&scope=others`;
+    const searchInput = document.getElementById('search-input');
+    const wordsetsList = document.getElementById('wordsets-list');
+    const loadingIndicator = document.getElementById('loading');
+    const noWordsetsMsg = document.querySelector('.no-wordsets');
 
-    function getWordSets() {
-        try {
-            fetch(apiUrl, {
-                method: 'GET',
-            })
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        wordsetsList.innerHTML = ''; // Clear previous results
+
+        if (query === '') {
+            apiUrl = `/api/wordset/?page=1&scope=others`;
+            getWordSets();
+            return;
+        }
+
+        fetch(`/api/wordset/?scope=others&search=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
-                if (data.results.length > 0) {
-                    
-                    generateWordSet(data);
+                wordsetsList.innerHTML = '';
+                loadingIndicator.style.display = 'none';
 
-                    if (data.next) {
-                        apiUrl = data.next
-                        console.log(apiUrl)
-                        
-                    } else {
-                        apiUrl = null
-                    }
+                if (data.results.length > 0) {
+                    generateWordSet(data);
+                    apiUrl = data.next || null;
                 } else {
-                    console.log("No wordsets available.");
+                    noWordsetsMsg.style.display = 'block';
+                    apiUrl = null;
                 }
-                console.log(data)
             })
-        } catch (error) {
-            console.log(error)
-        }
+            .catch(err => {
+                loadingIndicator.style.display = 'none';
+                console.error('Search failed:', err);
+                wordsetsList.innerHTML = '<p>Error fetching word sets.</p>';
+            });
+    });
+
+    function getWordSets() {
+        if (!apiUrl) return;
+        loadingIndicator.style.display = 'block';
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+
+                if (data.results.length > 0) {
+                    generateWordSet(data);
+                    noWordsetsMsg.style.display = 'none';
+                    apiUrl = data.next || null;
+                } else if (wordsetsList.children.length === 0) {
+                    noWordsetsMsg.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                console.error('Failed to fetch word sets:', error);
+            });
     }
 
-    function generateWordSet(data)
-    {
+    function generateWordSet(data) {
         data.results.forEach(wordset => {
             const wordsetElement = document.createElement('li');
             wordsetElement.classList.add('word-set');
 
             wordsetElement.innerHTML = `
                 <div class="word-set-info" data-id="${wordset.id}" style="cursor: pointer;">
-                    <h8 class="word-set-title">${wordset.title}</h8>
+                    <h4 class="word-set-title">${wordset.title}</h4>
                     <div class="word-set-details">
                         <span class="word-count">${wordset.words.length} words</span>
                     </div>
                 </div>
             `;
 
-            wordsetElement.getElementsByClassName('word-set-info')
-            wordsetElement.addEventListener("click", function() {
-                window.location.href = `/wordset/${wordset.id}/?from_explore=true`;  
+            wordsetElement.addEventListener("click", () => {
+                window.location.href = `/wordset/${wordset.id}/?from_explore=true`;
             });
 
-            document.getElementById('wordsets-list').appendChild(wordsetElement);
+            wordsetsList.appendChild(wordsetElement);
         });
-
-
     }
 
     getWordSets();
 
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', function () {
         if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100) {
-
-            if (document.getElementById('loading').style.display === 'none' && apiUrl !== null) {
+            if (loadingIndicator.style.display === 'none' && apiUrl !== null) {
                 getWordSets();
             }
         }
     });
 });
-
