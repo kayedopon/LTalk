@@ -1,0 +1,5 @@
+Copyright © 2025 Anna Nevidoma, Kiril Postrehan, Dmytro Papii
+
+All rights reserved. No part of this code may be reproduced, distributed,
+or used for commercial or non-commercial purposes without explicit
+written permission from the author.
