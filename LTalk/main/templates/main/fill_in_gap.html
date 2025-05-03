@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fill in the Gap Practice - {{ wordset.title }}</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <style>
+        .fill-in-gap-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .question-sentence {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+        
+        .question-hint {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .gap-input {
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            min-width: 120px;
+            display: inline-block;
+            margin: 0 4px;
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .feedback-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .feedback-content {
+            line-height: 1.6;
+        }
+        
+        .progress-container {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fill in the Gap Practice: {{ wordset.title }}</h1>
+        
+        <p class="instructions">Complete each sentence by filling in the blank with the correct form of the given Lithuanian word.</p>
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+        </div>
+        
+        <div id="exercise-area">
+            <div class="loading">Loading exercise...</div>
+            <!-- Question will be inserted here by JS -->
+        </div>
+        
+        <div id="feedback-area" style="display: none;">
+            <!-- Feedback will be inserted here by JS -->
+        </div>
+        
+        <div id="controls-area" class="controls" style="display: none;">
+            <button id="submit-btn" class="btn btn-primary">Submit Answer</button>
+            <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question</button>
+        </div>
+        
+        <div id="summary" class="finished" style="display: none;">
+            <h2>Practice Complete!</h2>
+            <p>Correct: <span id="correct-count">0</span></p>
+            <p>Incorrect: <span id="incorrect-count">0</span></p>
+            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+        </div>
+    </div>
+
+    <!-- Pass data to JavaScript -->
+    <script>
+        const wordsetId = {{ wordset_id }};
+        const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
+        const timestamp = {{ timestamp }}; // Pass timestamp for uniqueness
+    </script>
+    <script src="{% static 'main/js/fill_in_gap.js' %}" defer></script>
+</body>
+</html> 
