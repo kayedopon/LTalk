@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from main.models import ExerciseProgress, Word, WordSet, WordProgress, Exercise
-
+from authentication.serializer import UserSerializer
 
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,6 +11,7 @@ class WordSerializer(serializers.ModelSerializer):
 
 class WordSetSerializer(serializers.ModelSerializer):
     words = WordSerializer(many=True)
+
     class Meta:
         model = WordSet
         fields = ['id', 'user', 'title', 'description', 'public', 'created', 'words']
@@ -27,7 +28,6 @@ class WordSetSerializer(serializers.ModelSerializer):
         for word in words:
             w, _ = Word.objects.get_or_create(word=word['word'], defaults=word)
             wordset.words.add(w)
-
         return wordset
     
     def update(self, instance, validated_data):

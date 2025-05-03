@@ -26,6 +26,7 @@
             </span>
         </p>
         <div class="word-set-actions"> 
+            {% if user == wordset.user%}
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
             <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-secondary">Mupltiple Choice</a>
@@ -36,6 +37,13 @@
                     <i class="fas fa-trash"></i> Delete Word Set
                 </button>
             </form>
+            {% else %}
+                <button class="btn btn-success" id="add-wordset" style="background-color: #45a049; border: none;" onclick="addWordSet({{ wordset.id }})">
+                    <i class="fa-solid fa-plus"></i> Add to My Word Sets
+                </button>
+            {% endif %}
+
+
         </div>
     
         <h2 class="section-subtitle">Words in this Set</h2>
@@ -55,10 +63,10 @@
         {% endif %}
     
         <div class="back-button-wrapper">
-            <a href="{% url 'home' %}" class="upload-button">← Back to Word Sets</a>
+            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">← Back to Word Sets</a>
         </div>
     </div>
 
-    <script src="{% static 'main/js/change_public.js' %}" defer></script>
+    <script src="{% static 'main/js/ws_detail.js' %}" defer></script>
 </body>
 </html>

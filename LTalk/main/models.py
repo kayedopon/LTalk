@@ -8,6 +8,13 @@ class WordSet(models.Model):
     description = models.CharField(max_length=200, blank=True, null=True)
     public = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
+    duplicated_from = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='duplicates'
+    )
 
     def learned_percent(self, user):
         words = self.words.all()

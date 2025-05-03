@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Explore Word Sets</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+</head>
+<body>
+    <div class="home-container">
+        <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
+        <h1>Explore Public Word Sets</h1>
+        <input type="text" id="search-input" class="search-input" placeholder="Search word sets by title...">
+        <ul id="wordsets-list" class="wordsets-list"></ul>
+        <div id="loading" style="display: none;">Loading...</div>
+        <p class="no-wordsets" style="display: none;">No public word sets found.</p>
+    </div>
+    <script src="{% static 'main/js/explore_sets.js' %}"></script>
+</body>
+</html>
