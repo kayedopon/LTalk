@@ -91,6 +91,8 @@ def m_choice_practice(request, id):
 @login_required(login_url='login')
 def wordset_detail(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
+    if not wordset.public and wordset.user != request.user:
+        return redirect('home')
     return render(request, 'wordset_detail.html', {'wordset': wordset})
 
 from collections import defaultdict

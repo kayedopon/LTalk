@@ -6,6 +6,7 @@
     <title>{{ wordset.title }} - Details</title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
     <div class="container">
@@ -14,7 +15,16 @@
             <p class="wordset-description">{{ wordset.description }}</p>
         {% endif %}
         <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
-        <p><strong>Visibility:</strong> {{ wordset.public|yesno:"Public,Private" }}</p>
+        <p>
+            <strong>Visibility:</strong>
+            <span id="visibility-toggle" 
+                data-id="{{ wordset.id }}"
+                data-current="{{ wordset.public }}"
+                class="clickable"
+                style="cursor:pointer; color: #007bff;">
+              {{ wordset.public|yesno:"Public,Private" }}
+            </span>
+        </p>
         <div class="word-set-actions"> 
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
@@ -48,5 +58,7 @@
             <a href="{% url 'home' %}" class="upload-button">← Back to Word Sets</a>
         </div>
     </div>
+
+    <script src="{% static 'main/js/change_public.js' %}" defer></script>
 </body>
 </html>

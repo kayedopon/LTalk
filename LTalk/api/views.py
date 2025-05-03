@@ -44,6 +44,7 @@ class WordSetViewSet(ModelViewSet):
 
     serializer_class = WordSetSerializer
     queryset = WordSet.objects.all()
+    http_method_names = ['get', 'post', 'patch', 'head', 'options', 'delete']
 
 
 class WordProgressViewSet(ModelViewSet):

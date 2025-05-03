@@ -29,6 +29,11 @@ class WordSetSerializer(serializers.ModelSerializer):
             wordset.words.add(w)
 
         return wordset
+    
+    def update(self, instance, validated_data):
+        instance.public = validated_data.get('public', instance.public)
+        instance.save()
+        return instance
 
 
 class WordProgressSerializer(serializers.ModelSerializer):
