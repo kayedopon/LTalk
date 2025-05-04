@@ -1,0 +1,123 @@
+.wordset-description {
+    text-align: center;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.words-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.word-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.word-card:hover {
+    transform: translateY(-3px);
+}
+
+.word-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.infinitive-text {
+    font-size: 1rem;
+    color: #666;
+    margin: 5px 0;
+}
+
+.translation-text {
+    font-size: 1rem;
+    color: #4CAF50;
+}
+
+/* Word form styles */
+#word-form {
+    margin-top: 20px;
+}
+
+.wordset-input {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.wordset-input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    outline: none;
+}
+
+.words-list {
+    list-style: none;
+    padding: 0;
+}
+
+.word-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.word-item .word {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.word-item .infinitive {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.word-item .translation {
+    color: #34495e;
+}
+
+.remove-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.remove-btn:hover {
+    background-color: #c0392b;
+}
+
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.upload-section #file-name {
+    margin-left: 10px;
+} 
