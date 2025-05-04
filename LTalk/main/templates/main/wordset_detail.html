@@ -11,13 +11,18 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1 class="section-title">{{ wordset.title }}</h1>
+        <div class="wordset-header" style="justify-content: flex-start;">
+            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">← Back to Word Sets</a>
+        </div>
+        <h1 class="section-title" style="text-align:center; margin-bottom: 10px;">{{ wordset.title }}</h1>
         {% if wordset.description %}
             <p class="wordset-description">{{ wordset.description }}</p>
         {% endif %}
         <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
 
-        <span id="wordset-id" data-id="{{wordset.id}}"> </span>
+        <span id="wordset-id" data-id="{{wordset.id}}" style="display: none;"></span>
+
+
         {% if user == wordset.user %}
         <p>
             <strong>Visibility:</strong>
@@ -29,25 +34,19 @@
               {{ wordset.public|yesno:"Public,Private" }}
             </span>
         </p>
-        {% endif %}
-
-        <div class="word-set-actions"> 
-            {% if user == wordset.user%}
-            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
-            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
-            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-secondary">Mupltiple Choice</a>
-            <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
-            <button class="btn btn-danger" id="delete-wordset" style="background-color: #dc3545; border: none;">
-                <i class="fas fa-trash"></i> Delete Word Set
-            </button>
-            {% else %}
-                <button class="btn btn-success" id="add-wordset" style="background-color: #45a049; border: none;">
-                    <i class="fa-solid fa-plus"></i> Add to My Word Sets
-                </button>
-            {% endif %}
-
-
+        <div class="word-set-actions-horizontal">
+            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn-exercise">Flashcards</a>
+            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn-exercise">Fill in the Gap</a>
+            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn-exercise">Multiple Choice</a>
+            <a href="{% url 'exercise_history' wordset.id %}" class="btn-exercise">History</a>
         </div>
+        {% else %}
+        <div class="word-set-actions-horizontal">
+            <button class="btn-exercise" id="add-wordset" onclick="addWordSet({{ wordset.id }})">
+                <i class="fa-solid fa-plus"></i> Add to My Word Sets
+            </button>
+        </div>
+        {% endif %}
     
         <h2 class="section-subtitle">Words in this Set</h2>
     
@@ -64,10 +63,14 @@
         {% else %}
             <p class="no-words">No words in this set.</p>
         {% endif %}
-    
-        <div class="back-button-wrapper">
-            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">← Back to Word Sets</a>
-        </div>
+
+        {% if user == wordset.user %}
+        <form method="get" class="delete-form" style="margin-top: 32px; text-align:center;">
+            <button class="btn btn-danger" id="delete-wordset" style="background-color: #dc3545; border: none;">
+                <i class="fas fa-trash"></i> Delete Word Set
+            </button>
+        </form>
+        {% endif %}
     </div>
 
     <script src="{% static 'main/js/ws_detail.js' %}" defer></script>
