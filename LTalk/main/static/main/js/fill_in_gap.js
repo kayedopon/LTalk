@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showNextQuestion() {
         if (currentQuestionIndex >= questions.length) {
+            // Ensure progress bar is at 100% before showing summary
+            progressBar.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', 100);
             showSummary();
             return;
         }
@@ -218,6 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryArea.style.display = 'block';
         correctCountSpan.textContent = correctAnswersCount;
         incorrectCountSpan.textContent = incorrectAnswersCount;
+        
+        // Set progress bar to 100% when showing summary
+        progressBar.style.width = '100%';
+        progressBar.setAttribute('aria-valuenow', 100);
         
         // Submit all answers to the server
         submitResults();
