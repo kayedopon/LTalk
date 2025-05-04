@@ -80,7 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const isCorrect = choice === exercise.correct_answers[questionKey];
                 recordAnswer(isCorrect);
-                feedback.textContent = isCorrect ? '✅ Correct!' : `❌ Incorrect. Correct: ${exercise.correct_answers[questionKey]}`;
+                
+                if (isCorrect) {
+                    feedback.innerHTML = `<span style="color: #28a745;">✅ Correct!</span>`;
+                } else {
+                    feedback.innerHTML = `<span style="color: #dc3545;">❌ Incorrect. Correct: ${exercise.correct_answers[questionKey]}</span>`;
+                }
+                
                 feedback.style.display = 'block';
     
                 optionsContainer.querySelectorAll('button').forEach(b => b.disabled = true);
