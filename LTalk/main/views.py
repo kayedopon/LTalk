@@ -88,7 +88,8 @@ def exercise_history(request, id):
     context = {
         "wordset": wordset,
         "grouped_exercises": dict(grouped_exercises),
-        "exercise_types": Exercise.EXERCISE_TYPES 
+        "exercise_types": Exercise.EXERCISE_TYPES,
+        "label_lookup": dict(Exercise.EXERCISE_TYPES)
     }
     return render(request, 'exercise_history.html', context=context)
 

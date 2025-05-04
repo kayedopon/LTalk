@@ -98,7 +98,6 @@ class WordSetViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        print(pk)
         wordset = get_object_or_404(WordSet, pk=pk, user=request.user)
 
         for word in wordset.words.all():
