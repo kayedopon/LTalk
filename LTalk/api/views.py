@@ -59,7 +59,7 @@ class WordSetViewSet(ModelViewSet):
             queryset = queryset.filter(public=True).exclude(user=self.request.user)
             if search:
                 return queryset.filter(title__icontains=search).order_by('-created')
-            return queryset
+            return queryset.order_by('-created')
 
         return queryset.filter(user=self.request.user).annotate(
             latest_exercise=Max('exercises__progress_entries__answered_at'),
