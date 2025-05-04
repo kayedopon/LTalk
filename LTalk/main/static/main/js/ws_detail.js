@@ -1,10 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const toggleEl = document.getElementById("visibility-toggle");
-    const ws_id = toggleEl.dataset.id;
+    const ws_id = document.getElementById("wordset-id").dataset.id;
     const addButton = document.getElementById("add-wordset")
     const deleteButton = document.getElementById("delete-wordset")
 
-    toggleEl.addEventListener('click', () => changePublic());
+    if (toggleEl)
+    {
+        toggleEl.addEventListener('click', () => changePublic());
+    }
     if (addButton) {
         addButton.addEventListener("click", () => addWordSet(ws_id));
     }

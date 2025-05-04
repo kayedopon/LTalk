@@ -16,6 +16,9 @@
             <p class="wordset-description">{{ wordset.description }}</p>
         {% endif %}
         <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
+
+        <span id="wordset-id" data-id="{{wordset.id}}"> </span>
+        {% if user == wordset.user %}
         <p>
             <strong>Visibility:</strong>
             <span id="visibility-toggle" 
@@ -26,6 +29,8 @@
               {{ wordset.public|yesno:"Public,Private" }}
             </span>
         </p>
+        {% endif %}
+
         <div class="word-set-actions"> 
             {% if user == wordset.user%}
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-secondary">Flashcards</a>
