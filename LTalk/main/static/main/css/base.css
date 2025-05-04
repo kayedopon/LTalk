@@ -4,6 +4,7 @@ body {
     margin: 0 auto;
     padding: 20px;
     background-color: #f5f5f5;
+    background: #f4f6fb;
 }
 
 .container, .home-container {
@@ -36,12 +37,12 @@ body {
     display: none;
 }
 
-.btn-primary, .upload-button {
+.btn-primary, .btn-secondary, .upload-button {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #4CAF50;
-    color: #fff;
+    /* background-color: #4CAF50;
+    color: #fff; */
     padding: 0;
     border: none;
     border-radius: 4px;
@@ -84,4 +85,58 @@ body {
 .back-button-wrapper {
     text-align: center;
     margin-top: 30px;
+}
+
+.home-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+    padding: 32px 32px 24px 32px;
+    margin: 40px auto;
+    max-width: 700px;
+}
+
+.home-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.btn {
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-primary, .upload-button {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #388e3c;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #bdbdbd;
 } 
