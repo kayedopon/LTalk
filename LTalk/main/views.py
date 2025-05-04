@@ -92,23 +92,5 @@ def exercise_history(request, id):
     }
     return render(request, 'exercise_history.html', context=context)
 
-@login_required(login_url='login')
-def delete_wordset(request, id):
-    wordset = get_object_or_404(WordSet, pk=id, user=request.user)
-    if request.method == 'POST':
-        # For each word in the set
-        for word in wordset.words.all():
-            if word.wordsets.count() == 1:  # Only in this set
-                # Delete all progress for this word
-                WordProgress.objects.filter(word=word).delete()
-                # Remove the word itself
-                word.delete()
-            else:
-                # Just remove the relation
-                word.wordsets.remove(wordset)
-        wordset.delete()
-        return redirect('home')
-    return render(request, 'confirm_delete.html', {'wordset': wordset})
-
 def explore_sets(request):
     return render(request, "explore_sets.html",)

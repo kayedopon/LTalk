@@ -97,6 +97,20 @@ class WordSetViewSet(ModelViewSet):
         serializer = self.get_serializer(new_wordset)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, pk=None):
+        print(pk)
+        wordset = get_object_or_404(WordSet, pk=pk, user=request.user)
+
+        for word in wordset.words.all():
+            if word.wordsets.count() == 1:
+                WordProgress.objects.filter(word=word).delete()
+                word.delete()
+            else:
+                word.wordsets.remove(wordset)
+
+        wordset.delete()
+        return Response({"detail": "Word set deleted."}, status=status.HTTP_204_NO_CONTENT)
+
 
 class WordProgressViewSet(ModelViewSet):
 

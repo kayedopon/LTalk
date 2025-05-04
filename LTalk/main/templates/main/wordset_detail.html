@@ -31,14 +31,11 @@
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-secondary">Fill in the Gap</a>
             <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-secondary">Mupltiple Choice</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn btn-secondary">History</a>
-            <form method="post" action="{% url 'delete_wordset' wordset.id %}" style="display:inline-block;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="background-color: #dc3545; border: none;" onclick="return confirm('Are you sure you want to delete this word set? This action cannot be undone.');">
-                    <i class="fas fa-trash"></i> Delete Word Set
-                </button>
-            </form>
+            <button class="btn btn-danger" id="delete-wordset" style="background-color: #dc3545; border: none;">
+                <i class="fas fa-trash"></i> Delete Word Set
+            </button>
             {% else %}
-                <button class="btn btn-success" id="add-wordset" style="background-color: #45a049; border: none;" onclick="addWordSet({{ wordset.id }})">
+                <button class="btn btn-success" id="add-wordset" style="background-color: #45a049; border: none;">
                     <i class="fa-solid fa-plus"></i> Add to My Word Sets
                 </button>
             {% endif %}

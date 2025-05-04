@@ -1,11 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     const toggleEl = document.getElementById("visibility-toggle");
     const ws_id = toggleEl.dataset.id;
-    const button = document.getElementById("add-wordset")
+    const addButton = document.getElementById("add-wordset")
+    const deleteButton = document.getElementById("delete-wordset")
 
     toggleEl.addEventListener('click', () => changePublic());
-    if (button) {
-        button.addEventListener("click", () => addWordSet(ws_id));
+    if (addButton) {
+        addButton.addEventListener("click", () => addWordSet(ws_id));
+    }
+
+    if (deleteButton) {
+        deleteButton.addEventListener("click", () => deleteWordSet(ws_id));
     }
 
     function changePublic() {
@@ -61,6 +66,34 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             alert(error);
+        });
+    }
+
+    function deleteWordSet(wordsetId) {
+        if (!confirm("Are you sure you want to delete this word set? This action cannot be undone.")) {
+            return;
+        }
+    
+        fetch(`/api/wordset/${wordsetId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Word set deleted successfully.");
+                window.location.href = '/';
+            } else {
+                return response.json().then(err => {
+                    throw new Error(err.detail || "Failed to delete word set.");
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting word set:", error);
+            alert("Error deleting word set: " + error.message);
         });
     }
 
