@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="home-container">
         <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
         <h1>Explore Public Word Sets</h1>

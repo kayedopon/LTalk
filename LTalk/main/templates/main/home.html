@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="home-container">
         <div class="button-group">
             <a href="{% url 'create_set' %}" class="btn btn-primary upload-button">Add Word Set</a>

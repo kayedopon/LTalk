@@ -3,10 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flashcard Practice - {{ wordset.title }}</title>
+    <title>Flashcard Practice</title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="container">
         <h1>Flashcards</h1>
         <div id="flashcard-area">

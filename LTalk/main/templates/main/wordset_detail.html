@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="container">
         <h1 class="section-title">{{ wordset.title }}</h1>
         {% if wordset.description %}

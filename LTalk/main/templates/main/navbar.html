@@ -1,0 +1,9 @@
+<nav class="navbar">
+    <div class="navbar-container">
+      <a href="{% url 'home' %}" class="navbar-logo">LTalk</a>
+      <form action="{% url 'logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="nav-button">Logout</button>
+      </form>
+    </div>
+</nav>
