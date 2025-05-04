@@ -10,11 +10,14 @@
     {% include 'navbar.html' %}
     <div class="home-container">
         <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
-        <h1>Explore Public Word Sets</h1>
+        <h1 class="home-title">Explore Public Word Sets</h1>
         <input type="text" id="search-input" class="search-input" placeholder="Search word sets by title...">
-        <ul id="wordsets-list" class="wordsets-list"></ul>
-        <div id="loading" style="display: none;">Loading...</div>
-        <p class="no-wordsets" style="display: none;">No public word sets found.</p>
+        
+        <div class="wordsets-wrapper">
+            <ul id="wordsets-list" class="wordsets-list"></ul>
+            <div id="loading" class="loading" style="display: none;">Loading...</div>
+            <p class="no-wordsets" style="display: none;">No public word sets found.</p>
+        </div>
     </div>
     <script src="{% static 'main/js/explore_sets.js' %}"></script>
 </body>
