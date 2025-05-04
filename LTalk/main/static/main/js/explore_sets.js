@@ -66,16 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
             wordsetElement.classList.add('word-set');
 
             wordsetElement.innerHTML = `
-                <div class="word-set-info" data-id="${wordset.id}" style="cursor: pointer;">
-                    <h4 class="word-set-title">${wordset.title}</h4>
-                    <div class="word-set-details">
-                        <span class="word-count">${wordset.words.length} words</span>
+                <div class="word-set-content" data-id="${wordset.id}">
+                    <div>
+                        <div class="word-set-title">${wordset.title}</div>
+                        <div class="word-count">${wordset.words.length} words</div>
                     </div>
                 </div>
             `;
 
-            wordsetElement.addEventListener("click", () => {
-                window.location.href = `/wordset/${wordset.id}/?from_explore=true`;
+            wordsetElement.querySelector('.word-set-content').addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                window.location.href = `/wordset/${id}/?from_explore=true`;
             });
 
             wordsetsList.appendChild(wordsetElement);

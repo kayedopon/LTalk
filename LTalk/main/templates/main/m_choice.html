@@ -16,11 +16,9 @@
             
             <div id="question-block" style="display: none;">
                 <div id="question-text" class="question-text"></div>
-                <div id="options" class="options">
-                    
-                </div>
+                <div id="options" class="options-container"></div>
                 <div id="feedback" class="feedback" style="display: none;"></div>
-                <button id="next-btn" class="btn btn-secondary" style="display: none;">Next</button>
+                <button id="next-btn" class="next-btn" style="display: none;">Next</button>
             </div>
         </div>
 
@@ -32,8 +30,10 @@
             <h2>Practice Complete!</h2>
             <p>Correct: <span id="correct-count">0</span></p>
             <p>Incorrect: <span id="incorrect-count">0</span></p>
-            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
-            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+            <div class="button-group">
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Go back</a>
+                <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+            </div>
         </div>
     </div>
 

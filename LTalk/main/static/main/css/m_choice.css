@@ -1,0 +1,114 @@
+/* Multiple Choice Exercise Styles */
+
+/* Question area */
+#m_choice-area {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-text {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+/* Options styling */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+    background-color: #e9f7ff;
+    border-color: #c6e2ff;
+}
+
+.option-btn:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+/* Feedback styling */
+.feedback {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Next button */
+.next-btn {
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: #4CAF50;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.next-btn:hover {
+    background: #388e3c;
+}
+
+/* Loading state */
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 30px 0;
+    color: #007bff;
+}
+
+/* Summary section */
+.finished {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.finished h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.finished p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Error message */
+.error-message {
+    color: #dc3545;
+    padding: 15px;
+    background-color: #f8d7da;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 1.1rem;
+} 

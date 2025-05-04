@@ -219,7 +219,10 @@ document.addEventListener('DOMContentLoaded', () => {
         correctCountSpan.textContent = correctAnswersCount;
         incorrectCountSpan.textContent = incorrectAnswersCount;
         
-        // Submit all answers to the server
+        // Set progress bar to 100% when showing summary
+        progressBar.style.width = '100%';
+        progressBar.setAttribute('aria-valuenow', 100);
+        
         submitResults();
     }
 
@@ -329,6 +332,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initialize
     fetchOrCreateExercise();
 }); 

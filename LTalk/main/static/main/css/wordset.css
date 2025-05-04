@@ -71,40 +71,49 @@
 }
 
 .word-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
     background-color: #f9f9f9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+.word-item:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .word-item .word {
     font-weight: bold;
     color: #2c3e50;
+    padding-right: 10px;
 }
 
 .word-item .infinitive {
     color: #7f8c8d;
     font-style: italic;
+    padding-right: 10px;
 }
 
 .word-item .translation {
     color: #34495e;
+    padding-right: 10px;
 }
 
 .remove-btn {
     background-color: #e74c3c;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    margin-left: 10px;
-    margin-top: 10px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    justify-self: end;
 }
 
 .remove-btn:hover {
@@ -174,4 +183,85 @@
 }
 .btn-exercise:hover {
     background: #388e3c !important;
+}
+
+/* Words container and header styles */
+.words-container {
+    margin: 20px 0;
+}
+
+.words-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 5px;
+}
+
+.header-word, .header-infinitive, .header-translation, .header-actions {
+    font-size: 1rem;
+}
+
+.header-actions {
+    justify-self: end;
+}
+
+.words-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.word-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background-color: #f9f9f9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+.word-item:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.word-item .word {
+    font-weight: bold;
+    color: #2c3e50;
+    padding-right: 10px;
+}
+
+.word-item .infinitive {
+    color: #7f8c8d;
+    font-style: italic;
+    padding-right: 10px;
+}
+
+.word-item .translation {
+    color: #34495e;
+    padding-right: 10px;
+}
+
+.remove-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    justify-self: end;
+}
+
+.remove-btn:hover {
+    background-color: #c0392b;
 } 

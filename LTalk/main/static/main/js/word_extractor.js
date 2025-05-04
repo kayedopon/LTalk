@@ -75,6 +75,20 @@ function displayResult(result) {
     const form  = document.createElement('form');
     form.id = 'word-form';
     form.method = 'post';
+    
+    const wordsContainer = document.createElement('div');
+    wordsContainer.className = 'words-container';
+    
+    const wordsHeader = document.createElement('div');
+    wordsHeader.className = 'words-header';
+    wordsHeader.innerHTML = `
+        <div class="header-word">Word</div>
+        <div class="header-infinitive">Infinitive</div>
+        <div class="header-translation">Translation</div>
+        <div class="header-actions">Actions</div>
+    `;
+    wordsContainer.appendChild(wordsHeader);
+    
     const wordsList = document.createElement('ul');
     form.onsubmit = (e) => {
         prepareWordsJSON();
@@ -99,19 +113,21 @@ function displayResult(result) {
         li.setAttribute('data-translation', item.translation);
         li.innerHTML = `
             <span class="word">${item.word}</span>
-            <span class="infinitive">(${item.infinitive})</span>
+            <span class="infinitive">${item.infinitive}</span>
             <span class="translation">${item.translation}</span>
             <button type="button" class="remove-btn" onclick="removeWord(this)">Delete</button>
         `;
         wordsList.appendChild(li);
     });
 
+    wordsContainer.appendChild(wordsList);
+    form.appendChild(wordsContainer);
+
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.className = 'upload-button';
     submitButton.textContent = 'Create Word Set';
 
-    form.appendChild(wordsList);
     form.appendChild(submitButton);
 
     resultDiv.innerHTML = '';
