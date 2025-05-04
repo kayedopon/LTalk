@@ -117,6 +117,9 @@ class WordProgressViewSet(ModelViewSet):
     queryset = WordProgress.objects.all()
     http_method_names = ['get', 'head', 'options']
 
+    def get_queryset(self):
+        return WordProgress.objects.filter(user=self.request.user)
+
 
 
 
