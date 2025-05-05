@@ -142,7 +142,6 @@ The application was developed using a variety of tools and technologies:
 3. **Version Control and Deployment**
    - Git for version control
    - GitHub for code repository hosting
-   - Docker for containerization and deployment
 
 **Steps Followed During Development**
 
@@ -166,9 +165,6 @@ The application was developed using a variety of tools and technologies:
    - Conducted unit testing for models and APIs in `tests.py` files
    - Performed functional testing for user workflows in `tests.py` files
 
-5. **Deployment**
-   - Created Docker configuration for containerization
-   - Set up Nginx for serving static files and reverse proxy
 
 ### Results and Demonstration
 
