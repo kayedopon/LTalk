@@ -1,3 +1,6 @@
+from io import BytesIO
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 from django.test import TestCase
 from rest_framework.test import APITestCase, APIClient
 from authentication.models import User
@@ -131,3 +134,61 @@ class ExerciseAPITest(TestCase):
         self.assertEqual(data["type"], "flashcard")
         self.assertTrue(Exercise.objects.filter(id=data["id"], wordset=self.wordset).exists())
 
+
+class SubmitExerciseAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="user", password="pass", email="user@gmail.com")
+        self.client.login(email="user@gmail.com", password="pass")
+
+        self.wordset = WordSet.objects.create(title="Test Set", user=self.user)
+        self.word1 = Word.objects.create(word="cat", infinitive="test", translation="katė")
+        self.word2 = Word.objects.create(word="dog", infinitive="test", translation="šuo")
+        self.wordset.words.add(self.word1)
+        self.wordset.words.add(self.word2)
+
+        response1 = self.client.post("/api/exercise/", {
+            "type": "flashcard",
+            "wordset": self.wordset.id
+        }, format="json")
+
+        response2 = self.client.post("/api/exercise/", {
+            "type": "multiple_choice",
+            "wordset": self.wordset.id
+        }, format="json")
+
+        self.data1 = response1.json()
+        self.data2 = response2.json()
+
+    def test_submit_exercise(self):
+        response1 = self.client.post(f"/api/exercise/{self.data1["id"]}/submit/", {
+            "user_answers": self.data1['correct_answers']
+        }, format='json')
+        response2 = self.client.post(f"/api/exercise/{self.data2["id"]}/submit/", {
+            "user_answers": self.data2['correct_answers']
+        }, format='json')
+
+        self.assertEqual(response1.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
+
+
+
+class ProcessPhotoAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="user", password="pass", email="user@gmail.com")
+        self.client.login(email="user@gmail.com", password="pass")
+
+        self.image_path = "api/images/food.png"
+        self.url = reverse('process_photo')
+
+    def test_process_photo(self):
+        img = Image.open(self.image_path)
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+
+        uploaded_file = SimpleUploadedFile("food.png", buffer.read(), content_type="image/png")
+
+        response = self.client.post(self.url, {'image': uploaded_file}, format='multipart')
+        self.assertEqual(response.status_code, 200)

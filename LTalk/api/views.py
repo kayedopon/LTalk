@@ -1,3 +1,4 @@
+import re
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -617,7 +618,7 @@ class SubmitExerciseAPIView(APIView):
         user_answers = request.data.get('user_answers')  
         if not user_answers:
             return Response({"error": "'user_answers' is required."}, status=status.HTTP_400_BAD_REQUEST)
-        print(user_answers)
+
         is_correct = True  
         correct = 0
         incorrect = 0
@@ -748,17 +749,18 @@ class ProcessPhotoAPIView(APIView):
             response = model.generate_content([prompt_text, img])
             response_text = response.text.strip()
 
-            if not response_text.startswith('['):
-                import re
-                json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
-                if json_match:
-                    response_text = json_match.group(0)
-                else:
-                    return Response({
-                        "error": "Invalid response format",
-                        "raw_response": response_text
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            if response_text.startswith('```'):
+                response_text = re.sub(r'^```(?:json)?\s*', '', response_text.strip(), flags=re.IGNORECASE)
+                response_text = re.sub(r'\s*```$', '', response_text.strip())
+                
+            json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(0)
+            else:
+                return Response({
+                    "error": "Invalid response format",
+                    "raw_response": response_text
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             words_data = json.loads(response_text)
             if not isinstance(words_data, list):
                 raise ValueError("Response is not a list")
