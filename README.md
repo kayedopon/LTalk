@@ -110,10 +110,6 @@ Key Model Classes:
    - The progress tracking system implements an observer pattern where exercise attempts observe and update word progress.
    - When exercises are completed, the system updates the related `WordProgress` objects to reflect the user's performance.
 
-4. **Strategy Pattern**
-   - Different exercise types (flashcards, multiple-choice, fill-in-gap) implement the strategy pattern.
-   - Each exercise type has its own implementation strategy for question generation and answer evaluation while sharing a common interface.
-
 **Key Algorithms and Data Structures Implemented**
 
 1. **Progress Calculation Algorithm**
@@ -234,11 +230,6 @@ The application was developed using a variety of tools and technologies:
 <div style="text-align: center">
   <img src="screenshots/history.png" alt="Exercise history" width="300"/>
   <p><em>Figure 5: Exercise history page</em></p>
-</div>
-
-<div style="text-align: center">
-  <img src="screenshots/exercise.png" alt="Exercise" width="300"/>
-  <p><em>Figure 6: One of 4 types of exercise</em></p>
 </div>
 
 ### Testing and Validation
