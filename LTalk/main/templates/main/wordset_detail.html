@@ -38,6 +38,7 @@
             <a href="{% url 'flashcard_practice' wordset.id %}" class="btn-exercise">Flashcards</a>
             <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn-exercise">Fill in the Gap</a>
             <a href="{% url 'm_choice_practice' wordset.id %}" class="btn-exercise">Multiple Choice</a>
+            <a href="{% url 'text_exercise' wordset.id %}" class="btn-exercise">Text Exercise</a>
             <a href="{% url 'exercise_history' wordset.id %}" class="btn-exercise">History</a>
         </div>
         {% else %}

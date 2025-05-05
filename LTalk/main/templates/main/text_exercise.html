@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lithuanian Text Exercise</title>
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <style>
+        .text-area {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .question-area {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .choices-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .choice-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: background-color 0.2s;
+        }
+        
+        .choice-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .choice-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196F3;
+        }
+        
+        .correct {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h1>Lithuanian Text Exercise: {{ wordset.title }}</h1>
+        
+        <p class="instructions">Read the Lithuanian text generated with words from your vocabulary set, then answer the multiple choice questions.</p>
+        
+        <div id="exercise-area">
+            <div class="loading">Loading exercise...</div>
+            <!-- Text and questions will be inserted here by JS -->
+        </div>
+        
+        <div id="results-area" style="display: none;">
+            <h2>Exercise Results</h2>
+            <p>Correct answers: <span id="correct-count">0</span> / 5</p>
+            <div id="results-details"></div>
+            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Back to Word Set</a>
+            <a href="{% url 'text_exercise' wordset.id %}" class="btn btn-primary">Try Again</a>
+        </div>
+    </div>
+
+    <!-- Pass data to JavaScript -->
+    <script>
+        const wordsetId = {{ wordset_id }};
+        const csrfToken = "{{ csrf_token }}";
+        const timestamp = {{ timestamp }};
+    </script>
+    <script src="{% static 'main/js/text_exercise.js' %}" defer></script>
+</body>
+</html> 
