@@ -209,6 +209,38 @@ The application was developed using a variety of tools and technologies:
    - Browse and discover public word sets from other users
    - Duplicate interesting word sets for personal use
 
+**Screenshots or relevant visuals**
+
+<div style="text-align: center">
+  <img src="screenshots/home.png" alt="Home" width="300"/>
+  <p><em>Figure 1: Home page</em></p>
+</div>
+
+<div style="text-align: center">
+  <img src="screenshots/details.png" alt="Word set details" width="300"/>
+  <p><em>Figure 2: Word set details page</em></p>
+</div>
+
+<div style="text-align: center">
+  <img src="screenshots/create.png" alt="Word set create" width="300"/>
+  <p><em>Figure 3: Word set create page</em></p>
+</div>
+
+<div style="text-align: center">
+  <img src="screenshots/explore.png" alt="Explore word sets" width="300"/>
+  <p><em>Figure 4: Explore word sets page</em></p>
+</div>
+
+<div style="text-align: center">
+  <img src="screenshots/history.png" alt="Exercise history" width="300"/>
+  <p><em>Figure 5: Exercise history page</em></p>
+</div>
+
+<div style="text-align: center">
+  <img src="screenshots/exercise.png" alt="Exercise" width="300"/>
+  <p><em>Figure 6: One of 4 types of exercise</em></p>
+</div>
+
 ### Testing and Validation
 
 **Description of Testing Procedures**
@@ -227,6 +259,9 @@ The application was developed using a variety of tools and technologies:
    - Conducted user testing sessions for usability feedback
    - Identified and addressed pain points in the user journey
    - Refined the interface based on user feedback
+
+**Application Features**
+
 
 **Test Results and Issues Resolved**
 
