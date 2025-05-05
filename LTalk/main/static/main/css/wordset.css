@@ -180,6 +180,10 @@
     text-decoration: none;
     text-align: center;
     box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
 }
 .btn-exercise:hover {
     background: #388e3c !important;

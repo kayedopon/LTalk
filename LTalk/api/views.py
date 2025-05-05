@@ -779,4 +779,131 @@ class ProcessPhotoAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class TextExerciseAPIView(APIView):
+    http_method_names = ['get']
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='wordset_id',
+                description='ID of the wordset to use for the exercise',
+                required=True,
+                type=int
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                description="Returns generated Lithuanian text and multiple choice questions",
+                examples=[
+                    {
+                        "text": "Lithuanian text generated based on vocabulary...",
+                        "questions": [
+                            {
+                                "question": "What does 'word' mean?",
+                                "choices": ["option 1", "option 2", "option 3", "option 4"],
+                                "correct_answer": "option 2"
+                            }
+                        ]
+                    }
+                ]
+            ),
+            400: OpenApiResponse(description="Wordset not found or insufficient words")
+        },
+        description="Generate Lithuanian text and multiple choice questions based on wordset vocabulary"
+    )
+    def get(self, request):
+        wordset_id = request.query_params.get('wordset_id')
+        if not wordset_id:
+            return Response({"error": "wordset_id parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            wordset = WordSet.objects.get(id=wordset_id)
+            if not wordset.words.exists():
+                return Response({"error": "Wordset has no words"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Get all words from the wordset
+            words = list(wordset.words.all().values('word', 'translation', 'infinitive'))
+            
+            # Create the prompt for Gemini API
+            prompt = self._create_text_prompt(words)
+            
+            # Generate text and questions using Gemini API
+            generated_content = self._generate_text_and_questions(prompt)
+            
+            return Response(generated_content, status=status.HTTP_200_OK)
+            
+        except WordSet.DoesNotExist:
+            return Response({"error": "Wordset not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def _create_text_prompt(self, words):
+        word_list = [f"{word['word']} ({word['translation']})" for word in words]
+        word_list_formatted = ", ".join(word_list)
+        
+        prompt = f"""
+        You are a Lithuanian language teacher helping beginners learn Lithuanian.
+        
+        Using the vocabulary list below, create:
+        1. A coherent text in Lithuanian using as many words from the list as possible
+        2. 5 multiple choice questions in simple Lituanian about the text to check comprehension
+        
+        Vocabulary list: {word_list_formatted}
+        
+        The text should:
+        - Use beginner-friendly grammar and sentence structure
+        - Include at least 50% of the words from the vocabulary list
+        - Be contextual and meaningful (not just random sentences)
+        
+        The questions should:
+        - Be in Lithuanian to test understanding
+        - Each have 4 answer options (A, B, C, D)
+        - Have varying difficulty levels
+        
+        Format your response as JSON with the following structure:
+        {{
+            "text": "Lithuanian text here...",
+            "questions": [
+                {{
+                    "question": "Question 1",
+                    "choices": ["Option A", "Option B", "Option C", "Option D"],
+                    "correct_answer": "Option B"
+                }},
+                ...more questions...
+            ]
+        }}
+        """
+        return prompt
+    
+    def _generate_text_and_questions(self, prompt):
+        try:
+            response = model.generate_content(prompt)
+            response_text = response.text.strip()
+            
+            # Extract JSON content
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(0)
+            
+            content = json.loads(response_text)
+            
+            # Validate the expected structure
+            if 'text' not in content or 'questions' not in content:
+                raise ValueError("Response missing required fields")
+                
+            if not isinstance(content['questions'], list) or len(content['questions']) == 0:
+                raise ValueError("Questions must be a non-empty list")
+                
+            for q in content['questions']:
+                if not all(k in q for k in ('question', 'choices', 'correct_answer')):
+                    raise ValueError("Question missing required fields")
+                
+            return content
+            
+        except Exception as e:
+            print(f"Error generating content: {e}")
+            raise ValueError(f"Failed to generate content: {str(e)}")
+
+
 
