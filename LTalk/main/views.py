@@ -63,6 +63,18 @@ def m_choice_practice(request, id):
     return render(request, "m_choice.html", context)
 
 @login_required(login_url='login')
+def text_exercise(request, wordset_id):
+    wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
+    timestamp = int(time.time())
+    
+    context = {
+        'wordset': wordset,
+        'wordset_id': wordset_id,
+        'timestamp': timestamp,
+    }
+    return render(request, "main/text_exercise.html", context)
+
+@login_required(login_url='login')
 def wordset_detail(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
     if not wordset.public and wordset.user != request.user:
