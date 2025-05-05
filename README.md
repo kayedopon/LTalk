@@ -1,32 +1,4 @@
 
-Let me create a comprehensive report for your LTalk application by first examining the codebase to understand its structure and features.
-
-Ran tool
-Let me try the correct path:
-
-Ran tool
-
-Read file: LTalk/main/models.py
-
-Read file: LTalk/main/views.py
-
-Ran tool
-
-Read file: LTalk/authentication/models.py
-
-Ran tool
-
-Read file: LTalk/api/serializer.py
-
-Ran tool
-
-Ran tool
-
-Read file: LTalk/main/templates/main/flashcard.html
-
-Read file: LTalk/main/static/main/js/flashcard.js
-Based on my examination of your LTalk application, I've prepared a comprehensive coursework report that highlights the OOP principles and design patterns implemented:
-
 # LTalk - Language Learning Application
 ## Coursework Report for Object-Oriented Programming - Python App
 
@@ -69,8 +41,8 @@ Language learning is often challenging due to the difficulty in maintaining cons
 **Object-oriented Design Principles Used**
 
 1. **Encapsulation**
-   - The application encapsulates data and functionality within classes, hiding implementation details and providing controlled access through methods.
-   - Example: The `WordProgress` class encapsulates the progress data and provides methods like `update_progress()` to modify the state while enforcing business rules.
+   - The application encapsulates data and functionality within the `ExerciseViewSet` class, hiding implementation details and exposing only necessary logic through view methods.
+   - Example: The `ExerciseViewSet` encapsulates question generation logic through private helper methods like `_generate_flashcard_data()` and `_get_unlearned_words()`, keeping the internal process hidden while allowing controlled use via `get_queryset()` and `perform_create()`.
 
 2. **Inheritance**
    - The application utilizes inheritance to extend existing functionality and promote code reuse.
@@ -83,8 +55,6 @@ Language learning is often challenging due to the difficulty in maintaining cons
    - Different exercise types (flashcards, multiple-choice, fill-in-gap) share a common API but implement different behaviors.
 
 4. **Abstraction**
-   - The application abstracts complex implementation details behind simple interfaces.
-   - Example: The REST API provides a clean interface for frontend-backend communication, abstracting database operations and business logic.
    - Exercise creation and evaluation are abstracted through the `Exercise` model and API, hiding the complexity of generating questions and evaluating answers.
 
 **Class Diagrams and Structure**
@@ -127,10 +97,10 @@ Key Model Classes:
 
 **Design Patterns Implemented**
 
-1. **Repository Pattern**
-   - The application implements the Repository Pattern through Django's ORM (Object-Relational Mapping).
-   - Models like `WordSet`, `Word`, and `Exercise` act as repositories, providing an abstraction layer over the database.
-   - This pattern centralizes data access logic and provides a consistent interface for operations like create, read, update, and delete.
+1. **MVT (Model-View-Template)**
+   - The project uses Django's MVT (Model-View-Template) pattern to separate concerns.
+   - Models handle database interactions, Views process user requests and business logic, and Templates render dynamic HTML for the user interface.
+   - This ensures modularity and simplifies maintenance by keeping data, logic, and presentation layers distinct.
 
 2. **Factory Method Pattern**
    - The `CustomUserManager` implements a factory method pattern with `create_user` and `_create_user` methods.
@@ -171,7 +141,7 @@ The application was developed using a variety of tools and technologies:
    - Python 3.x as the primary programming language
    - Django web framework for server-side logic and ORM
    - Django REST Framework for API development
-   - SQLite database for development (as seen in db.sqlite3)
+   - SQLite database for development
 
 2. **Frontend Development**
    - HTML, CSS, and JavaScript for user interface
@@ -219,6 +189,7 @@ The application was developed using a variety of tools and technologies:
    - Registration, login, and profile management
 
 2. **Word Set Management**
+   - Extracting words from photos using Gemini
    - Creation, editing, and deletion of word sets
    - Public/private visibility control
    - Word addition and removal
@@ -291,7 +262,6 @@ The key achievements include:
 **Recommendations for Future Improvements**
 
 1. **Content Enhancement**
-   - Add support for audio pronunciation of words
    - Implement image associations for visual learners
    - Develop more advanced exercise types for grammar practice
 
@@ -302,18 +272,15 @@ The key achievements include:
 
 3. **AI Integration**
    - Implement AI-powered personalized learning paths
+   - Create the chat with AI-assistant to get real-time advices
    - Use natural language processing for better sentence generation
    - Add intelligent difficulty adjustment based on user performance
 
-4. **Mobile Application**
-   - Develop a dedicated mobile app for better on-the-go learning
-   - Add offline mode for practicing without internet connection
-
-5. **Data Analysis**
+4. **Data Analysis**
    - Implement more detailed analytics for learning patterns
    - Provide insights and recommendations based on performance data
 
-6. **Gamification**
+5. **Gamification**
    - Add points, badges, and levels to increase engagement
    - Implement streaks and daily goals to encourage regular practice
 
