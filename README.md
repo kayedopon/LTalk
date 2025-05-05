@@ -100,7 +100,6 @@ Key Model Classes:
 1. **MVT (Model-View-Template)**
    - The project uses Django's MVT (Model-View-Template) pattern to separate concerns.
    - Models handle database interactions, Views process user requests and business logic, and Templates render dynamic HTML for the user interface.
-   - This ensures modularity and simplifies maintenance by keeping data, logic, and presentation layers distinct.
 
 2. **Factory Method Pattern**
    - The `CustomUserManager` implements a factory method pattern with `create_user` and `_create_user` methods.
@@ -112,18 +111,14 @@ Key Model Classes:
 
 **Key Algorithms and Data Structures Implemented**
 
-1. **Progress Calculation Algorithm**
-   - The `WordProgress.update_progress` method implements an algorithm that calculates if a word is considered "learned" based on correct/incorrect attempts ratio.
-   - The `WordSet.learned_percent` method calculates the percentage of learned words in a set.
-
-2. **Fisher-Yates Shuffle Algorithm**
+1. **Fisher-Yates Shuffle Algorithm**
    - In the frontend JavaScript (flashcard.js), the application uses the Fisher-Yates shuffle algorithm to randomize questions for exercises.
 
-3. **JSON Data Structure**
+2. **JSON Data Structure**
    - The application uses JSON data structures extensively for storing exercise questions, answers, and user responses.
    - This allows flexible data storage and exchange between frontend and backend.
 
-4. **RESTful API Structure**
+3. **RESTful API Structure**
    - The application implements a RESTful API structure with serializers, views, and URL routing.
    - This structure provides a consistent and standardized way to interact with the application's resources.
 
@@ -142,7 +137,7 @@ The application was developed using a variety of tools and technologies:
 2. **Frontend Development**
    - HTML, CSS, and JavaScript for user interface
    - Django Templates for server-side rendering
-   - Fetch API for AJAX communication with the backend
+   - Fetch API for communication with the backend
 
 3. **Version Control and Deployment**
    - Git for version control
@@ -168,9 +163,8 @@ The application was developed using a variety of tools and technologies:
    - Implemented the exercise types and progress tracking
 
 4. **Testing**
-   - Conducted unit testing for models and APIs
-   - Performed functional testing for user workflows
-   - Implemented test cases as seen in `tests.py` files
+   - Conducted unit testing for models and APIs in `tests.py` files
+   - Performed functional testing for user workflows in `tests.py` files
 
 5. **Deployment**
    - Created Docker configuration for containerization
@@ -196,40 +190,39 @@ The application was developed using a variety of tools and technologies:
    - Fill-in-the-Gap: Complete sentences with appropriate words
    - Text Exercises: More complex language practice
 
-4. **Progress Tracking**
-   - Word-level progress tracking (learned vs. not learned)
-   - Exercise history and performance review
-   - Visual progress indicators
-
-5. **Exploration**
+4. **Exploration**
    - Browse and discover public word sets from other users
    - Duplicate interesting word sets for personal use
 
 **Screenshots or relevant visuals**
 
-<div style="text-align: center">
-  <img src="screenshots/home.png" alt="Home" width="300"/>
-  <p><em>Figure 1: Home page</em></p>
-</div>
+<div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
 
-<div style="text-align: center">
-  <img src="screenshots/details.png" alt="Word set details" width="300"/>
-  <p><em>Figure 2: Word set details page</em></p>
-</div>
+  <div style="text-align: center;">
+    <img src="screenshots/home.png" alt="Home" width="250"/>
+    <p><em>Figure 1: Home page</em></p>
+  </div>
 
-<div style="text-align: center">
-  <img src="screenshots/create.png" alt="Word set create" width="300"/>
-  <p><em>Figure 3: Word set create page</em></p>
-</div>
+  <div style="text-align: center;">
+    <img src="screenshots/details.png" alt="Word set details" width="250"/>
+    <p><em>Figure 2: Word set details page</em></p>
+  </div>
 
-<div style="text-align: center">
-  <img src="screenshots/explore.png" alt="Explore word sets" width="300"/>
-  <p><em>Figure 4: Explore word sets page</em></p>
-</div>
+  <div style="text-align: center;">
+    <img src="screenshots/create.png" alt="Word set create" width="250"/>
+    <p><em>Figure 3: Word set create page</em></p>
+  </div>
 
-<div style="text-align: center">
-  <img src="screenshots/history.png" alt="Exercise history" width="300"/>
-  <p><em>Figure 5: Exercise history page</em></p>
+  <div style="text-align: center;">
+    <img src="screenshots/explore.png" alt="Explore word sets" width="250"/>
+    <p><em>Figure 4: Explore word sets page</em></p>
+  </div>
+
+  <div style="text-align: center;">
+    <img src="screenshots/history.png" alt="Exercise history" width="250"/>
+    <p><em>Figure 5: Exercise history page</em></p>
+  </div>
+
 </div>
 
 ### Testing and Validation
@@ -241,18 +234,10 @@ The application was developed using a variety of tools and technologies:
    - Tested model validation and constraints
    - Verified API responses and error handling
 
-2. **Integration Testing**
-   - Tested the interaction between different components
-   - Verified data flow from frontend to backend and vice versa
-   - Ensured proper state management and updates
-
-3. **User Testing**
+2. **User Testing**
    - Conducted user testing sessions for usability feedback
    - Identified and addressed pain points in the user journey
    - Refined the interface based on user feedback
-
-**Application Features**
-
 
 **Test Results and Issues Resolved**
 
@@ -299,15 +284,10 @@ The key achievements include:
 3. **AI Integration**
    - Implement AI-powered personalized learning paths
    - Create the chat with AI-assistant to get real-time advices
-   - Use natural language processing for better sentence generation
    - Add intelligent difficulty adjustment based on user performance
 
 4. **Data Analysis**
    - Implement more detailed analytics for learning patterns
    - Provide insights and recommendations based on performance data
-
-5. **Gamification**
-   - Add points, badges, and levels to increase engagement
-   - Implement streaks and daily goals to encourage regular practice
 
 The application successfully fulfills the requirements of reading from and writing to files through its database operations and file-based configurations. The project has been developed using Git version control, promoting collaborative development and proper code management.
