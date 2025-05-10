@@ -1,9 +1,22 @@
 <nav class="navbar">
     <div class="navbar-container">
       <a href="{% url 'home' %}" class="navbar-logo">LTalk</a>
-      <form action="{% url 'logout' %}" method="post" class="logout-form">
-        {% csrf_token %}
-        <button type="submit" class="nav-button">Logout</button>
-      </form>
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="navbar-menu" id="navbar-menu">
+        <form action="{% url 'logout' %}" method="post" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="nav-button">Logout</button>
+        </form>
+      </div>
     </div>
 </nav>
+<script>
+  document.getElementById('menuToggle').addEventListener('click', function() {
+    document.getElementById('navbar-menu').classList.toggle('active');
+    this.classList.toggle('active');
+  });
+</script>

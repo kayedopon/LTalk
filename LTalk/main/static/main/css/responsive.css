@@ -1,0 +1,125 @@
+/* Responsive styles for mobile devices */
+
+/* Small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container, .home-container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    
+    .home-title, .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .wordsets-list {
+        padding-left: 0;
+    }
+    
+    .word-set {
+        margin-bottom: 10px;
+    }
+    
+    .word-form {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .exercise-container {
+        padding: 15px;
+    }
+    
+    .answer-container {
+        flex-direction: column;
+    }
+    
+    .history-item {
+        padding: 10px;
+    }
+    
+    .options-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Medium devices (tablets, less than 768px) */
+@media (max-width: 767.98px) {
+    .navbar-container {
+        padding: 0 15px;
+    }
+    
+    .exercise-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .flashcard {
+        width: 90%;
+        min-height: 150px;
+    }
+    
+    .text-exercise-container textarea {
+        min-height: 100px;
+    }
+}
+
+/* Specific fixes for form elements */
+@media (max-width: 575.98px) {
+    input[type="text"], 
+    input[type="password"],
+    input[type="email"],
+    textarea, 
+    select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+}
+
+/* Touch optimization for mobile */
+@media (hover: none) {
+    /* Remove hover effects on touch devices */
+    .btn:hover, .nav-button:hover {
+        background-color: inherit;
+    }
+    
+    /* Add active state for touch feedback */
+    .touch-active {
+        opacity: 0.7;
+        transform: scale(0.98);
+        transition: transform 0.1s, opacity 0.1s;
+    }
+    
+    /* Increase tap target sizes */
+    .btn, .nav-button, .word-set-content {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    /* Add styles for active touch state */
+    .btn:active, .nav-button:active, .word-set-content:active {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+} 

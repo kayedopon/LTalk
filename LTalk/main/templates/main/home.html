@@ -1,54 +1,52 @@
+{% extends 'main/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Your Word Sets</title>
-    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
-</head>
-<body>
-    {% include 'navbar.html' %}
-    <div class="home-container">
-        <h1 class="home-title">Your Word Sets</h1>
-        <div class="button-group">
-            <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
-            <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore other sets</a>
-        </div>
-        <div class="wordsets-wrapper">
-            {% if wordsets %}
-                <ul class="wordsets-list">
-                    {% for ws in wordsets %}
-                        <li class="word-set">
-                            <div class="word-set-content" data-id="{{ ws.pk }}">
-                                <div>
-                                    <div class="word-set-title">{{ ws.title }}</div>
-                                    <div class="word-count">{{ ws.words.count }} words</div>
-                                </div>
-                                <div
-                                    class="progress-circle"
-                                    style="background: conic-gradient(#4CAF50 {{ ws.progress }}%, #ddd {{ ws.progress }}%);"
-                                    aria-label="Learned {{ ws.progress }} percent"
-                                    title="Learned {{ ws.progress }}% of words"
-                                    data-progress="{{ ws.progress }}"
-                                >
-                                    <span>{{ ws.progress }}%</span>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="no-wordsets">You have no word sets yet.</p>
-            {% endif %}
-        </div>
+
+{% block title %}Your Word Sets{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1 class="home-title">Your Word Sets</h1>
+    <div class="button-group">
+        <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
+        <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore other sets</a>
     </div>
-    <script>
-        document.querySelectorAll(".word-set-content").forEach(function(block) {
-            block.addEventListener("click", function() {
-                const id = this.getAttribute("data-id");
-                window.location.href = `/wordset/${id}/`;
-            });
+    <div class="wordsets-wrapper">
+        {% if wordsets %}
+            <ul class="wordsets-list">
+                {% for ws in wordsets %}
+                    <li class="word-set">
+                        <div class="word-set-content" data-id="{{ ws.pk }}">
+                            <div>
+                                <div class="word-set-title">{{ ws.title }}</div>
+                                <div class="word-count">{{ ws.words.count }} words</div>
+                            </div>
+                            <div
+                                class="progress-circle"
+                                style="background: conic-gradient(#4CAF50 {{ ws.progress }}%, #ddd {{ ws.progress }}%);"
+                                aria-label="Learned {{ ws.progress }} percent"
+                                title="Learned {{ ws.progress }}% of words"
+                                data-progress="{{ ws.progress }}"
+                            >
+                                <span>{{ ws.progress }}%</span>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-wordsets">You have no word sets yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll(".word-set-content").forEach(function(block) {
+        block.addEventListener("click", function() {
+            const id = this.getAttribute("data-id");
+            window.location.href = `/wordset/${id}/`;
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}

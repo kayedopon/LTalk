@@ -1,46 +1,106 @@
 .navbar {
-  max-width: 800px;         
-  margin: 0.5rem auto;  
-  padding: 0.5rem 1rem;
-  background-color: #f4f4f9;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
-  font-family: inherit;      
-  border-radius: 8px;
-}
-  
-  .navbar-container {
-    display: flex;
-    justify-content: space-between;  
-    align-items: center;
-  }
-  
-  .navbar-logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #4CAF50;
-    text-decoration: none;
-    padding: 8px 16px;
-    background-color: transparent;
-    border: none;
-    transition: color 0.3s;
+  background-color: #333;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.navbar-logo:hover {
-    color: #388E3C;
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 60px;
 }
-  .logout-form {
-    margin: 0;                
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  border-radius: 4px;
+}
+
+.nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  height: 3px;
+  width: 100%;
+  background-color: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 767.98px) {
+  .menu-toggle {
+    display: flex;
   }
+  
+  .navbar-menu {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .navbar-menu.active {
+    max-height: 300px;
+  }
+  
   .nav-button {
-    background-color: #4CAF50;  
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 4px;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
   }
-  .nav-button:hover {
-    background-color: #45a049; 
-  }
+}
   
