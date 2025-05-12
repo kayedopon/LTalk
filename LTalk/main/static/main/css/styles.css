@@ -1,6 +1,7 @@
 /* Main CSS file that imports all modular CSS files */
-@import 'navbar.css';
+@import 'theme.css';
 @import 'base.css';
+@import 'navbar.css';
 @import 'home.css';
 @import 'wordset.css';
 @import 'exercises.css'; 

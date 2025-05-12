@@ -2,18 +2,18 @@
 
 /* Question area */
 #m_choice-area {
-    background-color: #fff;
-    border-radius: 8px;
+    background-color: var(--card);
+    border-radius: var(--radius);
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .question-text {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
     margin-bottom: 20px;
     font-weight: 500;
-    color: #2c3e50;
+    color: var(--foreground);
 }
 
 /* Options styling */
@@ -29,17 +29,20 @@
     width: 100%;
     text-align: left;
     padding: 15px;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #f8f9fa;
+    font-size: var(--font-size-base);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-short);
+    position: relative;
 }
 
 .option-btn:hover {
-    background-color: #e9f7ff;
-    border-color: #c6e2ff;
+    background-color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
 }
 
 .option-btn:disabled {
@@ -50,65 +53,67 @@
 /* Feedback styling */
 .feedback {
     padding: 15px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     margin: 20px 0;
-    font-size: 1.1rem;
+    font-size: var(--font-size-base);
     font-weight: 500;
+    color: var(--foreground);
 }
 
 /* Next button */
 .next-btn {
     padding: 12px 32px;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
     font-weight: 500;
     border: none;
     cursor: pointer;
-    transition: background 0.2s;
-    background: #4CAF50;
-    color: #fff;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+    background-color: var(--chart-2);
+    color: white;
     margin-top: 10px;
 }
 
 .next-btn:hover {
-    background: #388e3c;
+    background-color: hsl(173, 58%, 35%);
+    transform: translateY(-2px);
 }
 
 /* Loading state */
 .loading {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: var(--font-size-lg);
     margin: 30px 0;
-    color: #007bff;
+    color: var(--primary);
 }
 
 /* Summary section */
 .finished {
-    background-color: #f8f9fa;
-    border-radius: 8px;
+    background-color: var(--card);
+    border-radius: var(--radius);
     padding: 20px;
     margin-top: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
     text-align: center;
 }
 
 .finished h2 {
-    color: #2c3e50;
+    color: var(--foreground);
     margin-bottom: 20px;
-    font-size: 1.8rem;
+    font-size: var(--font-size-2xl);
 }
 
 .finished p {
-    font-size: 1.2rem;
+    font-size: var(--font-size-lg);
     margin-bottom: 10px;
 }
 
 /* Error message */
 .error-message {
-    color: #dc3545;
+    color: var(--destructive);
     padding: 15px;
-    background-color: #f8d7da;
-    border-radius: 8px;
+    background-color: rgba(var(--destructive-rgb, 220, 53, 69), 0.1);
+    border-radius: var(--radius);
     margin: 20px 0;
-    font-size: 1.1rem;
+    font-size: var(--font-size-base);
 } 

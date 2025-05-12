@@ -4,12 +4,14 @@
 {% block title %}Your Word Sets{% endblock %}
 
 {% block content %}
-<div class="home-container">
+<div class="container">
     <h1 class="home-title">Your Word Sets</h1>
+    
     <div class="button-group">
         <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
-        <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore other sets</a>
+        <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore Sets</a>
     </div>
+    
     <div class="wordsets-wrapper">
         {% if wordsets %}
             <ul class="wordsets-list">
@@ -22,7 +24,7 @@
                             </div>
                             <div
                                 class="progress-circle"
-                                style="background: conic-gradient(#4CAF50 {{ ws.progress }}%, #ddd {{ ws.progress }}%);"
+                                style="--progress: {{ ws.progress }}%;"
                                 aria-label="Learned {{ ws.progress }} percent"
                                 title="Learned {{ ws.progress }}% of words"
                                 data-progress="{{ ws.progress }}"
@@ -34,7 +36,10 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="no-wordsets">You have no word sets yet.</p>
+            <div class="card text-center">
+                <p class="mb-3">You have no word sets yet.</p>
+                <a href="{% url 'create_set' %}" class="btn btn-primary">Create Your First Set</a>
+            </div>
         {% endif %}
     </div>
 </div>
@@ -47,6 +52,11 @@
             const id = this.getAttribute("data-id");
             window.location.href = `/wordset/${id}/`;
         });
+    });
+    
+    document.querySelectorAll(".progress-circle").forEach(function(circle) {
+        const progress = circle.getAttribute("data-progress");
+        circle.style.background = `conic-gradient(var(--primary) ${progress}%, var(--secondary) ${progress}%)`;
     });
 </script>
 {% endblock %}

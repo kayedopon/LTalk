@@ -10,22 +10,23 @@
 }
 
 .type-button {
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
     padding: 10px 20px;
-    border-radius: 20px;
+    border-radius: var(--radius-full, 20px);
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s, color 0.3s;
+    font-size: var(--font-size-base);
+    transition: background-color var(--transition-short), color var(--transition-short), transform var(--transition-short);
 }
 
 .type-button:hover {
-    background-color: #4CAF50;
+    background-color: var(--chart-2);
     color: white;
+    transform: translateY(-2px);
 }
 
 .type-button.active {
-    background-color: #4CAF50;
+    background-color: var(--chart-2);
     color: white;
 }
 
@@ -33,27 +34,27 @@
 .progress-list {
     margin: 20px 0;
     padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--card);
+    box-shadow: var(--shadow-sm);
 }
 
 .progress-list h3 {
     margin-top: 0;
-    font-size: 20px;
-    color: #2c3e50;
+    font-size: var(--font-size-lg);
+    color: var(--foreground);
     text-align: center;
 }
 
 /* Individual progress entries */
 .progress-entry {
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: var(--background);
+    border: 1px solid var(--border);
     padding: 10px 15px;
     margin: 10px 0;
-    border-radius: 6px;
-    font-size: 15px;
+    border-radius: var(--radius-sm, 6px);
+    font-size: var(--font-size-base);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -61,12 +62,12 @@
 }
 
 .progress-entry .correct {
-    color: #28a745;
+    color: var(--chart-2);
     font-weight: bold;
 }
 
 .progress-entry .incorrect {
-    color: #dc3545;
+    color: var(--destructive);
     font-weight: bold;
 }
 
@@ -75,11 +76,12 @@
     position: relative;
     padding: 15px 20px;
     margin-bottom: 20px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--card);
 }
 
 .history-header .left-button {
@@ -88,23 +90,24 @@
 }
 
 .history-header .btn-primary {
-    background-color: #4CAF50;
+    background-color: var(--chart-2);
     color: white;
     padding: 0 20px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm, 5px);
     text-decoration: none;
-    transition: background-color 0.3s;
-    font-size: 16px;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+    font-size: var(--font-size-base);
 }
 
 .history-header .btn-primary:hover {
-    background-color: #45a049;
+    background-color: hsl(173, 58%, 35%);
+    transform: translateY(-2px);
 }
 
 .center-title {
     margin: 0;
-    font-size: 24px;
-    color: #2c3e50;
+    font-size: var(--font-size-xl);
+    color: var(--foreground);
     text-align: center;
     width: 100%;
 }

@@ -14,9 +14,10 @@
     transform-style: preserve-3d;
     transition: transform 0.6s;
     cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    background-color: var(--card);
 }
 
 .flashcard.is-flipped {
@@ -31,20 +32,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: var(--font-size-xl);
     padding: 20px;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: var(--radius);
 }
 
 .flashcard-front {
-    background-color: #e9f7ff;
-    color: #333;
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
 }
 
 .flashcard-back {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: var(--accent);
+    color: var(--accent-foreground);
     transform: rotateY(180deg);
 }
 
@@ -56,26 +57,38 @@
 .controls button {
     padding: 10px 20px;
     margin: 0 10px;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: var(--radius);
     border: none;
+    transition: background-color var(--transition-short), transform var(--transition-short);
 }
 
 .correct-btn {
-    background-color: #28a745;
+    background-color: var(--chart-2);
     color: white;
 }
 
+.correct-btn:hover {
+    background-color: hsl(173, 58%, 35%);
+    transform: translateY(-2px);
+}
+
 .incorrect-btn {
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+}
+
+.incorrect-btn:hover {
+    background-color: hsl(0, 84.2%, 55%);
+    transform: translateY(-2px);
 }
 
 .loading, .finished {
     text-align: center;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     margin-top: 20px;
+    color: var(--foreground);
 }
 
 /* Multiple choice styles */
@@ -83,18 +96,30 @@
     display: block;
     margin: 10px 0;
     padding: 10px;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     cursor: pointer;
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: background-color var(--transition-short), transform var(--transition-short);
+}
+
+.option-btn:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
 }
 
 .question {
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--foreground);
 }
 
 .feedback {
     margin-top: 15px;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
+    color: var(--foreground);
 }
 
 /* Search input for exercise history */
@@ -104,71 +129,78 @@
     padding: 10px 14px;
     margin: 20px auto;
     display: block;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    transition: border 0.3s ease;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    box-shadow: var(--shadow-sm);
+    transition: border var(--transition-short), box-shadow var(--transition-short);
+    background-color: var(--background);
+    color: var(--foreground);
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: var(--primary);
     box-shadow: 0 0 6px rgba(0,123,255,0.2);
 } 
 
 .fill-in-gap-container {
-    background-color: #f8f9fa;
-    border-radius: 8px;
+    background-color: var(--card);
+    border-radius: var(--radius);
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .question-sentence {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
     margin-bottom: 15px;
     line-height: 1.8;
     font-weight: 500;
+    color: var(--foreground);
 }
 
 .question-hint {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--muted-foreground);
     font-style: italic;
     margin-top: 10px;
 }
 
 .gap-input {
-    border: 2px solid #007bff;
-    border-radius: 4px;
+    border: 2px solid var(--primary);
+    border-radius: calc(var(--radius) - 2px);
     padding: 5px 10px;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     min-width: 120px;
     display: inline-block;
     margin: 0 4px;
+    background-color: var(--background);
+    color: var(--foreground);
 }
 
 .feedback {
     padding: 15px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     margin-top: 20px;
 }
 
 .feedback.correct {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
+    background-color: var(--chart-2);
+    color: white;
+    border: 1px solid transparent;
 }
 
 .feedback.incorrect {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+    border: 1px solid transparent;
 }
 
 .feedback-header {
     font-weight: bold;
     margin-bottom: 8px;
-    font-size: 1.1rem;
+    font-size: var(--font-size-base);
 }
 
 .feedback-content {
@@ -177,15 +209,15 @@
 
 .progress-container {
     height: 8px;
-    background-color: #e9ecef;
-    border-radius: 4px;
+    background-color: var(--secondary);
+    border-radius: calc(var(--radius) - 2px);
     margin-bottom: 20px;
 }
 
 .progress-bar {
     height: 100%;
-    background-color: #007bff;
-    border-radius: 4px;
+    background-color: var(--primary);
+    border-radius: calc(var(--radius) - 2px);
     transition: width 0.3s ease;
 }
 
@@ -196,4 +228,14 @@
 .btn {
     padding: 8px 16px;
     margin-right: 8px;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
 }

@@ -1,84 +1,149 @@
+/* Modern Home Page Styles */
+
+.home-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  text-align: center;
+  margin: 2rem 0;
+  color: var(--foreground);
+}
+
 .wordsets-wrapper {
-    margin-top: 10px;
+  margin-top: 2rem;
 }
 
 .wordsets-list {
-    padding: 0;
-    margin: 0;
-    list-style: none;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
 }
 
 .word-set {
-    background: #f9fafc;
-    border: 1px solid #e0e4ea;
-    border-radius: 12px;
-    margin-bottom: 18px;
-    transition: box-shadow 0.2s;
-    cursor: pointer;
-    padding: 0;
+  background-color: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform var(--transition-short), box-shadow var(--transition-short), border-color var(--transition-short);
 }
 
 .word-set:hover {
-    box-shadow: 0 2px 12px rgba(76,175,80,0.08);
-    border-color: #b2dfdb;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--ring);
 }
 
 .word-set-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 24px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  height: 100%;
 }
 
 .word-set-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #388e3c;
-    margin-bottom: 4px;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
 }
 
 .word-count {
-    font-size: 0.98rem;
-    color: #666;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
 }
 
+/* Progress Circle */
 .progress-circle {
-    min-width: 54px;
-    min-height: 54px;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    color: #4CAF50;
-    font-weight: bold;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(76,175,80,0.07);
-    position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--foreground);
+  position: relative;
+  background: conic-gradient(var(--primary) var(--progress, 0%), var(--secondary) var(--progress, 0%));
 }
 
-.progress-circle::after {
-    content: "";
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    background: #f9fafc;
-    border-radius: 50%;
-    z-index: 0;
+.progress-circle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background-color: var(--card);
+  border-radius: 50%;
+  z-index: 1;
 }
 
 .progress-circle span {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 2;
 }
 
+/* Empty state */
 .no-wordsets {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--muted-foreground);
+  font-size: var(--font-size-lg);
 }
+
+/* Button group */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+/* Create set button */
+.create-set-button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: background-color var(--transition-short);
+  text-align: center;
+  display: block;
+  max-width: 200px;
+  margin: 2rem auto;
+}
+
+.create-set-button:hover {
+  filter: brightness(1.1);
+}
+
+/* Animation for new sets */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.word-set {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Staggered animation for multiple sets */
+.word-set:nth-child(1) { animation-delay: 0.05s; }
+.word-set:nth-child(2) { animation-delay: 0.1s; }
+.word-set:nth-child(3) { animation-delay: 0.15s; }
+.word-set:nth-child(4) { animation-delay: 0.2s; }
+.word-set:nth-child(5) { animation-delay: 0.25s; }
+.word-set:nth-child(6) { animation-delay: 0.3s; }
+.word-set:nth-child(7) { animation-delay: 0.35s; }
+.word-set:nth-child(8) { animation-delay: 0.4s; }
 
 .word-set-info {
      flex-grow: 1; /* Allow info to take available space */
