@@ -136,33 +136,83 @@ function displayResult(result) {
 
 // DOMContentLoaded listener to handle the form submission asynchronously
 document.addEventListener('DOMContentLoaded', function() {
+    const chosenFiles = [];     // each element is the actual File object
     const form = document.getElementById('form1');
     const imageInput = document.getElementById('image-input');
     const fileNameSpan = document.getElementById('file-name');
+    const fileListUl   = document.getElementById('file-list');
 
-    imageInput.addEventListener('change', function() {
-        if (imageInput.files.length > 0) {
-            fileNameSpan.textContent = imageInput.files[0].name;
-        } else {
+    // ---------- helper to refresh the visible list ----------
+    function renderFileList() {
+        // fallback: show the first file’s name inline (your old UI)
+        if (chosenFiles.length === 0) {
             fileNameSpan.textContent = '';
+        } else {
+            fileNameSpan.textContent = `${chosenFiles.length} file(s) selected`;
         }
+
+        // nicer list under the button
+        fileListUl.innerHTML = '';
+        chosenFiles.forEach((file, idx) => {
+            const li = document.createElement('li');
+            li.textContent = file.name;
+            // (optional) add a small “×” so user can remove a file
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '✕';
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-file-btn';
+            removeBtn.onclick = () => {
+                chosenFiles.splice(idx, 1);
+                renderFileList();
+            };
+            li.appendChild(removeBtn);
+            fileListUl.appendChild(li);
+        });
+    }
+
+    // ---------- when user picks files ----------
+    imageInput.addEventListener('change', () => {
+        // append every newly selected file to the persistent array
+        for (const file of imageInput.files) {
+            chosenFiles.push(file);
+        }
+        renderFileList();
+
+        // IMPORTANT: reset the <input> so the same file can be chosen again
+        imageInput.value = '';
     });
 
+    // ---------- when the form is submitted ----------
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
 
-        // Show loading message
-        document.getElementById('result').innerHTML = '<div class="loading-message">Loading words...</div>';
+        if (chosenFiles.length === 0) {
+            alert('Pick at least one image first');
+            return;
+        }
+
+        const formData = new FormData();
+        for (const file of chosenFiles) {
+            formData.append('image', file);            // same field name as before
+        }
+        formData.append('csrfmiddlewaretoken', getCSRFToken());
+
+        document.getElementById('result').innerHTML =
+            '<div class="loading-message">Loading words…</div>';
 
         try {
-            const response = await fetch('api/process-photo/', {
+            const response = await fetch('/api/process-photo/', {
                 method: 'POST',
-                body: formData,
+                body:   formData,
+                credentials: 'same-origin'
             });
             const result = await response.json();
             displayResult(result);
-        } catch (error) {
+
+            // on success you might want to clear files
+            chosenFiles.length = 0;
+            renderFileList();
+        } catch (err) {
             displayResult({ error: 'An error occurred while processing your request.' });
         }
     });

@@ -6,6 +6,16 @@
     <title>LTalk - Image Word Extractor</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <style>
+        /* minimal extras for the file list */
+        .file-list      { margin: .5rem 0 0; padding-left: 1.2rem; list-style: disc; }
+        .file-list li   { margin-bottom: .25rem; display: flex; gap: .5rem; align-items: center; }
+        .remove-file-btn{
+            font: inherit; background: none; border: none;
+            cursor: pointer; line-height: 1; padding: 0 .25rem;
+        }
+        .remove-file-btn:hover { color: red; }
+    </style>
     <script src="{% static 'main/js/word_extractor.js' %}" defer></script>
 </head>
 <body>
@@ -14,12 +24,28 @@
         <h1>LTalk Image Word Extractor</h1>
 
         <div class="upload-section">
-            <form method="post" id="form1" enctype="multipart/form-data">
+            <form id="form1" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="file" name="image" accept="image/*" required id="image-input" class="hidden-input" />
-                <label for="image-input" class="upload-button">Choose Image</label>
-                <button type="submit" class="upload-button" style="margin-top: 10px;">Process Image</button>
+
+                <!-- hidden <input> so we can style the label as a button -->
+                <input  type="file"
+                        id="image-input"
+                        name="image"           
+                        accept="image/*"
+                        multiple            
+                        class="hidden-input">
+
+                <label for="image-input" class="upload-button">Choose image(s)</label>
+
+                <!-- tiny summary: “3 file(s) selected” -->
                 <span id="file-name"></span>
+
+                <!-- full list under the button -->
+                <ul id="file-list" class="file-list"></ul>
+
+                <button type="submit" class="upload-button" style="margin-top:10px;">
+                    Process image(s)
+                </button>
             </form>
         </div>
 

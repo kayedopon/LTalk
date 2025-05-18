@@ -702,22 +702,41 @@ prompt_text = (
 )
 
 
+def extract_words_from_gemini(text: str) -> list[dict]:
+    """
+    Clean Gemini’s response and return a list of word-dicts.
+    Raises ValueError / json.JSONDecodeError when it can’t parse.
+    """
+    text = text.strip()
+    if text.startswith('```'):
+        text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.I).rstrip('`').strip()
+
+    match = re.search(r'\[.*\]', text, re.S)
+    if not match:
+        raise ValueError("No JSON array found in Gemini response")
+
+    words_data = json.loads(match.group(0))
+    if not isinstance(words_data, list):
+        raise ValueError("Parsed JSON is not a list")
+
+    return words_data
+
 
 class ProcessPhotoAPIView(APIView):
-    http_method_names = ['post']
+    http_method_names = ["post"]
     parser_classes = [MultiPartParser, FormParser]
 
     @extend_schema(
         request={
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'image': {
-                        'type': 'string',
-                        'format': 'binary',
-                        'description': 'Image file to process'
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "image": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "binary"},
+                        "description": "One or more images",
                     }
-                }
+                },
             }
         },
         responses={
@@ -726,59 +745,63 @@ class ProcessPhotoAPIView(APIView):
                 examples=[
                     {
                         "words": [
-                            {"word": "obuolys", "translation": "apple", "infinitive": "obuolys"}
+                            {
+                                "word": "obuolys",
+                                "translation": "apple",
+                                "infinitive": "obuolys",
+                            }
                         ]
                     }
-                ]
+                ],
             ),
-            400: OpenApiResponse(description="Invalid image or bad format")
+            400: OpenApiResponse(description="Invalid image or bad format"),
         },
-        description="Extract Lithuanian words from an image"
+        description="Extract Lithuanian words from one or more images",
     )
     def post(self, request):
-        if 'image' not in request.FILES:
-            return Response({"error": "No image file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+        images = request.FILES.getlist("image")
+        if not images:
+            return Response(
+                {"error": "No image files uploaded."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        file = request.FILES['image']
-        try:
-            img = PIL.Image.open(file)
-        except Exception as e:
-            return Response({"error": f"Error loading image: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+        aggregated: dict[str, dict] = {}
+        skipped = []
 
-        try:
-            response = model.generate_content([prompt_text, img])
-            response_text = response.text.strip()
+        for file in images:
+            try:
+                img = PIL.Image.open(file)
+            except Exception as exc:
+                skipped.append(f"{file.name}: cannot open ({exc})")
+                continue
 
-            if response_text.startswith('```'):
-                response_text = re.sub(r'^```(?:json)?\s*', '', response_text.strip(), flags=re.IGNORECASE)
-                response_text = re.sub(r'\s*```$', '', response_text.strip())
-                
-            json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
-            if json_match:
-                response_text = json_match.group(0)
-            else:
-                return Response({
-                    "error": "Invalid response format",
-                    "raw_response": response_text
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            words_data = json.loads(response_text)
-            if not isinstance(words_data, list):
-                raise ValueError("Response is not a list")
+            try:
+                resp = model.generate_content([prompt_text, img])
+                words = extract_words_from_gemini(resp.text)
+            except Exception as exc:
+                # Log or collect the reason; just don’t abort the entire batch
+                skipped.append(f"{file.name}: {exc}")
+                continue
 
-            return Response({"words": words_data}, status=status.HTTP_200_OK)
+            for w in words:
+                aggregated.setdefault(w["infinitive"].lower(), w)
 
-        except json.JSONDecodeError as e:
-            return Response({
-                "error": "JSON parsing error",
-                "message": str(e),
-                "raw_response": response.text
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not aggregated:
+            # Every image failed → treat as 500 so the JS shows an error
+            return Response(
+                {
+                    "error": "Could not extract words from any image.",
+                    "details": skipped,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-        except Exception as e:
-            return Response({
-                "error": "Processing error",
-                "message": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"words": list(aggregated.values()), "skipped": skipped},
+            status=status.HTTP_200_OK,
+        )
+
 
 
 class TextExerciseAPIView(APIView):
