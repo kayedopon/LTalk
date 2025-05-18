@@ -65,73 +65,107 @@ function getCSRFToken() {
 }
 
 // This function sends the form data and displays the result
+// ---------------------------------------------------------------------------
+// REPLACEMENT displayResult – now renders editable <input> fields
+// ---------------------------------------------------------------------------
 function displayResult(result) {
     const resultDiv = document.getElementById('result');
+
+    /* ----- error handling unchanged ----- */
     if (result.error) {
         resultDiv.innerHTML = `<div class="error-message">${result.error}</div>`;
         return;
     }
-   
-    const form  = document.createElement('form');
-    form.id = 'word-form';
-    form.method = 'post';
-    
-    const wordsContainer = document.createElement('div');
-    wordsContainer.className = 'words-container';
-    
-    const wordsHeader = document.createElement('div');
-    wordsHeader.className = 'words-header';
-    wordsHeader.innerHTML = `
-        <div class="header-word">Word</div>
-        <div class="header-infinitive">Infinitive</div>
-        <div class="header-translation">Translation</div>
-        <div class="header-actions">Actions</div>
-    `;
-    wordsContainer.appendChild(wordsHeader);
-    
-    const wordsList = document.createElement('ul');
-    form.onsubmit = (e) => {
-        prepareWordsJSON();
-        sendWordSet();
 
-        return true;
+    /* ----- 1. build the edit-form -------------------------------------- */
+    const form  = document.createElement('form');
+    form.id     = 'word-form';
+    form.method = 'post';             // used only by JS; server will be hit via fetch
+    form.onsubmit = (e) => {
+        e.preventDefault();           // we’ll handle submit manually
+        prepareWordsJSON();           // collects values from inputs
+        sendWordSet();                // your existing POST /api/wordset/
     };
 
+    /* CSRF hidden field + title/description */
     const csrfToken = getCSRFToken();
-    form.innerHTML = `<input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-                      <input type="hidden" name="words_json" id="words-json">
-                      <input type="text" name="wordset_title" id="wordset-title" class="wordset-input" placeholder="Enter word set title" required>
-                      <input type="text" name="wordset_description" id="wordset-description" class="wordset-input" placeholder="Short description (optional)">`;
+    form.innerHTML = `
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+        <input type="hidden" name="words_json" id="words-json">
+        <input type="text"   name="wordset_title" id="wordset-title"
+               class="wordset-input" placeholder="Enter word set title" required>
+        <input type="text"   name="wordset_description" id="wordset-description"
+               class="wordset-input" placeholder="Short description (optional)">
+    `;
 
-    wordsList.className = 'words-list';
+    /* ----- 2. table-like container with editable cells ------------------ */
+    const container = document.createElement('div');
+    container.className = 'words-container';
 
-    result.words.forEach(item => {
+    /* header row */
+    container.innerHTML = `
+        <div class="words-header">
+            <div class="header-word">Word</div>
+            <div class="header-infinitive">Infinitive</div>
+            <div class="header-translation">Translation</div>
+            <div class="header-actions">Actions</div>
+        </div>
+    `;
+
+    /* list of rows */
+    const list = document.createElement('ul');
+    list.className = 'words-list';
+
+    result.words.forEach((item, idx) => {
         const li = document.createElement('li');
         li.className = 'word-item';
-        li.setAttribute('data-word', item.word);
-        li.setAttribute('data-infinitive', item.infinitive);
-        li.setAttribute('data-translation', item.translation);
+
         li.innerHTML = `
-            <span class="word">${item.word}</span>
-            <span class="infinitive">${item.infinitive}</span>
-            <span class="translation">${item.translation}</span>
-            <button type="button" class="remove-btn" onclick="removeWord(this)">Delete</button>
+            <input type="text" class="word-input"        value="${item.word}"
+                   data-field="word">
+            <input type="text" class="infinitive-input" value="${item.infinitive}"
+                   data-field="infinitive">
+            <input type="text" class="translation-input"value="${item.translation}"
+                   data-field="translation">
+            <button type="button" class="remove-btn" onclick="removeWord(this)">
+                Delete
+            </button>
         `;
-        wordsList.appendChild(li);
+        list.appendChild(li);
     });
 
-    wordsContainer.appendChild(wordsList);
-    form.appendChild(wordsContainer);
+    container.appendChild(list);
+    form.appendChild(container);
 
-    const submitButton = document.createElement('button');
-    submitButton.type = 'submit';
-    submitButton.className = 'upload-button';
-    submitButton.textContent = 'Create Word Set';
+    /* submit button */
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.className = 'upload-button';
+    submitBtn.textContent = 'Create Word Set';
+    form.appendChild(submitBtn);
 
-    form.appendChild(submitButton);
-
+    /* ----- 3. render the whole thing in #result ------------------------- */
     resultDiv.innerHTML = '';
     resultDiv.appendChild(form);
+}
+
+/* --------------------------------------------------------------------- */
+/* helpers stay basically the same                                       */
+/* --------------------------------------------------------------------- */
+function prepareWordsJSON() {
+    const items = document.querySelectorAll('.word-item');
+    const words = Array.from(items).map(item => {
+        const obj = {};
+        item.querySelectorAll('input[data-field]').forEach(inp => {
+            obj[inp.dataset.field] = inp.value.trim();
+        });
+        return obj;
+    });
+    document.getElementById('words-json').value = JSON.stringify(words);
+}
+
+function removeWord(btn) {
+    btn.closest('.word-item').remove();
 }
 
 // DOMContentLoaded listener to handle the form submission asynchronously

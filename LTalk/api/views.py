@@ -319,10 +319,10 @@ class ExerciseViewSet(ModelViewSet):
                     self.__class__._api_call_timestamps = []
                     recent_calls = 0
             
-            model = genai.GenerativeModel('gemini-2.0-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
             
             prompt = f"""
-            Create a beginner-friendly, complete Lithuanian sentence using the word '{word.word}' (which means '{word.translation}' in English).
+            Create a beginner-friendly, complete Lithuanian sentence using the word '{word.infinitive}' (which means '{word.translation}' in English).
             - The sentence must be clear and understandable, with enough context for a language learner.
             - Use the word in a grammatically correct, but not basic, form (e.g., different case for nouns, different tense/person for verbs).
             - Replace the word with a gap indicated by '___'.
@@ -597,7 +597,7 @@ class SubmitExerciseAPIView(APIView):
             The correct form to fill the gap is '{correct_answer}'.
             User answered: '{user_answer}'
 
-            Please provide a helpful explanation (2-3 sentences) about:
+            Please provide a short and helpful explanation (1-2 sentences) about:
             1. Why their answer is incorrect 
             2. What grammatical rules apply here
             3. How to correctly form this word from the infinitive
