@@ -17,6 +17,7 @@ async function sendWordSet() {
     const data = {
         title: document.getElementById('wordset-title').value,
         description: document.getElementById('wordset-description').value,
+        public: !document.getElementById('wordset-private').checked,
         words: JSON.parse(document.getElementById('words-json').value)
     };
 
@@ -96,6 +97,10 @@ function displayResult(result) {
                class="wordset-input" placeholder="Enter word set title" required>
         <input type="text"   name="wordset_description" id="wordset-description"
                class="wordset-input" placeholder="Short description (optional)">
+        <label class="privacy-toggle">
+            <input type="checkbox" id="wordset-private">
+            <span>Make&nbsp;private</span>
+        </label>
     `;
 
     /* ----- 2. table-like container with editable cells ------------------ */
@@ -106,7 +111,7 @@ function displayResult(result) {
     container.innerHTML = `
         <div class="words-header">
             <div class="header-word">Word</div>
-            <div class="header-infinitive">Infinitive</div>
+            <div class="header-infinitive">Base form</div>
             <div class="header-translation">Translation</div>
             <div class="header-actions">Actions</div>
         </div>

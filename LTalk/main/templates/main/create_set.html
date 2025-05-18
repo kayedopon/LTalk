@@ -15,6 +15,26 @@
             cursor: pointer; line-height: 1; padding: 0 .25rem;
         }
         .remove-file-btn:hover { color: red; }
+        /* keep it on one line, align centre, and tighten the gap */
+        .privacy-toggle{
+            display:inline-flex;     /* inline keeps it next to the inputs above */
+            align-items:center;
+            gap:0.4rem;              /* space between box and text */
+            margin:0.5rem 0;         /* top/bottom breathing-room */
+            white-space:nowrap;      /* never wrap the text */
+        }
+
+        .word-edit-row{
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap:.5rem;
+            margin-bottom:.5rem;
+        }
+        .word-edit-row input{ width:100%; }
+        .remove-btn{
+            background:none; border:none; font-size:1rem; cursor:pointer;
+        }
+
     </style>
     <script src="{% static 'main/js/word_extractor.js' %}" defer></script>
 </head>

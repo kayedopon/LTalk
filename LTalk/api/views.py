@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 from django.db.models import Max, Value, DateTimeField
@@ -43,11 +44,17 @@ class WordViewSet(ModelViewSet):
     queryset = Word.objects.all()
     http_method_names = ['get', 'head', 'options']
 
-
+class IsOwnerOrReadOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:           # GET / HEAD / OPTIONS
+            return True
+        return obj.user == request.user
+    
 class WordSetViewSet(ModelViewSet):
 
     serializer_class = WordSetSerializer
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'delete']
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     
     def get_queryset(self):
         scope = self.request.query_params.get("scope")
@@ -876,9 +883,10 @@ class TextExerciseAPIView(APIView):
         Vocabulary list: {word_list_formatted}
         
         The text should:
-        - Use beginner-friendly grammar and sentence structure
+        - Use beginner-friendly vocabulary
         - Include at least 50% of the words from the vocabulary list
         - Be contextual and meaningful (not just random sentences)
+        - Preferrably tell a story
         
         The questions should:
         - Be in Lithuanian to test understanding
@@ -902,6 +910,7 @@ class TextExerciseAPIView(APIView):
     
     def _generate_text_and_questions(self, prompt):
         try:
+            model = genai.GenerativeModel('gemini-2.0-flash')
             response = model.generate_content(prompt)
             response_text = response.text.strip()
             

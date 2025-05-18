@@ -13,26 +13,29 @@ class WordSetSerializer(serializers.ModelSerializer):
     words = WordSerializer(many=True)
 
     class Meta:
-        model = WordSet
-        fields = ['id', 'user', 'title', 'description', 'public', 'created', 'words']
+        model  = WordSet
+        fields = ['id', 'user', 'title', 'description',
+                  'public', 'created', 'words']
         read_only_fields = ['id', 'user', 'created']
 
-    # override create function to add own implementation
-    def create(self, validated_data):
-        user = self.context['request'].user
-        validated_data['user'] = user 
-
-        words = validated_data.pop('words')
-        wordset = self.Meta.model.objects.create(**validated_data)
-
-        for word in words:
-            w, _ = Word.objects.get_or_create(word=word['word'], defaults=word)
-            wordset.words.add(w)
-        return wordset
-    
     def update(self, instance, validated_data):
-        instance.public = validated_data.get('public', instance.public)
+        words_data = validated_data.pop('words', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
+
+        if words_data is not None:
+            instance.words.clear()
+            for w in words_data:
+                word_obj, _ = Word.objects.get_or_create(
+                    word=w['word'],
+                    infinitive=w['infinitive'],
+                    translation=w['translation'],
+                    defaults=w
+                )
+                instance.words.add(word_obj)
+
         return instance
 
 
