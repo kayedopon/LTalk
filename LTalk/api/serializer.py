@@ -18,6 +18,19 @@ class WordSetSerializer(serializers.ModelSerializer):
                   'public', 'created', 'words']
         read_only_fields = ['id', 'user', 'created']
 
+    # override create function to add own implementation
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['user'] = user
+
+        words = validated_data.pop('words')
+        wordset = self.Meta.model.objects.create(**validated_data)
+
+        for word in words:
+            w, _ = Word.objects.get_or_create(word=word['word'], defaults=word)
+            wordset.words.add(w)
+        return wordset
+
     def update(self, instance, validated_data):
         words_data = validated_data.pop('words', None)
 
