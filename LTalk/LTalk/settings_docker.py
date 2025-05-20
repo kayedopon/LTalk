@@ -1,69 +1,42 @@
-"""
-Production settings for LTalk project when running in Docker.
-"""
-import os
-from pathlib import Path
 from .settings import *  # Import base settings
 
-# Set production environment
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-SECRET_KEY = os.environ.get('SECRET_KEY')
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+from pathlib import Path
+import os
+import dj_database_url     # pip install dj-database-url
 
-# Database settings
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DEBUG = False
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+
+# --- Database (PostgreSQL) ---
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
+    "default": dj_database_url.config(
+        default=os.getenv(
+            "DATABASE_URL",      # e.g. postgres://user:pass@db:5432/mydb
+            "postgres://postgres:postgres@db:5432/postgres"
+        ),
+        conn_max_age=600,
+    )
 }
 
-# Static files configuration
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "main/static/main/",
-]
+# --- Static files ---
+STATIC_URL  = "/static/"
+STATIC_ROOT = "/static" 
 
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'mediafiles'
+# # If you keep custom assets within project:
+# STATICFILES_DIRS = [
+#     BASE_DIR / "main" / "static",
+#     BASE_DIR / "authentication" / "static",
+    
+# ]
 
-# Security settings
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
+# --- Media files (optional) ---
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path("/media")
 
-# Cache settings
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/tmp/django_cache',
-    }
-}
-
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': '/app/logs/django.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-    },
-} 
+# --- Security & other prod settings ---
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+# SECRET_KEY should come from environment!
+SECRET_KEY = os.getenv("SECRET_KEY")

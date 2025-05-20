@@ -1,0 +1,119 @@
+/* Multiple Choice Exercise Styles */
+
+/* Question area */
+#m_choice-area {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md);
+}
+
+.question-text {
+    font-size: var(--font-size-xl);
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+/* Options styling */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    font-size: var(--font-size-base);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    cursor: pointer;
+    transition: all var(--transition-short);
+    position: relative;
+}
+
+.option-btn:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.option-btn:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+/* Feedback styling */
+.feedback {
+    padding: 15px;
+    border-radius: var(--radius);
+    margin: 20px 0;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+/* Next button */
+.next-btn {
+    padding: 12px 32px;
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+    background-color: var(--chart-2);
+    color: white;
+    margin-top: 10px;
+}
+
+.next-btn:hover {
+    background-color: hsl(173, 58%, 35%);
+    transform: translateY(-2px);
+}
+
+/* Loading state */
+.loading {
+    text-align: center;
+    font-size: var(--font-size-lg);
+    margin: 30px 0;
+    color: var(--primary);
+}
+
+/* Summary section */
+.finished {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.finished h2 {
+    color: var(--foreground);
+    margin-bottom: 20px;
+    font-size: var(--font-size-2xl);
+}
+
+.finished p {
+    font-size: var(--font-size-lg);
+    margin-bottom: 10px;
+}
+
+/* Error message */
+.error-message {
+    color: var(--destructive);
+    padding: 15px;
+    background-color: rgba(var(--destructive-rgb, 220, 53, 69), 0.1);
+    border-radius: var(--radius);
+    margin: 20px 0;
+    font-size: var(--font-size-base);
+} 
