@@ -765,6 +765,7 @@ class ProcessPhotoAPIView(APIView):
         },
         description="Extract Lithuanian words from one or more images",
     )
+
     def post(self, request):
         images = request.FILES.getlist("image")
         if not images:
@@ -778,21 +779,65 @@ class ProcessPhotoAPIView(APIView):
 
         for file in images:
             try:
+                # Open the image
                 img = PIL.Image.open(file)
-            except Exception as exc:
-                skipped.append(f"{file.name}: cannot open ({exc})")
+                
+                # Resize large images to reduce memory usage and API processing time
+                max_size = (1600, 1600)  # Maximum dimensions
+                if img.width > max_size[0] or img.height > max_size[1]:
+                    img.thumbnail(max_size, PIL.Image.Resampling.LANCZOS)
+                
+                # Convert to RGB if needed (removing alpha channel)
+                if img.mode == 'RGBA':
+                    img = img.convert('RGB')
+                    
+                # Use a timeout for the API call
+                import threading
+                from concurrent.futures import ThreadPoolExecutor, TimeoutError
+                
+                # Function to run in the thread
+                def call_gemini_api():
+                    return model.generate_content([prompt_text, img])
+                
+                # Use ThreadPoolExecutor to run with timeout
+                with ThreadPoolExecutor() as executor:
+                    future = executor.submit(call_gemini_api)
+                    try:
+                        # Wait for 25 seconds max
+                        resp = future.result(timeout=25)
+                        words = extract_words_from_gemini(resp.text)
+                    except TimeoutError:
+                        skipped.append(f"{file.name}: API call timed out")
+                        continue
+                    except Exception as exc:
+                        skipped.append(f"{file.name}: {exc}")
+                        continue
+                
+                for w in words:
+                    aggregated.setdefault(w["infinitive"].lower(), w)
+                    
+            except PIL.UnidentifiedImageError:
+                skipped.append(f"{file.name}: not a valid image")
                 continue
-
-            try:
-                resp = model.generate_content([prompt_text, img])
-                words = extract_words_from_gemini(resp.text)
             except Exception as exc:
-                # Log or collect the reason; just don’t abort the entire batch
+                # Log or collect the reason; just don't abort the entire batch
                 skipped.append(f"{file.name}: {exc}")
                 continue
 
-            for w in words:
-                aggregated.setdefault(w["infinitive"].lower(), w)
+        if not aggregated:
+            # Every image failed → treat as 500 so the JS shows an error
+            return Response(
+                {
+                    "error": "Could not extract words from any image.",
+                    "details": skipped,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(
+            {"words": list(aggregated.values()), "skipped": skipped},
+            status=status.HTTP_200_OK,
+        )
 
         if not aggregated:
             # Every image failed → treat as 500 so the JS shows an error
