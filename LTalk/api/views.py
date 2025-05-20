@@ -326,7 +326,7 @@ class ExerciseViewSet(ModelViewSet):
                     self.__class__._api_call_timestamps = []
                     recent_calls = 0
             
-            model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             prompt = f"""
             Create a beginner-friendly, complete Lithuanian sentence using the word '{word.infinitive}' (which means '{word.translation}' in English).

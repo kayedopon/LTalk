@@ -1,0 +1,54 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+
+# Django specific
+db.sqlite3
+*.sqlite3
+*.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache/
+coverage.xml
+*.cover
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env.local
+
+# Developer tools
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local files
+.git/
+.gitignore
+.DS_Store
+.env
+.env.example
+
+# Docker related
+.dockerignore
+docker-compose*.yml
+
+# Project specifics (assuming these are mounted as volumes)
+/media/
+/static/
