@@ -56,7 +56,7 @@ function getCSRFToken() {
 
 
 function displayResult(result) {
-    const resultDiv = document.getElementById('container');
+    const resultDiv = document.getElementById('wordset-edit');
 
     if (result.error) {
         resultDiv.innerHTML = `<div class="error-message">${result.error}</div>`;
@@ -162,7 +162,7 @@ function removeWord(btn) {
 
 async function fetchWords() {
     const wordsetId = document.getElementById('wordset-id').getAttribute('data-id');
-    document.getElementById('container').innerHTML = '<div class="loading-message">Loading words…</div>';
+    document.getElementById('wordset-edit').innerHTML = '<div class="loading-message">Loading words…</div>';
 
     try {
 

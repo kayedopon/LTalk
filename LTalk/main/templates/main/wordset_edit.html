@@ -40,8 +40,15 @@
 <body>
     {% include 'navbar.html' %}
     <span id="wordset-id" data-id="{{wordset.id}}" style="display: none;"></span>
+
     <div class="container" id="container">
-    
+        <div class="wordset-header" style="justify-content: flex-start;">
+            <a href="{% url 'wordset_detail' wordset.id %}" class="upload-button">← Cancel</a>
+        </div>
+        
+        <div class="wordset-edit" id="wordset-edit">
+
+        </div>
     </div>
 
     <script src="{% static 'main/js/ws_edit.js' %}" defer></script>
