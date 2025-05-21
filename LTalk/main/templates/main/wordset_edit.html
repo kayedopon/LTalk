@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTalk - Image Word Extractor</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* minimal extras for the file list */
+        .file-list      { margin: .5rem 0 0; padding-left: 1.2rem; list-style: disc; }
+        .file-list li   { margin-bottom: .25rem; display: flex; gap: .5rem; align-items: center; }
+        .remove-file-btn{
+            font: inherit; background: none; border: none;
+            cursor: pointer; line-height: 1; padding: 0 .25rem;
+        }
+        .remove-file-btn:hover { color: red; }
+        /* keep it on one line, align centre, and tighten the gap */
+        .privacy-toggle{
+            display:inline-flex;     /* inline keeps it next to the inputs above */
+            align-items:center;
+            gap:0.4rem;              /* space between box and text */
+            margin:0.5rem 0;         /* top/bottom breathing-room */
+            white-space:nowrap;      /* never wrap the text */
+        }
+
+        .word-edit-row{
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap:.5rem;
+            margin-bottom:.5rem;
+        }
+        .word-edit-row input{ width:100%; }
+        .remove-btn{
+            background:none; border:none; font-size:1rem; cursor:pointer;
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <span id="wordset-id" data-id="{{wordset.id}}" style="display: none;"></span>
+    <div class="container" id="container">
+    
+    </div>
+
+    <script src="{% static 'main/js/ws_edit.js' %}" defer></script>
+</body>
+</html>

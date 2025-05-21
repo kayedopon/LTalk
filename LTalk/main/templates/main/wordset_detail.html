@@ -71,7 +71,15 @@
                 <i class="fas fa-trash"></i> Delete Word Set
             </button>
         </form>
+        
+        
+        <a href="{% url 'wordset_edit' wordset.id %}" class="edit-wordset-link">
+            <button class="btn btn-info" id="edit-wordset" style="background-color: #27303e; border: none;">
+                <i class="fas fa-edit"></i> Edit Word Set
+            </button>
+        </a>
         {% endif %}
+
     </div>
 
     <script src="{% static 'main/js/ws_detail.js' %}" defer></script>

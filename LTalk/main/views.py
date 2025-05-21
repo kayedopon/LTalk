@@ -86,6 +86,19 @@ def wordset_detail(request, id):
     }
     return render(request, 'wordset_detail.html', context=context)
 
+@login_required(login_url='login')
+def wordset_edit(request, id):
+    wordset = get_object_or_404(WordSet, pk=id, user=request.user)
+    if request.method == 'POST':
+        
+        return redirect('home')
+    
+    context = {
+        'wordset': wordset,
+        'user': request.user
+    }
+    return render(request, 'wordset_edit.html', context=context)
+
 from collections import defaultdict
 
 @login_required(login_url='login')

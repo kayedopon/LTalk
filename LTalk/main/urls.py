@@ -9,6 +9,7 @@ urlpatterns = [
     path('wordset/<int:id>/multiple-choice', views.m_choice_practice, name='m_choice_practice'),
     path('wordset/<int:wordset_id>/text-exercise/', views.text_exercise, name='text_exercise'),
     path('wordset/<int:id>/', views.wordset_detail, name='wordset_detail'),
+    path('wordset/<int:id>/edit', views.wordset_edit, name='wordset_edit'),
     path('wordset/<int:id>/history', views.exercise_history, name='exercise_history'),
     path('explore', views.explore_sets, name="explore_sets")
     
