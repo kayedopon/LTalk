@@ -32,9 +32,9 @@ async function sendWordSet() {
         });
 
         const result = await response.json();
-
+        
         if (response.ok) {
-            displayResult(result); // here we should redirect user to wordlist
+            window.location.href = `/wordset/${result.id}/`;
         } else {
             displayResult({ error: result.detail || 'An error occurred while processing your request.' });
         }

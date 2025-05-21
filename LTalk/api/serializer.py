@@ -27,7 +27,10 @@ class WordSetSerializer(serializers.ModelSerializer):
         wordset = self.Meta.model.objects.create(**validated_data)
 
         for word in words:
-            w, _ = Word.objects.get_or_create(word=word['word'], defaults=word)
+            w, _ = Word.objects.get_or_create(word=word['word'], 
+                                              infinitive=word['infinitive'], 
+                                              translation=word['translation'], 
+                                              defaults=word)
             wordset.words.add(w)
         return wordset
 
