@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (response.ok) {
+                console.log("____")
                 alert("Word set deleted successfully.");
                 window.location.href = '/';
             } else {
