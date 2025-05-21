@@ -66,18 +66,18 @@
         {% endif %}
 
         {% if user == wordset.user %}
-        <form method="get" class="delete-form" style="margin-top: 32px; text-align:center;">
+        <form method="get" class="options-form" style="margin-top: 32px; text-align:center;">
             <button class="btn btn-danger" id="delete-wordset" style="background-color: #dc3545; border: none;">
                 <i class="fas fa-trash"></i> Delete Word Set
             </button>
+
+            <a href="{% url 'wordset_edit' wordset.id %}" class="edit-wordset-link">
+                <button class="btn btn-info" id="edit-wordset" style="background-color: #27303e; border: none;">
+                    <i class="fas fa-edit"></i> Edit Word Set
+                </button>
+            </a>
         </form>
         
-        
-        <a href="{% url 'wordset_edit' wordset.id %}" class="edit-wordset-link">
-            <button class="btn btn-info" id="edit-wordset" style="background-color: #27303e; border: none;">
-                <i class="fas fa-edit"></i> Edit Word Set
-            </button>
-        </a>
         {% endif %}
 
     </div>
