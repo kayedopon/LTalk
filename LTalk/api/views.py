@@ -53,7 +53,7 @@ class IsOwnerOrReadOnly(BasePermission):
 class WordSetViewSet(ModelViewSet):
 
     serializer_class = WordSetSerializer
-    http_method_names = ['get', 'post', 'patch', 'head', 'options', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'put', 'head', 'options', 'delete']
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     
     def get_queryset(self):

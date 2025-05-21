@@ -23,7 +23,7 @@ async function sendWordSet() {
         const result = await response.json();
 
         if (response.ok) {
-            displayResult(result); // here we should redirect user to wordlist
+            window.location.href = `/wordset/${wordsetId}/`;
         } else {
             displayResult({ error: result.detail || 'An error occurred while processing your request.' });
         }
@@ -54,20 +54,15 @@ function getCSRFToken() {
     return '';
 }
 
-// This function sends the form data and displays the result
-// ---------------------------------------------------------------------------
-// REPLACEMENT displayResult – now renders editable <input> fields
-// ---------------------------------------------------------------------------
+
 function displayResult(result) {
     const resultDiv = document.getElementById('container');
 
-    /* ----- error handling unchanged ----- */
     if (result.error) {
         resultDiv.innerHTML = `<div class="error-message">${result.error}</div>`;
         return;
     }
 
-    /* ----- 1. build the edit-form -------------------------------------- */
     const form  = document.createElement('form');
     form.id     = 'word-form';
     form.method = 'post';             // used only by JS; server will be hit via fetch
@@ -136,7 +131,7 @@ function displayResult(result) {
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.className = 'upload-button';
-    submitBtn.textContent = 'Create Word Set';
+    submitBtn.textContent = 'Edit Word Set';
     form.appendChild(submitBtn);
 
 
@@ -180,7 +175,7 @@ async function fetchWords() {
         })
 
         const result = await response.json();
-        console.log(result);
+
         displayResult(result);
 
     } catch (err) {
