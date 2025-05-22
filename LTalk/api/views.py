@@ -717,12 +717,13 @@ class SubmitExerciseAPIView(APIView):
 
 prompt_text = (
     "Look at the image, extract only Lithuanian words and give me their English translation. "
+    "Ignore words in other languages on the image, just extract only Lithuanian words"
     "For each word, return: "
     "- the original word exactly as it appears, "
     "- its basic form (lemma), without changing the part of speech, "
     "- and English translation of the basic form "
     "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is and only with -is, give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io"
+    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is, give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io"
     "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
     "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
     "For other parts of speech, use the dictionary base form. "
