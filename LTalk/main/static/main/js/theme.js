@@ -68,5 +68,5 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add smooth transition class after initial load
   setTimeout(() => {
     document.body.classList.add('theme-transition-ready');
-  }, 300);
+  }, 0);
 }); 
