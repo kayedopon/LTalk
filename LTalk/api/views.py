@@ -329,19 +329,44 @@ class ExerciseViewSet(ModelViewSet):
             model = genai.GenerativeModel('gemini-2.0-flash')
             
             prompt = f"""
-            Create a beginner-friendly, complete Lithuanian sentence using the word '{word.infinitive}' (which means '{word.translation}' in English).
-            - The sentence must be clear and understandable, with enough context for a language learner.
-            - Use the word in a grammatically correct, but not basic, form (e.g., different case for nouns, different tense/person for verbs).
-            - Replace the word with a gap indicated by '___'.
-            - Do NOT return an empty or placeholder sentence.
-            - Do NOT return only the word or a fragment.
-            - Example output:
+            Create a beginner-friendly Lithuanian example using the word '{word.infinitive}' (which means '{word.translation}' in English). Follow these detailed instructions:
+
+            General Instructions:
+            - Generate 1-2 connected, beginner-friendly sentences that provide a clear and natural context for the word.
+            - The word must appear only once in the text and must be replaced with a gap marked "___".
+            - Do not use placeholder sentences or fragments.
+            - Return a JSON object with fields:
+            - "sentence" - the full 1-2 sentence context with the word replaced by "___",
+            - "correct_form" - the accurate Lithuanian form of the word as used in the sentence.
+
+            Instructions by Part of Speech:
+
+            If the word is a noun:
+            - Use the word in a non-nominative case (e.g., accusative, genitive, instrumental).
+            - Use singular or plural depending on context.
+            - Make sure the noun fits naturally in a realistic setting.
+
+            If the word is a verb:
+            - Use the verb in a conjugated form (not infinitive) and indicate the needed tense clearly and gramatically correctly (present, past, or future tense) in the parenthesis within the sentence.
+            - Match with a clear subject (e.g., “Aš”, “Jis”, etc.).
+            - Avoid using the verb together with verbs like "mėgsti", "norėti", "turėti", "galėti" "privalau",  etc., because these require the infinitive form.
+            - Ensure the sentence shows a real-life situation or action in context.
+
+            If the word is an adjective:
+            - Use it with a noun, ensuring agreement in gender, number, and case.
+            - Avoid overly simple constructions like “Tai ___.”
+            - Provide some narrative context in the surrounding sentence(s).
+
+            Output Format:
             {{
-                "sentence": "Man patinka keliauti su ___ per upę.",
-                "correct_form": "keltu"
+            "sentence": "Jis nusipirko ___, kad galėtų piešti parke.",
+            "correct_form": "teptuką"
             }}
-            Format your response as a JSON object with the fields 'sentence' and 'correct_form'. Do not add any explanation.
+
+            Do not include any explanation or description—only the JSON output.
             """
+
+
             
             try:
                 response = model.generate_content(prompt)
