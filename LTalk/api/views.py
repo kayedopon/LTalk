@@ -272,8 +272,8 @@ class ExerciseViewSet(ModelViewSet):
         from datetime import datetime, timedelta
         
         # Rate limiting management
-        MAX_CALLS_PER_MINUTE = 15
-        SAFE_LIMIT = 12  # Stay a bit under the limit for safety
+        MAX_CALLS_PER_MINUTE = 10000
+        SAFE_LIMIT = 9500  # Stay a bit under the limit for safety
         
         # Keep track of API calls with timestamps
         if not hasattr(self.__class__, '_api_call_timestamps'):
@@ -694,12 +694,14 @@ prompt_text = (
     "Look at the image, extract only Lithuanian words and give me their English translation. "
     "For each word, return: "
     "- the original word exactly as it appears, "
-    "- its English translation, "
-    "- and its basic form (lemma), without changing the part of speech. "
+    "- its basic form (lemma), without changing the part of speech, "
+    "- and English translation of the basic form "
     "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-    "For nouns, return the nominative singular form in the 'infinitive' field. "
-    "For verbs, return the actual infinitive form. "
-    "For adjectives, use the masculine nominative singular form, and for other parts of speech, use the dictionary base form. "
+    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is and only with -is, give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io"
+    "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
+    "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
+    "For other parts of speech, use the dictionary base form. "
+    "If you see that the word is very close to another on the photo and together they form a collocation lexically, put those words together in the field. Example: word: Labas rytas"
     "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
     "Preserve the original part of speech. "
     "Format the output as a JSON array of objects with the following fields: "
@@ -915,8 +917,15 @@ class TextExerciseAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def _create_text_prompt(self, words):
-        word_list = [f"{word['word']} ({word['translation']})" for word in words]
-        word_list_formatted = ", ".join(word_list)
+        # Format the word list to handle special characters better
+        word_entries = []
+        for word in words:
+            # Use quotes to properly encapsulate words with commas or spaces
+            word_entry = f'"{word["word"]}" ("{word["translation"]}")'
+            word_entries.append(word_entry)
+        
+        # Join with semicolons instead of commas to avoid confusion
+        word_list_formatted = "; ".join(word_entries)
         
         prompt = f"""
         You are a Lithuanian language teacher helping beginners learn Lithuanian.
@@ -925,13 +934,17 @@ class TextExerciseAPIView(APIView):
         1. A coherent text in Lithuanian using as many words from the list as possible
         2. 5 multiple choice questions in simple Lituanian about the text to check comprehension
         
-        Vocabulary list: {word_list_formatted}
+        Vocabulary list: {word_list_formatted}. The words or collocations are separated with semicolons.
         
         The text should:
         - Use beginner-friendly vocabulary
+        - B grammatically correct
+        - contain multiple paragraphs that are meaningfully connected. The first paragraph is introduction, the second is the main part, and the third is the conlusion/end of story.
         - Include at least 50% of the words from the vocabulary list
         - Be contextual and meaningful (not just random sentences)
-        - Preferrably tell a story
+        - each sentense should be connected to the whole text
+        - Preferrably tell a story or report something
+        - do not use any additional formatting for the text, don't make the words bold with *
         
         The questions should:
         - Be in Lithuanian to test understanding
