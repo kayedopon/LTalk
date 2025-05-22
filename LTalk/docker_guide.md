@@ -36,13 +36,13 @@ DATABASE_URL=postgres://ltalk_user:your_secure_password@db:5432/ltalk_db
 1. Build the containers:
 
 ```sh
-docker-compose build
+docker compose build
 ```
 
 2. Start the services:
 
 ```sh
-docker-compose up
+docker compose up
 ```
 
 3. Access the application at http://localhost
@@ -52,7 +52,7 @@ docker-compose up
 When running for the first time or after model changes:
 
 ```sh
-docker-compose exec web python manage.py migrate
+docker compose exec web python manage.py migrate
 ```
 
 ## Creating a superuser
@@ -60,7 +60,7 @@ docker-compose exec web python manage.py migrate
 To create an admin user:
 
 ```sh
-docker-compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py createsuperuser
 ```
 
 ## Viewing logs
@@ -68,25 +68,25 @@ docker-compose exec web python manage.py createsuperuser
 To see application logs:
 
 ```sh
-docker-compose logs -f web
+docker compose logs -f web
 ```
 
 To see all container logs:
 
 ```sh
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ## Stopping the application
 
 ```sh
-docker-compose down
+docker compose down
 ```
 
 To remove volumes (database data will be lost):
 
 ```sh
-docker-compose down -v
+docker compose down -v
 ```
 
 ## Troubleshooting
@@ -96,7 +96,7 @@ docker-compose down -v
 If static files are missing, try:
 
 ```sh
-docker-compose exec web python manage.py collectstatic --no-input
+docker compose exec web python manage.py collectstatic --no-input
 ```
 
 ### Database connection issues
