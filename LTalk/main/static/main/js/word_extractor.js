@@ -176,6 +176,12 @@ function prepareWordsJSON() {
 
 function removeWord(btn) {
     btn.closest('.word-item').remove();
+
+    const wordsList = document.querySelector(".words-list");
+    if (wordsList.children.length == 0) {
+        const btn = document.getElementById('create-wordset');
+        btn.remove();  
+    }
 }
 
 function addNewWord() {
@@ -202,9 +208,13 @@ function addNewWord() {
             sendWordSet();              
         };
 
+    }
+
+    if (list.children.length === 0) {
         const submitBtn = document.createElement('button');
         submitBtn.type = 'submit';
         submitBtn.className = 'upload-button';
+        submitBtn.id = 'create-wordset'
         submitBtn.textContent = 'Create Word Set';
         form.appendChild(submitBtn);
     }
