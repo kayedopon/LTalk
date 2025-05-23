@@ -151,6 +151,7 @@ function displayResult(result) {
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.className = 'upload-button';
+    submitBtn.id = 'create-wordset';
     submitBtn.textContent = 'Create Word Set';
     form.appendChild(submitBtn);
 
