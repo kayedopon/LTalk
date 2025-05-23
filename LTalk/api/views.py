@@ -977,6 +977,9 @@ class TextExerciseAPIView(APIView):
         - Each have 4 answer options (A, B, C, D)
         - Have varying difficulty levels
         
+        IMPORTANT: Return ONLY valid JSON without any markdown formatting, code blocks, or additional text.
+        Ensure all text content is properly escaped for JSON (escape quotes and newlines).
+
         Format your response as JSON with the following structure:
         {{
             "text": "Lithuanian text here...",
@@ -998,13 +1001,37 @@ class TextExerciseAPIView(APIView):
             response = model.generate_content(prompt)
             response_text = response.text.strip()
             
+            # Clean the response text to remove invalid control characters
+            import string
+            # Remove control characters except for newlines and tabs
+            cleaned_text = ''.join(char for char in response_text 
+                                if char in string.printable or char.isprintable())
+            
             # Extract JSON content
             import re
-            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            json_match = re.search(r'\{.*\}', cleaned_text, re.DOTALL)
             if json_match:
                 response_text = json_match.group(0)
+            else:
+                response_text = cleaned_text
             
-            content = json.loads(response_text)
+            # Additional cleaning: remove any remaining problematic characters
+            response_text = response_text.replace('\r', '').replace('\b', '').replace('\f', '')
+            
+            try:
+                content = json.loads(response_text)
+            except json.JSONDecodeError as json_error:
+                # If JSON parsing still fails, log the problematic text for debugging
+                print(f"JSON parsing failed. Response text: {response_text[:500]}...")
+                print(f"JSON error: {json_error}")
+                # Try to extract just the content between the first { and last }
+                start_idx = response_text.find('{')
+                end_idx = response_text.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    response_text = response_text[start_idx:end_idx+1]
+                    content = json.loads(response_text)
+                else:
+                    raise ValueError("Could not extract valid JSON from response")
             
             # Validate the expected structure
             if 'text' not in content or 'questions' not in content:
