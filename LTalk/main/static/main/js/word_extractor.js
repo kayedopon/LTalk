@@ -133,11 +133,11 @@ function displayResult(result) {
 
         li.innerHTML = `
             <input type="text" class="word-input"        value="${item.word}"
-                   data-field="word">
+                   data-field="word" required>
             <input type="text" class="infinitive-input" value="${item.infinitive}"
-                   data-field="infinitive">
+                   data-field="infinitive" required>
             <input type="text" class="translation-input"value="${item.translation}"
-                   data-field="translation">
+                   data-field="translation" required>
             <button type="button" class="remove-btn" onclick="removeWord(this)">
                 Delete
             </button>
@@ -203,18 +203,16 @@ function addNewWord() {
 
     li.innerHTML = `
         <input type="text" class="word-input"       
-                data-field="word">
+                data-field="word" required>
         <input type="text" class="infinitive-input" 
-                data-field="infinitive">
+                data-field="infinitive" required>
         <input type="text" class="translation-input"
-                data-field="translation">
+                data-field="translation" required>
         <button type="button" class="remove-btn" onclick="removeWord(this)">
             Delete
         </button>
     `;
     list.appendChild(li);
-
-
 }
 
 // DOMContentLoaded listener to handle the form submission asynchronously

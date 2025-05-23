@@ -112,11 +112,11 @@ function displayResult(result) {
 
         li.innerHTML = `
             <input type="text" class="word-input"        value="${item.word}"
-                   data-field="word">
+                   data-field="word" required>
             <input type="text" class="infinitive-input" value="${item.infinitive}"
-                   data-field="infinitive">
+                   data-field="infinitive" required>
             <input type="text" class="translation-input"value="${item.translation}"
-                   data-field="translation">
+                   data-field="translation" required>
             <button type="button" class="remove-btn" onclick="removeWord(this)">
                 Delete
             </button>
@@ -127,13 +127,19 @@ function displayResult(result) {
     container.appendChild(list);
     form.appendChild(container);
 
+    const addBtn = document.createElement('button');
+    addBtn.type = "button";
+    addBtn.className = "new-word";
+    addBtn.id = "new-word";
+    addBtn.textContent = "Add new word";
+    addBtn.addEventListener('click', addNewWord);
+    form.appendChild(addBtn);
 
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.className = 'upload-button';
     submitBtn.textContent = 'Edit Word Set';
     form.appendChild(submitBtn);
-
 
     resultDiv.innerHTML = '';
     resultDiv.appendChild(form);
@@ -181,6 +187,26 @@ async function fetchWords() {
     } catch (err) {
         displayResult({ error: 'An error occurred while processing your request.' });
     }
+}
+
+function addNewWord() {
+    let list = document.querySelector('.words-list');
+
+    const li = document.createElement('li');
+    li.className = 'word-item';
+
+    li.innerHTML = `
+        <input type="text" class="word-input"       
+                data-field="word" required>
+        <input type="text" class="infinitive-input" 
+                data-field="infinitive" required>
+        <input type="text" class="translation-input"
+                data-field="translation" required>
+        <button type="button" class="remove-btn" onclick="removeWord(this)">
+            Delete
+        </button>
+    `;
+    list.appendChild(li);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
