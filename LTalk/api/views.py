@@ -731,9 +731,9 @@ prompt_text = (
     "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
     "Preserve the original part of speech. "
     "Format the output as a JSON array of objects with the following fields: "
-    "'word' (original form), 'translation' (English meaning), and 'infinitive' (basic form). "
-    "Example: [{\"word\": \"stalo\", \"translation\": \"table\", \"infinitive\": \"stalas\"}, "
-    "{\"word\": \"eina\", \"translation\": \"goes\", \"infinitive\": \"eiti\"}]"
+    "'word' (original form),'infinitive' (basic form) and 'translation' (English meaning of the basic form)."
+    "Example: [{\"word\": \"stalo\", \"infinitive\": \"stalas\", \"translation\": \"table\"}, "
+    "{\"word\": \"eina\", \"infinitive\": \"eiti, eina, ejo\", \"translation\": \"to go\"}]"
 )
 
 
@@ -831,8 +831,8 @@ class ProcessPhotoAPIView(APIView):
                 with ThreadPoolExecutor() as executor:
                     future = executor.submit(call_gemini_api)
                     try:
-                        # Wait for 25 seconds max
-                        resp = future.result(timeout=25)
+                        # Wait for 160 seconds max
+                        resp = future.result(timeout=160)
                         words = extract_words_from_gemini(resp.text)
                     except TimeoutError:
                         skipped.append(f"{file.name}: API call timed out")
