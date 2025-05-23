@@ -402,3 +402,29 @@ label {
 .btn-secondary:hover {
     background: #bdbdbd;
 } 
+
+.new-word {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    margin: 1rem auto 0 auto;
+    cursor: pointer;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+    box-shadow: var(--shadow-sm);
+    width: 180px;
+    height: 50px;
+    text-align: center;
+}
+
+.new-word:hover {
+    background-color: #388e3c; /* matches .btn-primary:hover in base.css */
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
