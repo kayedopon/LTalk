@@ -402,3 +402,60 @@ label {
 .btn-secondary:hover {
     background: #bdbdbd;
 } 
+
+.new-word {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    margin: 1rem auto 0 auto;
+    cursor: pointer;
+    transition: background-color var(--transition-short), transform var(--transition-short);
+    box-shadow: var(--shadow-sm);
+    width: 180px;
+    height: 50px;
+    text-align: center;
+}
+
+.new-word:hover {
+    background-color: #388e3c; /* matches .btn-primary:hover in base.css */
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+/* minimal extras for the file list */
+.file-list      { margin: .5rem 0 0; padding-left: 1.2rem; list-style: disc; }
+.file-list li   { margin-bottom: .25rem; display: flex; gap: .5rem; align-items: center; }
+.remove-file-btn{
+    font: inherit; background: none; border: none;
+    cursor: pointer; line-height: 1; padding: 0 .25rem;
+}
+.remove-file-btn:hover { color: red; }
+/* keep it on one line, align centre, and tighten the gap */
+.privacy-toggle{
+    display:inline-flex;     /* inline keeps it next to the inputs above */
+    align-items:center;
+    gap:0.4rem;              /* space between box and text */
+    margin:0.5rem 0;         /* top/bottom breathing-room */
+    white-space:nowrap;      /* never wrap the text */
+}
+
+.word-edit-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap:.5rem;
+    margin-bottom:.5rem;
+}
+.word-edit-row input{ width:100%; }
+.remove-btn {
+    background: red;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}

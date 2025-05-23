@@ -70,6 +70,7 @@ function getCSRFToken() {
 // REPLACEMENT displayResult – now renders editable <input> fields
 // ---------------------------------------------------------------------------
 function displayResult(result) {
+    console.log(result)
     const resultDiv = document.getElementById('result');
 
     /* ----- error handling unchanged ----- */
@@ -79,9 +80,12 @@ function displayResult(result) {
     }
 
     /* ----- 1. build the edit-form -------------------------------------- */
-    const form  = document.createElement('form');
-    form.id     = 'word-form';
-    form.method = 'post';             // used only by JS; server will be hit via fetch
+    const form = document.createElement('form');
+    form.id = 'word-form';
+    form.method = 'post';
+    
+    
+    
     form.onsubmit = (e) => {
         e.preventDefault();           // we’ll handle submit manually
         prepareWordsJSON();           // collects values from inputs
@@ -101,13 +105,15 @@ function displayResult(result) {
             <input type="checkbox" id="wordset-public">
             <span>Make&nbsp;public</span>
         </label>
+        <div class="words-container" id="words-container"></div>
+        <button type="button" class="new-word" id="new-word">Add new word</button>
     `;
 
-    /* ----- 2. table-like container with editable cells ------------------ */
-    const container = document.createElement('div');
-    container.className = 'words-container';
+    let container = form.querySelector("#words-container");
+    const newWord = form.querySelector("#new-word");
+    newWord.addEventListener('click', addNewWord);
 
-    /* header row */
+    // header row
     container.innerHTML = `
         <div class="words-header">
             <div class="header-word">Word</div>
@@ -127,11 +133,11 @@ function displayResult(result) {
 
         li.innerHTML = `
             <input type="text" class="word-input"        value="${item.word}"
-                   data-field="word">
+                   data-field="word" required>
             <input type="text" class="infinitive-input" value="${item.infinitive}"
-                   data-field="infinitive">
+                   data-field="infinitive" required>
             <input type="text" class="translation-input"value="${item.translation}"
-                   data-field="translation">
+                   data-field="translation" required>
             <button type="button" class="remove-btn" onclick="removeWord(this)">
                 Delete
             </button>
@@ -140,7 +146,6 @@ function displayResult(result) {
     });
 
     container.appendChild(list);
-    form.appendChild(container);
 
     /* submit button */
     const submitBtn = document.createElement('button');
@@ -173,6 +178,54 @@ function removeWord(btn) {
     btn.closest('.word-item').remove();
 }
 
+function addNewWord() {
+    const form = document.getElementById('word-form');
+    let container = form.querySelector('.words-container');
+    let list = container.querySelector('.words-list');
+
+    if (!list) {
+        container.innerHTML = `
+            <div class="words-header">
+                <div class="header-word">Word</div>
+                <div class="header-infinitive">Base form</div>
+                <div class="header-translation">Translation</div>
+                <div class="header-actions">Actions</div>
+            </div>
+        `;
+        list = document.createElement('ul');
+        list.className = 'words-list';
+        container.appendChild(list);
+
+        form.onsubmit = (e) => {
+            e.preventDefault();           
+            prepareWordsJSON();           
+            sendWordSet();              
+        };
+
+        const submitBtn = document.createElement('button');
+        submitBtn.type = 'submit';
+        submitBtn.className = 'upload-button';
+        submitBtn.textContent = 'Create Word Set';
+        form.appendChild(submitBtn);
+    }
+
+    const li = document.createElement('li');
+    li.className = 'word-item';
+
+    li.innerHTML = `
+        <input type="text" class="word-input"       
+                data-field="word" required>
+        <input type="text" class="infinitive-input" 
+                data-field="infinitive" required>
+        <input type="text" class="translation-input"
+                data-field="translation" required>
+        <button type="button" class="remove-btn" onclick="removeWord(this)">
+            Delete
+        </button>
+    `;
+    list.appendChild(li);
+}
+
 // DOMContentLoaded listener to handle the form submission asynchronously
 document.addEventListener('DOMContentLoaded', function() {
     const chosenFiles = [];     // each element is the actual File object
@@ -180,6 +233,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('image-input');
     const fileNameSpan = document.getElementById('file-name');
     const fileListUl   = document.getElementById('file-list');
+
+    const addWord = document.getElementById('new-word');
+
+    addWord.addEventListener('click', addNewWord)
 
     // ---------- helper to refresh the visible list ----------
     function renderFileList() {
@@ -251,7 +308,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // on success you might want to clear files
             chosenFiles.length = 0;
             renderFileList();
+            console.log('aboba')
         } catch (err) {
+            console.log(err)
             displayResult({ error: 'An error occurred while processing your request.' });
         }
     });
