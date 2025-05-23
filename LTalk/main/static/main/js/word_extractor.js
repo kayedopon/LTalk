@@ -195,7 +195,18 @@ function addNewWord() {
         list = document.createElement('ul');
         list.className = 'words-list';
         container.appendChild(list);
-        form.appendChild(container);
+
+        form.onsubmit = (e) => {
+            e.preventDefault();           
+            prepareWordsJSON();           
+            sendWordSet();              
+        };
+
+        const submitBtn = document.createElement('button');
+        submitBtn.type = 'submit';
+        submitBtn.className = 'upload-button';
+        submitBtn.textContent = 'Create Word Set';
+        form.appendChild(submitBtn);
     }
 
     const li = document.createElement('li');
