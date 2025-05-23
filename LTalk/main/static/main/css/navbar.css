@@ -130,17 +130,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem 0;
+    padding: 0; /* CHANGE: Remove initial padding */
     max-height: 0;
     overflow: hidden;
     transition: max-height var(--transition-medium) ease-out, padding var(--transition-medium) ease-out;
     box-shadow: var(--shadow-md);
     border-bottom: 1px solid var(--border);
+    visibility: hidden; /* ADDED: Hide content completely when collapsed */
   }
   
   .navbar-menu.active {
     max-height: 300px;
-    padding: 1rem 0;
+    padding: 1rem 0; /* Keep padding only when active */
+    visibility: visible; /* ADDED: Show content when active */
   }
   
   .nav-button {

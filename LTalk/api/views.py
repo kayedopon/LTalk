@@ -272,8 +272,8 @@ class ExerciseViewSet(ModelViewSet):
         from datetime import datetime, timedelta
         
         # Rate limiting management
-        MAX_CALLS_PER_MINUTE = 15
-        SAFE_LIMIT = 12  # Stay a bit under the limit for safety
+        MAX_CALLS_PER_MINUTE = 10000
+        SAFE_LIMIT = 9500  # Stay a bit under the limit for safety
         
         # Keep track of API calls with timestamps
         if not hasattr(self.__class__, '_api_call_timestamps'):
@@ -329,19 +329,44 @@ class ExerciseViewSet(ModelViewSet):
             model = genai.GenerativeModel('gemini-2.0-flash')
             
             prompt = f"""
-            Create a beginner-friendly, complete Lithuanian sentence using the word '{word.infinitive}' (which means '{word.translation}' in English).
-            - The sentence must be clear and understandable, with enough context for a language learner.
-            - Use the word in a grammatically correct, but not basic, form (e.g., different case for nouns, different tense/person for verbs).
-            - Replace the word with a gap indicated by '___'.
-            - Do NOT return an empty or placeholder sentence.
-            - Do NOT return only the word or a fragment.
-            - Example output:
+            Create a beginner-friendly Lithuanian example using the word '{word.infinitive}' (which means '{word.translation}' in English). Follow these detailed instructions:
+
+            General Instructions:
+            - Generate 1-2 connected, beginner-friendly sentences that provide a clear and natural context for the word.
+            - The word must appear only once in the text and must be replaced with a gap marked "___".
+            - Do not use placeholder sentences or fragments.
+            - Return a JSON object with fields:
+            - "sentence" - the full 1-2 sentence context with the word replaced by "___",
+            - "correct_form" - the accurate Lithuanian form of the word as used in the sentence.
+
+            Instructions by Part of Speech:
+
+            If the word is a noun:
+            - Use the word in a non-nominative case (e.g., accusative, genitive, instrumental).
+            - Use singular or plural depending on context.
+            - Make sure the noun fits naturally in a realistic setting.
+
+            If the word is a verb:
+            - Use the verb in a conjugated form (not infinitive) and indicate the needed tense clearly and gramatically correctly (present, past, or future tense) in the parenthesis within the sentence.
+            - Match with a clear subject (e.g., “Aš”, “Jis”, etc.).
+            - Avoid using the verb together with verbs like "mėgsti", "norėti", "turėti", "galėti" "privalau",  etc., because these require the infinitive form.
+            - Ensure the sentence shows a real-life situation or action in context.
+
+            If the word is an adjective:
+            - Use it with a noun, ensuring agreement in gender, number, and case.
+            - Avoid overly simple constructions like “Tai ___.”
+            - Provide some narrative context in the surrounding sentence(s).
+
+            Output Format:
             {{
-                "sentence": "Man patinka keliauti su ___ per upę.",
-                "correct_form": "keltu"
+            "sentence": "Jis nusipirko ___, kad galėtų piešti parke.",
+            "correct_form": "teptuką"
             }}
-            Format your response as a JSON object with the fields 'sentence' and 'correct_form'. Do not add any explanation.
+
+            Do not include any explanation or description—only the JSON output.
             """
+
+
             
             try:
                 response = model.generate_content(prompt)
@@ -692,14 +717,17 @@ class SubmitExerciseAPIView(APIView):
 
 prompt_text = (
     "Look at the image, extract only Lithuanian words and give me their English translation. "
+    "Ignore words in other languages on the image, just extract only Lithuanian words"
     "For each word, return: "
     "- the original word exactly as it appears, "
-    "- its English translation, "
-    "- and its basic form (lemma), without changing the part of speech. "
+    "- its basic form (lemma), without changing the part of speech, "
+    "- and English translation of the basic form "
     "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-    "For nouns, return the nominative singular form in the 'infinitive' field. "
-    "For verbs, return the actual infinitive form. "
-    "For adjectives, use the masculine nominative singular form, and for other parts of speech, use the dictionary base form. "
+    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is, give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io"
+    "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
+    "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
+    "For other parts of speech, use the dictionary base form. "
+    "If you see that the word is very close to another on the photo and together they form a collocation lexically, put those words together in the field. Example: word: Labas rytas"
     "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
     "Preserve the original part of speech. "
     "Format the output as a JSON array of objects with the following fields: "
@@ -915,8 +943,15 @@ class TextExerciseAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def _create_text_prompt(self, words):
-        word_list = [f"{word['word']} ({word['translation']})" for word in words]
-        word_list_formatted = ", ".join(word_list)
+        # Format the word list to handle special characters better
+        word_entries = []
+        for word in words:
+            # Use quotes to properly encapsulate words with commas or spaces
+            word_entry = f'"{word["word"]}" ("{word["translation"]}")'
+            word_entries.append(word_entry)
+        
+        # Join with semicolons instead of commas to avoid confusion
+        word_list_formatted = "; ".join(word_entries)
         
         prompt = f"""
         You are a Lithuanian language teacher helping beginners learn Lithuanian.
@@ -925,13 +960,17 @@ class TextExerciseAPIView(APIView):
         1. A coherent text in Lithuanian using as many words from the list as possible
         2. 5 multiple choice questions in simple Lituanian about the text to check comprehension
         
-        Vocabulary list: {word_list_formatted}
+        Vocabulary list: {word_list_formatted}. The words or collocations are separated with semicolons.
         
         The text should:
         - Use beginner-friendly vocabulary
+        - B grammatically correct
+        - contain multiple paragraphs that are meaningfully connected. The first paragraph is introduction, the second is the main part, and the third is the conlusion/end of story.
         - Include at least 50% of the words from the vocabulary list
         - Be contextual and meaningful (not just random sentences)
-        - Preferrably tell a story
+        - each sentense should be connected to the whole text
+        - Preferrably tell a story or report something
+        - do not use any additional formatting for the text, don't make the words bold with *
         
         The questions should:
         - Be in Lithuanian to test understanding

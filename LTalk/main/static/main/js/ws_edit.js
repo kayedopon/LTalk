@@ -6,7 +6,7 @@ async function sendWordSet() {
     const data = {
         title: document.getElementById('wordset-title').value,
         description: document.getElementById('wordset-description').value,
-        public: !document.getElementById('wordset-private').checked,
+        public: document.getElementById('wordset-public').checked,
         words: JSON.parse(document.getElementById('words-json').value)
     };
 
@@ -78,12 +78,12 @@ function displayResult(result) {
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
         <input type="hidden" name="words_json" id="words-json">
         <input type="text"   name="wordset_title" id="wordset-title"
-               class="wordset-input" placeholder="Enter word set title" required>
+            class="wordset-input" placeholder="Enter word set title" required>
         <input type="text"   name="wordset_description" id="wordset-description"
-               class="wordset-input" placeholder="Short description (optional)">
+            class="wordset-input" placeholder="Short description (optional)">
         <label class="privacy-toggle">
-            <input type="checkbox" id="wordset-private">
-            <span>Make&nbsp;private</span>
+            <input type="checkbox" id="wordset-public">
+            <span>Make&nbsp;public</span>
         </label>
     `;
     console.log("|||")
@@ -140,7 +140,7 @@ function displayResult(result) {
 
     document.getElementById('wordset-title').value = result.title;
     document.getElementById('wordset-description').value = result.description;
-    document.getElementById('wordset-private').checked = !result.public;
+    document.getElementById('wordset-public').checked = result.public;
 }
 
 

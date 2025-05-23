@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 
-@login_required(login_url='login')
+@login_required()
 def home(request):
     wordsets = WordSet.objects.filter(user=request.user).annotate(
             latest_exercise=Max('exercises__progress_entries__answered_at'),
@@ -23,13 +23,13 @@ def home(request):
         ws.progress = ws.learned_percent(request.user)
     return render(request, "home.html", {"wordsets": wordsets})
 
-@login_required(login_url='login')
+@login_required()
 def create_set(request):
     if request.method == 'POST':
             return redirect('home')
     return render(request, "create_set.html")
 
-@login_required(login_url='login')
+@login_required()
 def flashcard_practice(request, wordset_id):
     wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
     context = {
@@ -38,7 +38,7 @@ def flashcard_practice(request, wordset_id):
     }
     return render(request, "main/flashcard.html", context)
 
-@login_required(login_url='login')
+@login_required()
 def fill_in_gap_practice(request, wordset_id):
     wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
     # Add timestamp to ensure a new exercise is created each time
@@ -52,7 +52,7 @@ def fill_in_gap_practice(request, wordset_id):
     }
     return render(request, "main/fill_in_gap.html", context)
 
-@login_required(login_url='login')
+@login_required()
 def m_choice_practice(request, id):
     wordset = get_object_or_404(WordSet, id=id, user=request.user)
 
@@ -62,7 +62,7 @@ def m_choice_practice(request, id):
     }
     return render(request, "m_choice.html", context)
 
-@login_required(login_url='login')
+@login_required()
 def text_exercise(request, wordset_id):
     wordset = get_object_or_404(WordSet, id=wordset_id, user=request.user)
     timestamp = int(time.time())
@@ -74,7 +74,7 @@ def text_exercise(request, wordset_id):
     }
     return render(request, "main/text_exercise.html", context)
 
-@login_required(login_url='login')
+@login_required()
 def wordset_detail(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
     if not wordset.public and wordset.user != request.user:
@@ -86,7 +86,7 @@ def wordset_detail(request, id):
     }
     return render(request, 'wordset_detail.html', context=context)
 
-@login_required(login_url='login')
+@login_required()
 def wordset_edit(request, id):
     wordset = get_object_or_404(WordSet, pk=id, user=request.user)
     if request.method == 'POST':
@@ -101,7 +101,7 @@ def wordset_edit(request, id):
 
 from collections import defaultdict
 
-@login_required(login_url='login')
+@login_required()
 def exercise_history(request, id):
     wordset = get_object_or_404(WordSet, pk=id)
     exercises = wordset.exercises.prefetch_related('progress_entries')

@@ -3,8 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multiple Choice</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
     {% include 'navbar.html' %}
@@ -38,9 +40,11 @@
     </div>
 
     <script>
-        const wordsetId = {{ wordset_id }};
+        const wordsetId = "{{ wordset_id }}";
         const csrfToken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'main/js/m_choice.js' %}" defer></script>
+    <script src="{% static 'main/js/theme.js' %}"></script>
+    <script src="{% static 'main/js/touch.js' %}"></script>
 </body>
 </html>

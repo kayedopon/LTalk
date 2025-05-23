@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.innerHTML = `
             <div class="question-sentence">${sentence}</div>
-            <div class="question-hint">Word: ${questionData.word} (${questionData.translation})</div>
+            <div class="question-hint">Word: ${questionData.infinitive} (${questionData.translation})</div>
         `;
         
         return container;
@@ -280,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sentence: value.sentence,
                     word: value.word,
                     infinitive: value.infinitive,
+                    translation: value.translation,
                     explanation: value.explanation
                 }));
                 

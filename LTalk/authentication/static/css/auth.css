@@ -4,31 +4,38 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
+    padding: 15px;
+    box-sizing: border-box;
 }
+
 .auth-container {
     background: #ffffff;
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    width: 450px;
-    max-width: 90%;
+    width: 100%;
+    max-width: 450px;
 }
+
 .title-block p {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
 }
+
 .input-box {
     margin-bottom: 20px;
 }
+
 .input-label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
 }
+
 .input-field {
     width: 100%;
     padding: 12px;
@@ -36,11 +43,14 @@ body {
     border-radius: 8px;
     font-size: 14px;
     transition: border-color 0.3s;
+    box-sizing: border-box;
 }
+
 .input-field:focus {
     border-color: #4CAF50;
     outline: none;
 }
+
 .messages {
     background: #ffe0e0;
     border: 1px solid #ffb0b0;
@@ -51,9 +61,11 @@ body {
     color: #d8000c;
     font-size: 14px;
 }
+
 .message {
     margin: 0;
 }
+
 #login-button button {
     width: 100%;
     padding: 12px;
@@ -65,18 +77,59 @@ body {
     cursor: pointer;
     font-size: 16px;
 }
+
 #login-button button:hover {
     background-color: #45a049;
 }
+
 .link-block {
     margin-top: 15px;
     text-align: center;
     font-size: 14px;
 }
+
 .link-block a {
     color: #4CAF50;
     text-decoration: none;
 }
+
 .link-block a:hover {
     text-decoration: underline;
+}
+
+/* Media queries for responsive design */
+@media screen and (max-width: 480px) {
+    .auth-container {
+        padding: 25px 20px;
+    }
+    
+    .title-block p {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .input-field {
+        padding: 10px;
+        font-size: 16px; /* Larger font size for better mobile interaction */
+    }
+    
+    #login-button button {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    .input-label {
+        font-size: 14px;
+    }
+}
+
+/* Make touch targets easier to hit on mobile */
+@media (hover: none) and (pointer: coarse) {
+    #login-button button {
+        min-height: 48px;
+    }
+    
+    .input-field {
+        min-height: 44px;
+    }
 }
