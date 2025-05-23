@@ -3,48 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTalk - Image Word Extractor</title>
+    <title>New Word Set</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
-    <style>
-        /* minimal extras for the file list */
-        .file-list      { margin: .5rem 0 0; padding-left: 1.2rem; list-style: disc; }
-        .file-list li   { margin-bottom: .25rem; display: flex; gap: .5rem; align-items: center; }
-        .remove-file-btn{
-            font: inherit; background: none; border: none;
-            cursor: pointer; line-height: 1; padding: 0 .25rem;
-        }
-        .remove-file-btn:hover { color: red; }
-        /* keep it on one line, align centre, and tighten the gap */
-        .privacy-toggle{
-            display:inline-flex;     /* inline keeps it next to the inputs above */
-            align-items:center;
-            gap:0.4rem;              /* space between box and text */
-            margin:0.5rem 0;         /* top/bottom breathing-room */
-            white-space:nowrap;      /* never wrap the text */
-        }
-
-        .word-edit-row{
-            display:grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap:.5rem;
-            margin-bottom:.5rem;
-        }
-        .word-edit-row input{ width:100%; }
-        .remove-btn {
-            background: red;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-    </style>
 </head>
 <body>
     {% include 'navbar.html' %}
     <div class="container">
-        <h1>LTalk Image Word Extractor</h1>
+        <h1>New Word Set</h1>
 
         <div class="upload-section">
             <form id="form1" method="post" enctype="multipart/form-data">
