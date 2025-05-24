@@ -392,7 +392,8 @@ class ExerciseViewSet(ModelViewSet):
             - Make sure the noun fits naturally in a realistic setting.
 
             If the word is a verb:
-            - Use the verb in a conjugated form (not infinitive) and indicate the needed tense clearly and gramatically correctly (present, past, or future tense) in the parenthesis within the sentence.
+            - Use the verb in a conjugated form (not infinitive).
+            - indicate the needed tense clearly and gramatically correctly based on the sentence (present, past, or future tense) in the parenthesis in the end of the sentence.
             - Match with a clear subject (e.g., “Aš”, “Jis”, etc.).
             - Avoid using the verb together with verbs like "mėgsti", "norėti", "turėti", "galėti" "privalau",  etc., because these require the infinitive form.
             - Ensure the sentence shows a real-life situation or action in context.
@@ -401,6 +402,8 @@ class ExerciseViewSet(ModelViewSet):
             - Use it with a noun, ensuring agreement in gender, number, and case.
             - Avoid overly simple constructions like “Tai ___.”
             - Provide some narrative context in the surrounding sentence(s).
+
+            IMPORTANT: you should use exactly these string to indicate the gap ___ with exactly the same amount of underscores (3).
 
             Output Format:
             {{
@@ -519,7 +522,7 @@ class ExerciseViewSet(ModelViewSet):
                 unlearned_words = wordset.words.all()
             
             # Limit number of words to avoid rate limit issues
-            MAX_WORDS_PER_REQUEST = 12  # Adjust based on your needs - well under the 15/min limit
+            MAX_WORDS_PER_REQUEST = 15  # Adjust based on your needs - well under the 15/min limit
             limited_words = list(unlearned_words)[:MAX_WORDS_PER_REQUEST]
             
             # If we still have no words, create a basic empty structure
