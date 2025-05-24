@@ -726,15 +726,15 @@ prompt_text = (
     "- its basic form (lemma), without changing the part of speech, "
     "- and English translation of the basic form "
     "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is, give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io"
+    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is , give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io . DON'T do it for other endings like -as, -us etc, do it ONLY for -is"
     "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
     "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
     "For other parts of speech, use the dictionary base form. "
-    "If you see that the word is very close to another on the photo and together they form a collocation lexically, put those words together in the field. Example: word: Labas rytas"
+    "If you see that the word forms a collocation lexically with another on the photo  and they are very close to one another on the photo, put those words together in the field. Example: word: labas rytas, word: dantų šepetėlis, etc"
     "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
     "Preserve the original part of speech. "
     "Format the output as a JSON array of objects with the following fields: "
-    "'word' (original form),'infinitive' (basic form) and 'translation' (English meaning of the basic form)."
+    "'word' (original form),'infinitive' (basic form) and 'translation' (English meaning of the basic form)." 
     "Example: [{\"word\": \"stalo\", \"infinitive\": \"stalas\", \"translation\": \"table\"}, "
     "{\"word\": \"eina\", \"infinitive\": \"eiti, eina, ejo\", \"translation\": \"to go\"}]"
 )
@@ -742,8 +742,8 @@ prompt_text = (
 
 def extract_words_from_gemini(text: str) -> list[dict]:
     """
-    Clean Gemini’s response and return a list of word-dicts.
-    Raises ValueError / json.JSONDecodeError when it can’t parse.
+    Clean Gemini's response and return a list of word-dicts.
+    Handles malformed JSON with separate suffix entries and multiple comma-separated words.
     """
     text = text.strip()
     if text.startswith('```'):
@@ -753,11 +753,44 @@ def extract_words_from_gemini(text: str) -> list[dict]:
     if not match:
         raise ValueError("No JSON array found in Gemini response")
 
-    words_data = json.loads(match.group(0))
+    json_text = match.group(0)
+    
+    try:
+        # First attempt: Try to parse as is
+        words_data = json.loads(json_text)
+    except json.JSONDecodeError as e:
+        logger.debug(f"Initial JSON parsing failed: {e}")
+        try:
+            # Fix the common issue with genitive endings as separate keys
+            # Pattern: "infinitive": "word", "-io", 
+            fixed_text = re.sub(r'"infinitive"\s*:\s*"([^"]+)"\s*,\s*"(-[^"]+)"\s*,', 
+                               r'"infinitive": "\1, \2", ', json_text)
+            
+            # Handle pattern at the end of an object: "infinitive": "word", "-io" }
+            fixed_text = re.sub(r'"infinitive"\s*:\s*"([^"]+)"\s*,\s*"(-[^"]+)"\s*}', 
+                               r'"infinitive": "\1, \2"}', fixed_text)
+            
+            words_data = json.loads(fixed_text)
+        except json.JSONDecodeError:
+            # If that doesn't work, try more aggressive approach - remove problematic entries
+            logger.debug("Attempting more aggressive JSON fixing")
+            fixed_text = re.sub(r',\s*"(-[^"]+)"', '', json_text)
+            words_data = json.loads(fixed_text)
+    
     if not isinstance(words_data, list):
         raise ValueError("Parsed JSON is not a list")
 
-    return words_data
+    # Handle multiple words separated by commas in one field (e.g. for verb forms)
+    result = []
+    for word in words_data:
+        # Normalize infinitive field if it contains commas but isn't properly formatted
+        if "infinitive" in word and "," in word["infinitive"]:
+            # Make sure items are properly separated with spaces after commas
+            word["infinitive"] = re.sub(r',\s*', ', ', word["infinitive"])
+            
+        result.append(word)
+    
+    return result
 
 
 class ProcessPhotoAPIView(APIView):
