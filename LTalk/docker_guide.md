@@ -62,36 +62,7 @@ To create an admin user:
 ```sh
 docker compose exec web python manage.py createsuperuser
 ```
-
-## Viewing logs
-
-To see application logs:
-
-```sh
-docker compose logs -f web
-```
-
-To see all container logs:
-
-```sh
-docker compose logs -f
-```
-
-## Stopping the application
-
-```sh
-docker compose down
-```
-
-To remove volumes (database data will be lost):
-
-```sh
-docker compose down -v
-```
-
-## Troubleshooting
-
-### Static files not appearing
+## Static files
 
 If static files are missing, try:
 
@@ -99,6 +70,70 @@ If static files are missing, try:
 docker compose exec web python manage.py collectstatic --no-input
 ```
 
+## Using the Logging System
+
+LTalk has a comprehensive logging system configured for Docker environments.
+
+### Log Configuration
+
+In Docker, logs are written to:
+- Console output (visible in Docker logs)
+- File at `/var/log/django-debug.log` inside the container
+
+### Log Levels
+
+The following log levels are available (from least to most severe):
+- DEBUG: Detailed debugging information
+- INFO: Confirmation that things are working as expected
+- WARNING: Indication that something unexpected happened
+- ERROR: Serious problem that prevents a function from working
+- CRITICAL: Serious error indicating program may be unable to continue
+
+### Using Logger in Code
+
+To use the logger in your code:
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+# Examples:
+logger.debug("Detailed information, typically useful for debugging")
+logger.info("Confirmation that things are working as expected")
+logger.warning("An indication something unexpected happened")
+logger.error("A more serious problem that prevents a function from working")
+logger.critical("A very serious error that may prevent the program from continuing")
+```
+
+### Viewing Logs
+
+View application logs in real-time:
+
+```sh
+docker compose logs -f web
+```
+
+Access the log file directly inside the container:
+
+```sh
+docker compose exec web cat /var/log/django-debug.log
+```
+
+Follow the log file in real-time:
+
+```sh
+docker compose exec web tail -f /var/log/django-debug.log
+```
+
+### Changing Log Levels
+
+To temporarily change log levels for debugging, modify the `LOGGING` configuration in settings_docker.py and restart the services:
+
+```sh
+docker compose restart web
+```
+
+## Troubleshooting
 ### Database connection issues
 
 If the web service can't connect to the database, make sure your .env file has the correct database credentials and that the `DATABASE_URL` matches the `POSTGRES_*` values.
@@ -109,8 +144,8 @@ Check that your `CSRF_TRUSTED_ORIGINS` in the .env file includes the domain you'
 
 ## Docker Compose Commands Reference
 
-- Start services: `docker-compose up -d`
-- Stop services: `docker-compose down`
-- View logs: `docker-compose logs -f`
-- Run command in web container: `docker-compose exec web [command]`
-- Rebuild containers: `docker-compose up -d --build`
+- Start services: `docker compose up -d`
+- Stop services: `docker compose down`
+- View logs: `docker compose logs -f`
+- Run command in web container: `docker compose exec web [command]`
+- Rebuild containers: `docker compose up -d --build`

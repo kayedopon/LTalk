@@ -16,6 +16,7 @@ services:
     volumes:
       - static_volume:/static         # STATIC_ROOT
       # - media_volume:/media           # MEDIA_ROOT (optional)
+      - logs_volume:/var/log
     depends_on: [db]
     networks: [backend]
     deploy:
@@ -37,6 +38,7 @@ services:
 volumes:
   db_data:
   static_volume:
+  logs_volume:
 
 networks:
   backend:

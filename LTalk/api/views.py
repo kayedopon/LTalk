@@ -23,6 +23,9 @@ from dotenv import load_dotenv
 import os
 import json
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Load environment variables from .env file
@@ -795,8 +798,11 @@ class ProcessPhotoAPIView(APIView):
     )
 
     def post(self, request):
+        logger.info(f"ProcessPhotoAPIView: Received request with {len(request.FILES)} files")
+        
         images = request.FILES.getlist("image")
         if not images:
+            logger.warning("No image files uploaded")
             return Response(
                 {"error": "No image files uploaded."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -807,17 +813,23 @@ class ProcessPhotoAPIView(APIView):
 
         for file in images:
             try:
+                logger.info(f"Processing file: {file.name} (size: {file.size} bytes)")
+                
                 # Open the image
                 img = PIL.Image.open(file)
+                logger.debug(f"Image opened successfully: {img.size}, mode: {img.mode}")
                 
                 # Resize large images to reduce memory usage and API processing time
-                max_size = (1600, 1600)  # Maximum dimensions
+                max_size = (1600, 1600)
                 if img.width > max_size[0] or img.height > max_size[1]:
+                    original_size = img.size
                     img.thumbnail(max_size, PIL.Image.Resampling.LANCZOS)
+                    logger.info(f"Image resized from {original_size} to {img.size}")
                 
                 # Convert to RGB if needed (removing alpha channel)
                 if img.mode == 'RGBA':
                     img = img.convert('RGB')
+                    logger.debug("Converted RGBA image to RGB")
                     
                 # Use a timeout for the API call
                 import threading
@@ -825,6 +837,7 @@ class ProcessPhotoAPIView(APIView):
                 
                 # Function to run in the thread
                 def call_gemini_api():
+                    logger.debug("Calling Gemini API...")
                     return model.generate_content([prompt_text, img])
                 
                 # Use ThreadPoolExecutor to run with timeout
@@ -833,11 +846,20 @@ class ProcessPhotoAPIView(APIView):
                     try:
                         # Wait for 160 seconds max
                         resp = future.result(timeout=160)
+                        logger.info(f"Gemini API call successful for {file.name}")
+                        logger.debug("Gemini response text BEGIN")
+                        logger.debug(resp.text)
+                        logger.debug("Gemini response text END")
+                        
                         words = extract_words_from_gemini(resp.text)
+                        logger.info(f"Extracted {len(words)} words from {file.name}")
+                        
                     except TimeoutError:
+                        logger.error(f"API call timed out for {file.name}")
                         skipped.append(f"{file.name}: API call timed out")
                         continue
                     except Exception as exc:
+                        logger.error(f"Error in API call for {file.name}: {exc}")
                         skipped.append(f"{file.name}: {exc}")
                         continue
                 
@@ -845,15 +867,18 @@ class ProcessPhotoAPIView(APIView):
                     aggregated.setdefault(w["infinitive"].lower(), w)
                     
             except PIL.UnidentifiedImageError:
+                logger.error(f"Not a valid image: {file.name}")
                 skipped.append(f"{file.name}: not a valid image")
                 continue
             except Exception as exc:
-                # Log or collect the reason; just don't abort the entire batch
+                logger.error(f"Unexpected error processing {file.name}: {exc}")
                 skipped.append(f"{file.name}: {exc}")
                 continue
 
+        logger.info(f"Processing complete. Aggregated: {len(aggregated)} words, Skipped: {len(skipped)} files")
+        
         if not aggregated:
-            # Every image failed → treat as 500 so the JS shows an error
+            logger.warning("Could not extract words from any image")
             return Response(
                 {
                     "error": "Could not extract words from any image.",
@@ -862,26 +887,11 @@ class ProcessPhotoAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        logger.info(f"Returning {len(aggregated)} words successfully")
         return Response(
             {"words": list(aggregated.values()), "skipped": skipped},
             status=status.HTTP_200_OK,
         )
-
-        if not aggregated:
-            # Every image failed → treat as 500 so the JS shows an error
-            return Response(
-                {
-                    "error": "Could not extract words from any image.",
-                    "details": skipped,
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-        return Response(
-            {"words": list(aggregated.values()), "skipped": skipped},
-            status=status.HTTP_200_OK,
-        )
-
 
 
 class TextExerciseAPIView(APIView):
