@@ -28,9 +28,9 @@ class WordSet(models.Model):
         return self.title
 
 class Word(models.Model):
-    word = models.CharField(max_length=35, null=False, blank=False)
-    infinitive = models.CharField(max_length=35, null=False, blank=False)
-    translation = models.CharField(max_length=35, null=False, blank=False)
+    word = models.CharField(max_length=100, null=False, blank=False)
+    infinitive = models.CharField(max_length=100, null=False, blank=False)
+    translation = models.CharField(max_length=100, null=False, blank=False)
     wordsets = models.ManyToManyField(WordSet, related_name="words")
 
     def __str__(self):

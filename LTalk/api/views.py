@@ -80,6 +80,48 @@ class WordSetViewSet(ModelViewSet):
             )
         ).order_by('-sort_time')
     
+    def create(self, request, *args, **kwargs):
+        """Override create method to add logging."""
+        logger.info(f"WordSet create attempt by user {request.user.id}")
+        try:
+            # Log request data (careful with sensitive info)
+            logger.debug(f"WordSet create data: {request.data}")
+            
+            # Check if words are included in the request
+            words_data = request.data.get('words', [])
+            if words_data:
+                logger.info(f"WordSet create includes {len(words_data)} words")
+            
+            response = super().create(request, *args, **kwargs)
+            wordset_id = response.data.get('id')
+            logger.info(f"WordSet {wordset_id} created successfully")
+            return response
+        except Exception as e:
+            # Log the specific error
+            logger.error(f"WordSet create failed: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "Failed to create word set", "detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+    def update(self, request, *args, **kwargs):
+        """Override update method to add logging."""
+        logger.info(f"WordSet update attempt by user {request.user.id} for set {kwargs.get('pk')}")
+        try:
+            # Log request data (careful with sensitive info)
+            logger.debug(f"WordSet update data: {request.data}")
+            
+            response = super().update(request, *args, **kwargs)
+            logger.info(f"WordSet {kwargs.get('pk')} updated successfully")
+            return response
+        except Exception as e:
+            # Log the specific error
+            logger.error(f"WordSet update failed: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "Failed to update word set", "detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     @action(detail=True, methods=['post'], url_path='duplicate')
     def duplicate_wordset(self, request, pk=None):
         original = WordSet.objects.filter(pk=pk).first()
