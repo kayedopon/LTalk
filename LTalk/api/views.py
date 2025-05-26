@@ -214,14 +214,14 @@ class ExerciseViewSet(ModelViewSet):
         prompt_text = (
             "Use the given list of Lithuanian words with their English translations to generate multiple choice questions. "
             "Each question should use the Lithuanian word as the question and provide four English answer options: "
-            "one correct translation and three plausible but incorrect distractors. "
+            "one correct translation and three plausible but incorrect distractors (2 words should be other words from the word list and one word should be in a similar context or meaning as the target word). "
             "Format the response as a JSON array of objects with the following fields: "
             "'question' (Lithuanian word), 'choices' (list of 4 English answers), and 'correct' (correct English translation). "
             "Example format: ['1':{\"question\": \"eiti\", \"choices\": [\"to walk\", \"to sleep\", \"to eat\", \"to read\"], \"correct\": \"to walk\"}]\n\n"
             "Here is the list of words:\n"
         )
 
-        word_list = [{"word": word.word, "translation": word.translation} for word in data]
+        word_list = [{"word": word.infinitive, "translation": word.translation} for word in data]
         word_list_str = json.dumps(word_list, ensure_ascii=False, indent=2)
 
         full_prompt = prompt_text + word_list_str
@@ -282,7 +282,7 @@ class ExerciseViewSet(ModelViewSet):
         questions = {}
         correct_answers = {}
         for i, word in enumerate(words):
-            questions[str(i)] = {"front": word.word, "back": word.translation}
+            questions[str(i)] = {"front": word.infinitive, "back": word.translation}
             correct_answers[str(i)] = word.translation
         return questions, correct_answers
 
@@ -1054,8 +1054,12 @@ class TextExerciseAPIView(APIView):
         - Use beginner-friendly vocabulary
         - B grammatically correct
         - contain multiple paragraphs that are meaningfully connected. The first paragraph is introduction, the second is the main part, and the third is the conlusion/end of story.
-        - Include at least 50% of the words from the vocabulary list
+        - Include at least 30-50% of the words from the vocabulary list
         - Be contextual and meaningful (not just random sentences)
+        - The words should be used in correct meaning, context and grammar form
+        - Do not just list activities or objects
+        - May optionally include more than one narrator if it helps to naturally incorporate more vocabulary words and avoid just listing words (for example, three different people talking about their hobbies in the first person). 
+        - For example: Anna: aš mėgstu klausyti muziką...(her words continue) Jonas: Aš mėgstu fotografuoti...(his words continue) Ema: Mano pomėgis yra sportuoti...(her words continue)
         - each sentense should be connected to the whole text
         - Preferrably tell a story or report something
         - do not use any additional formatting for the text, don't make the words bold with *
