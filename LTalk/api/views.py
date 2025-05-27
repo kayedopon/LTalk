@@ -1035,7 +1035,7 @@ class TextExerciseAPIView(APIView):
         word_entries = []
         for word in words:
             # Use quotes to properly encapsulate words with commas or spaces
-            word_entry = f'"{word["word"]}" ("{word["translation"]}")'
+            word_entry = f'"{word["infinitive"]}" ("{word["translation"]}")'
             word_entries.append(word_entry)
         
         # Join with semicolons instead of commas to avoid confusion
