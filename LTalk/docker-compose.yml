@@ -3,6 +3,9 @@ version: "3.9"
 services:
   db:
     image: postgres:16
+    dns:
+      - eric.ns.cloudflare.com
+      - wally.ns.cloudflare.com
     env_file: .env      # keeps POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -11,6 +14,9 @@ services:
   web:
     build: .
     # Add to your docker-compose.yml file under the web service:
+    dns:
+      - eric.ns.cloudflare.com
+      - wally.ns.cloudflare.com
     command: gunicorn LTalk.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
     env_file: .env
     volumes:
@@ -26,6 +32,9 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
+    dns:
+      - eric.ns.cloudflare.com
+      - wally.ns.cloudflare.com
     ports:
       - "80:80"
     volumes:
