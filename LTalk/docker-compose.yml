@@ -32,6 +32,7 @@ services:
       - static_volume:/static:ro
       # - media_volume:/media:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro   # Mount certs
     depends_on: [web]
     networks: [backend]
 

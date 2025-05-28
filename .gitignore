@@ -45,3 +45,10 @@ static/uploaded/
 *.swp
 *.swo
 .DS_Store
+
+# Don't commit SSL certs
+ssl/
+LTalk/ssl/
+*.key
+*.crt
+*.pem
