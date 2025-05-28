@@ -28,6 +28,7 @@ services:
     image: nginx:1.27-alpine
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - static_volume:/static:ro
       # - media_volume:/media:ro
