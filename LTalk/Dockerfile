@@ -18,6 +18,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 
 # 4. Collect static at build time (optional); else run it in entrypoint
-RUN python manage.py collectstatic --no-input
+# RUN python manage.py collectstatic --no-input
 
 EXPOSE 8000

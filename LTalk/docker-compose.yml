@@ -11,7 +11,7 @@ services:
   web:
     build: .
     # Add to your docker-compose.yml file under the web service:
-    command: gunicorn LTalk.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn LTalk.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"
     env_file: .env
     volumes:
       - static_volume:/static         # STATIC_ROOT

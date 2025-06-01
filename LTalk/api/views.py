@@ -682,7 +682,7 @@ class SubmitExerciseAPIView(APIView):
             2. What grammatical rules apply here
             3. How to correctly form this word from the infinitive
 
-            Focus on Lithuanian grammar and word form. Be clear and educational.
+            Focus on Lithuanian grammar and word form. Be clear and educational. Divide your answer in paragraphs.
             """
             
             response = model.generate_content(prompt)

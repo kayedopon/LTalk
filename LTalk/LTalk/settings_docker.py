@@ -53,6 +53,10 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
+        'security': {
+            'format': 'SECURITY {levelname} {asctime} {message} - IP:{remote_addr} - User:{user}',
+            'style': '{',
+        },
     },
     'handlers': {
         'console': {
