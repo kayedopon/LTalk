@@ -127,6 +127,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'authentication.password_validator.StrongPasswordValidator',
+    },
 ]
 
 
@@ -183,7 +186,7 @@ SESSION_COOKIE_AGE = 31536000  # 1 year
 SESSION_COOKIE_SAMESITE = 'Strict'
 
 # CSRF settings
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False # To do: maybe 
 CSRF_COOKIE_SAMESITE = 'Strict'
 # CSRF_FAILURE_VIEW = 'authentication.views.csrf_failure'
 

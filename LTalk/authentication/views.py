@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
 from .models import User
+from django.core.exceptions import ValidationError 
 
 def clean_passwords(request, ps1, ps2):
     if ps1 and ps2:
@@ -26,10 +28,17 @@ def registrationPage(request):
 
             if clean_passwords(request, password1, password2):
                 if not User.objects.filter(email=email).exists():
-                    user = User.objects.create_user(email=email, username=username, password=password1)
-                    user = authenticate(request, email=email, password=password1)
-                    login(request, user)
-                    return redirect("home")
+                    try:
+                        # This will run ALL validators in AUTH_PASSWORD_VALIDATORS
+                        validate_password(password1)
+                        # Only create user if password validation passes
+                        user = User.objects.create_user(email=email, username=username, password=password1)
+                        user = authenticate(request, email=email, password=password1)
+                        login(request, user)
+                        return redirect("home")
+                    except ValidationError as error:
+                        for message in error.messages:
+                            messages.error(request, message)
                 else:
                     messages.error(request, "User already exist")
         else:
