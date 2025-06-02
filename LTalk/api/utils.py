@@ -12,16 +12,19 @@ def custom_exception_handler(exc, context):
     # Log security-related exceptions
     request = context.get('request')
     if request:
-        user_info = f"User: {request.user}" if request.user.is_authenticated else "Anonymous"
-        path_info = f"Path: {request.path}"
-        method_info = f"Method: {request.method}"
-        ip_info = f"IP: {request.META.get('REMOTE_ADDR')}"
+        # Extract these for use in the log message
+        username = request.user.username if hasattr(request.user, 'username') and request.user.is_authenticated else 'anonymous'
+        ip_address = request.META.get('REMOTE_ADDR', 'unknown')
         
+        # Use extra parameter to provide variables for formatter
         security_logger.warning(
-            f"API Exception: {exc} - {user_info} - {path_info} - {method_info} - {ip_info}"
+            f"API Exception: {exc} - Path: {request.path} - Method: {request.method}",
+            extra={
+                'remote_addr': ip_address,
+                'user': username
+            }
         )
-    
-    # Add custom responses or modify existing ones
+        
     if response is not None:
         if response.status_code == 403:
             response.data['detail'] = "You don't have permission to perform this action."

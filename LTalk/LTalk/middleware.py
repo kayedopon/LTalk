@@ -27,10 +27,21 @@ class AccessLogMiddleware:
         
     def __call__(self, request):
         # Log access before processing
-        if request.user.is_authenticated:
-            security_logger.info(f"Access: {request.user.email} - {request.method} {request.path} - {request.META.get('REMOTE_ADDR')}")
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            security_logger.info(
+                "User access", 
+                extra={
+                    'remote_addr': request.META.get('REMOTE_ADDR', 'unknown'),
+                    'user': request.user.username
+                }
+            )
         else:
-            security_logger.info(f"Anonymous access - {request.method} {request.path} - {request.META.get('REMOTE_ADDR')}")
-            
+            security_logger.info(
+                "Anonymous access", 
+                extra={
+                    'remote_addr': request.META.get('REMOTE_ADDR', 'unknown'),
+                    'user': 'anonymous'
+                }
+            )
         response = self.get_response(request)
         return response

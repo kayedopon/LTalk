@@ -70,6 +70,12 @@ LOGGING = {
             'filename': '/var/log/django-debug.log',
             'formatter': 'verbose',
         },
+        'security_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django-security.log',
+            'formatter': 'security',
+        },
     },
     'loggers': {
         'django': {
@@ -85,6 +91,16 @@ LOGGING = {
         'main': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
+            'propagate': True,
+        },
+        'security': {
+            'handlers': ['security_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'authentication': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
             'propagate': True,
         },
     },

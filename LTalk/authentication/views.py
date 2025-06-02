@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from .models import User
 from django.core.exceptions import ValidationError 
+import logging
+
+auth_logger = logging.getLogger('authentication')
 
 def clean_passwords(request, ps1, ps2):
     if ps1 and ps2:
@@ -47,6 +50,7 @@ def registrationPage(request):
     context = {"page": page, "title": page.title()}
     return render(request, "auth/registration.html", context=context)
 
+
 def loginPage(request):
     page = "login"
 
@@ -63,12 +67,16 @@ def loginPage(request):
 
                 if user is not None:
                     login(request, user)
+                    auth_logger.info(f"Successful login: {email} from IP {request.META.get('REMOTE_ADDR')}")
                     return redirect('home')
                 else:
+                    auth_logger.warning(f"Failed login attempt: {email} from IP {request.META.get('REMOTE_ADDR')} - Invalid password")
                     messages.error(request, 'Wrong password')
             except:
+                auth_logger.warning(f"Failed login attempt: {email} from IP {request.META.get('REMOTE_ADDR')} - User does not exist")
                 messages.error(request, "User does not exist")
         else:
+            auth_logger.warning(f"Failed login attempt from IP {request.META.get('REMOTE_ADDR')} - Missing fields")
             messages.error(request, "You need to fill all fields")
 
     context = {"page": page, "title": page.title()}
