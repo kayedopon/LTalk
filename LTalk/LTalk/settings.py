@@ -188,7 +188,7 @@ SESSION_COOKIE_SAMESITE = 'Strict'
 # CSRF settings
 CSRF_COOKIE_HTTPONLY = False # To do: maybe 
 CSRF_COOKIE_SAMESITE = 'Strict'
-# CSRF_FAILURE_VIEW = 'authentication.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'authentication.views.csrf_failure'
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -243,10 +243,9 @@ CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 # Add django-axes configuration
 
-AXES_FAILURE_LIMIT = 5  # Lock after 5 failed attempts
-AXES_COOLOFF_TIME = 0.25  # Lock for 15 minutes (in hours)
+AXES_FAILURE_LIMIT = 10  # Lock after 10 failed attempts
+AXES_COOLOFF_TIME = 0.1  # Lock for 6 minutes (in hours)
 AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
 AXES_RESET_ON_SUCCESS = True
-AXES_LOCKOUT_TEMPLATE = 'auth/lockout.html'  # Create this template
-AXES_LOCKOUT_URL = '/auth/locked'
+AXES_LOCKOUT_CALLABLE = 'authentication.views.axes_lockout_handler'
 AXES_ENABLE_ADMIN = True

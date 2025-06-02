@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from .models import User
 from django.core.exceptions import ValidationError 
+from axes.utils import reset_request
+from django.urls import reverse
 import logging
 
 auth_logger = logging.getLogger('authentication')
@@ -56,6 +58,12 @@ def loginPage(request):
 
     if request.user.is_authenticated:
         return redirect("home")
+    
+    if request.GET.get('lockout') == 'true':
+        messages.error(request, "Too many failed login attempts. Please try again later")
+
+    if request.GET.get('csrf_error') == 'true':
+        messages.error(request, "Security token validation failed. Please try again.")
 
     if request.method == 'POST':
         if all(k in request.POST for k in ["email", "password"]):
@@ -81,6 +89,29 @@ def loginPage(request):
 
     context = {"page": page, "title": page.title()}
     return render(request, "auth/login.html", context=context)
+
+def axes_lockout_handler(request, credentials=None, *args, **kwargs):
+    """Custom lockout handler that adds a message and redirects to login"""
+    # Log the lockout attempt
+    auth_logger.warning(f"Account locked: IP {request.META.get('REMOTE_ADDR')} - Too many failed login attempts")
+    
+    # Get the base URL first, then add the query parameter
+    base_url = reverse('login')
+    return redirect(f"{base_url}?lockout=true")
+
+def csrf_failure(request, reason=""):
+    """Custom CSRF failure view that logs the failure and redirects to login with error message"""
+    # Log the CSRF failure attempt
+    auth_logger.warning(
+        f"CSRF validation failed: {reason} - IP: {request.META.get('REMOTE_ADDR')} - Path: {request.path}",
+        extra={
+            'remote_addr': request.META.get('REMOTE_ADDR', 'unknown'),
+            'user': 'anonymous'  # CSRF failures typically happen before authentication
+        }
+    )
+    
+    # Redirect to login page with csrf error parameter
+    return redirect(f"{reverse('login')}?csrf_error=true")
 
 @login_required(login_url='login')
 def logoutUser(request):
