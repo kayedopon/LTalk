@@ -2,6 +2,8 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 
+from LTalk.settings import LANGUAGE_CHOICES
+
 
 class CustomUserManager(UserManager):
     def _create_user(self, email, username, password, **extra_fields):
@@ -30,6 +32,11 @@ class User(AbstractUser):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)
+    language = models.CharField(
+        max_length=5,
+        choices=LANGUAGE_CHOICES,
+        default='en',
+    )
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
