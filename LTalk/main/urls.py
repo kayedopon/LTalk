@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('landing', views.landing_page, name='landing_page'),
     path('create-set', views.create_set, name='create_set'),
     path('wordset/<int:wordset_id>/flashcard/', views.flashcard_practice, name='flashcard_practice'),
     path('wordset/<int:wordset_id>/fill-in-gap/', views.fill_in_gap_practice, name='fill_in_gap_practice'),

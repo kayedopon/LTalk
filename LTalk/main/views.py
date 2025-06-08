@@ -23,6 +23,11 @@ def home(request):
         ws.progress = ws.learned_percent(request.user)
     return render(request, "home.html", {"wordsets": wordsets})
 
+def landing_page(request):
+    if request.user.is_authenticated:
+        return redirect('home') # Redirect to home if already logged in
+    return render(request, "main/landing.html")
+
 @login_required()
 def create_set(request):
     if request.method == 'POST':
