@@ -12,10 +12,11 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthentic
 from django.shortcuts import get_object_or_404
 from django.db.models import Max, Value, DateTimeField
 from django.db.models.functions import Coalesce, Greatest
+from django.db import transaction
 
 from .serializer import ExerciseProgressSerializer, ExerciseSerializer, WordSerializer, WordSetSerializer, WordProgressSerializer
 from main.models import Word, WordSet, WordProgress, Exercise, ExerciseProgress
-from django.db import transaction
+from LTalk.settings import LANGUAGE_CHOICES
 
 import google.generativeai as genai
 import PIL.Image
@@ -24,6 +25,7 @@ import os
 import json
 from datetime import datetime
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,7 @@ if not api_key:
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
+language_dict = dict(LANGUAGE_CHOICES)
 
 class WordViewSet(ModelViewSet):
    
@@ -212,11 +215,11 @@ class ExerciseViewSet(ModelViewSet):
 
     def _create_questions(self, data):
         prompt_text = (
-            "Use the given list of Lithuanian words with their English translations to generate multiple choice questions. "
-            "Each question should use the Lithuanian word as the question and provide four English answer options: "
+            f"Use the given list of Lithuanian words with their {language_dict[self.request.user.language]} translations to generate multiple choice questions. "
+            f"Each question should use the Lithuanian word as the question and provide four {language_dict[self.request.user.language]} answer options: "
             "one correct translation and three plausible but incorrect distractors (2 words should be other words from the word list and one word should be in a similar context or meaning as the target word). "
             "Format the response as a JSON array of objects with the following fields: "
-            "'question' (Lithuanian word), 'choices' (list of 4 English answers), and 'correct' (correct English translation). "
+            f"'question' (Lithuanian word), 'choices' (list of 4 {language_dict[self.request.user.language]} answers), and 'correct' (correct {language_dict[self.request.user.language]} translation). "
             "Example format: ['1':{\"question\": \"eiti\", \"choices\": [\"to walk\", \"to sleep\", \"to eat\", \"to read\"], \"correct\": \"to walk\"}]\n\n"
             "Here is the list of words:\n"
         )
@@ -374,7 +377,7 @@ class ExerciseViewSet(ModelViewSet):
             model = genai.GenerativeModel('gemini-2.0-flash')
             
             prompt = f"""
-            Create a beginner-friendly Lithuanian example using the word '{word.infinitive}' (which means '{word.translation}' in English). Follow these detailed instructions:
+            Create a beginner-friendly Lithuanian example using the word '{word.infinitive}' (which means '{word.translation}' in {language_dict[self.request.user.language]}). Follow these detailed instructions:
 
             General Instructions:
             - Generate 1-2 connected, beginner-friendly sentences that provide a clear and natural context for the word.
@@ -684,7 +687,6 @@ class SubmitExerciseAPIView(APIView):
 
             Focus on Lithuanian grammar and word form. Be clear and educational. Divide your answer in paragraphs.
             """
-            
             response = model.generate_content(prompt)
             return response.text.strip()
         except Exception as e:
@@ -760,31 +762,6 @@ class SubmitExerciseAPIView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-
-
-
-prompt_text = (
-    "Look at the image, extract only Lithuanian words and give me their English translation. "
-    "Ignore words in other languages on the image, just extract only Lithuanian words"
-    "For each word, return: "
-    "- the original word exactly as it appears, "
-    "- its basic form (lemma), without changing the part of speech, "
-    "- and English translation of the basic form "
-    "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
-    "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is , give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io . DON'T do it for other endings like -as, -us etc, do it ONLY for -is"
-    "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
-    "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
-    "For other parts of speech, use the dictionary base form. "
-    "If you see that the word forms a collocation lexically with another on the photo  and they are very close to one another on the photo, put those words together in the field. Example: word: labas rytas, word: dantų šepetėlis, etc"
-    "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
-    "Preserve the original part of speech. "
-    "Format the output as a JSON array of objects with the following fields: "
-    "'word' (original form),'infinitive' (basic form) and 'translation' (English meaning of the basic form)." 
-    "Example: [{\"word\": \"stalo\", \"infinitive\": \"stalas\", \"translation\": \"table\"}, "
-    "{\"word\": \"eina\", \"infinitive\": \"eiti, eina, ejo\", \"translation\": \"to go\"}]"
-)
-
-
 def extract_words_from_gemini(text: str) -> list[dict]:
     """
     Clean Gemini's response and return a list of word-dicts.
@@ -841,6 +818,26 @@ def extract_words_from_gemini(text: str) -> list[dict]:
 class ProcessPhotoAPIView(APIView):
     http_method_names = ["post"]
     parser_classes = [MultiPartParser, FormParser]
+    prompt_text = (
+        "Look at the image, extract only Lithuanian words and give me their `language` translation. "
+        "Ignore words in other languages on the image, just extract only Lithuanian words"
+        "For each word, return: "
+        "- the original word exactly as it appears, "
+        "- its basic form (lemma), without changing the part of speech, "
+        "- and `language` translation of the basic form "
+        "IMPORTANT: The field name 'infinitive' is just a label and DOES NOT mean the word must be a verb. "
+        "For nouns, return the nominative singular form in the 'infinitive' field. Only if the word ends with -is , give the ending for the genitive case for the word. Example: word: automobilis, infinitive: naktis, -ies, word: automobilis, infinitive: automobilis, -io . DON'T do it for other endings like -as, -us etc, do it ONLY for -is"
+        "For verbs, return the actual infinitive form, the form in the present tense third person, the form in past tense in third person. Example: word: einu, infinitive: eiti, eina, ejo"
+        "For adjectives, use the masculine and feminine nominative singular form. Example: word: gražus infinitive: gražus, graži. "
+        "For other parts of speech, use the dictionary base form. "
+        "If you see that the word forms a collocation lexically with another on the photo  and they are very close to one another on the photo, put those words together in the field. Example: word: labas rytas, word: dantų šepetėlis, etc"
+        "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
+        "Preserve the original part of speech. "
+        "Format the output as a JSON array of objects with the following fields: "
+        "'word' (original form),'infinitive' (basic form) and 'translation' (`language` meaning of the basic form)." 
+        "Example: [{\"word\": \"stalo\", \"infinitive\": \"stalas\", \"translation\": \"table\"}, "
+        "{\"word\": \"eina\", \"infinitive\": \"eiti, eina, ejo\", \"translation\": \"to go\"}]"
+    )
 
     @extend_schema(
         request={
@@ -916,7 +913,8 @@ class ProcessPhotoAPIView(APIView):
                 # Function to run in the thread
                 def call_gemini_api():
                     logger.debug("Calling Gemini API...")
-                    return model.generate_content([prompt_text, img])
+                    self.prompt_text += f"Note: substitute every `language` with {language_dict[self.request.user.language]}"
+                    return model.generate_content([self.prompt_text, img])
                 
                 # Use ThreadPoolExecutor to run with timeout
                 with ThreadPoolExecutor() as executor:

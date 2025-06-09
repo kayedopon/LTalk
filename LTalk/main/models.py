@@ -2,7 +2,6 @@ from django.db import models
 from datetime import datetime
 from authentication.models import User
 
-from LTalk.settings import LANGUAGE_CHOICES
 
 class WordSet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wordsets')
@@ -17,11 +16,6 @@ class WordSet(models.Model):
         blank=True,
         related_name='duplicates'
     )
-    language = models.CharField(
-        max_length=5,
-        choices=LANGUAGE_CHOICES,
-        default='en',
-    )
 
     def learned_percent(self, user):
         words = self.words.all()
@@ -30,11 +24,6 @@ class WordSet(models.Model):
             return 0
         learned = words.filter(wordprogress__user=user, wordprogress__is_learned=True).count()
         return int((learned / total) * 100)
-    
-    def save(self, *args, **kwargs):
-        if not self.language and self.user:
-            self.language = self.user.language
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

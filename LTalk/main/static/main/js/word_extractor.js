@@ -18,7 +18,6 @@ async function sendWordSet() {
         title: document.getElementById('wordset-title').value,
         description: document.getElementById('wordset-description').value,
         public: document.getElementById('wordset-public').checked,
-        language: document.getElementById('language-select').value,
         words: JSON.parse(document.getElementById('words-json').value)
     };
 
@@ -96,11 +95,6 @@ function displayResult(result) {
     /* CSRF hidden field + title/description */
     const csrfToken = getCSRFToken();
 
-    let optionsHtml = '<option value="" disabled selected>Select a language</option>';
-    langChoices.forEach(([code, name]) => {
-        optionsHtml += `<option value="${code}">${name}</option>`;
-    });
-
     form.innerHTML = `
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
         <input type="hidden" name="words_json" id="words-json">
@@ -108,12 +102,6 @@ function displayResult(result) {
             class="wordset-input" placeholder="Enter word set title" required>
         <input type="text" name="wordset_description" id="wordset-description"
             class="wordset-input" placeholder="Short description (optional)">
-        <div class="input-box">
-            <label class="input-label" for="language-select">Your first language</label>
-            <select class="wordset-input" name="language" id="language-select" required>
-                ${optionsHtml}
-            </select>
-        </div>
         <label class="privacy-toggle">
             <input type="checkbox" id="wordset-public">
             <span>Make&nbsp;public</span>

@@ -14,7 +14,7 @@ class WordSetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = WordSet
-        fields = ['id', 'user', 'title', 'description', 'language',
+        fields = ['id', 'user', 'title', 'description',
                   'public', 'created', 'words']
         read_only_fields = ['id', 'user', 'created']
 
