@@ -47,6 +47,16 @@
                     class="wordset-input" placeholder="Enter word set title" required>
                 <input type="text"   name="wordset_description" id="wordset-description"
                     class="wordset-input" placeholder="Short description (optional)">
+                
+                <div class="input-box">
+                    <label class="input-label" for="language-select">Your first language</label>
+                        <select class="wordset-input" name="language" id="language-select" required>
+                            <option value="" disabled selected>Select a language</option>
+                            {% for code, name in lang_choices %}
+                                <option value="{{ code }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                </div>
                 <label class="privacy-toggle">
                     <input type="checkbox" id="wordset-public">
                     <span>Make&nbsp;public</span>
@@ -58,8 +68,13 @@
                 <div class="error-message">{{ error }}</div>
             {% endif %}
         </div>
+    
+    <script>
+        const langChoices = JSON.parse('{{ lang_choices_json|safe }}');
+    </script>
     <script src="{% static 'main/js/word_extractor.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>
+
 </body>
 </html>

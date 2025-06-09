@@ -18,6 +18,7 @@ async function sendWordSet() {
         title: document.getElementById('wordset-title').value,
         description: document.getElementById('wordset-description').value,
         public: document.getElementById('wordset-public').checked,
+        language: document.getElementById('language-select').value,
         words: JSON.parse(document.getElementById('words-json').value)
     };
 
@@ -94,13 +95,25 @@ function displayResult(result) {
 
     /* CSRF hidden field + title/description */
     const csrfToken = getCSRFToken();
+
+    let optionsHtml = '<option value="" disabled selected>Select a language</option>';
+    langChoices.forEach(([code, name]) => {
+        optionsHtml += `<option value="${code}">${name}</option>`;
+    });
+
     form.innerHTML = `
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
         <input type="hidden" name="words_json" id="words-json">
-        <input type="text"   name="wordset_title" id="wordset-title"
+        <input type="text" name="wordset_title" id="wordset-title"
             class="wordset-input" placeholder="Enter word set title" required>
-        <input type="text"   name="wordset_description" id="wordset-description"
+        <input type="text" name="wordset_description" id="wordset-description"
             class="wordset-input" placeholder="Short description (optional)">
+        <div class="input-box">
+            <label class="input-label" for="language-select">Your first language</label>
+            <select class="wordset-input" name="language" id="language-select" required>
+                ${optionsHtml}
+            </select>
+        </div>
         <label class="privacy-toggle">
             <input type="checkbox" id="wordset-public">
             <span>Make&nbsp;public</span>
@@ -108,7 +121,6 @@ function displayResult(result) {
         <div class="words-container" id="words-container"></div>
         <button type="button" class="new-word" id="new-word">Add new word</button>
     `;
-
     let container = form.querySelector("#words-container");
     const newWord = form.querySelector("#new-word");
     newWord.addEventListener('click', addNewWord);
@@ -319,7 +331,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // on success you might want to clear files
             chosenFiles.length = 0;
             renderFileList();
-            console.log('aboba')
         } catch (err) {
             console.log(err)
             displayResult({ error: 'An error occurred while processing your request.' });

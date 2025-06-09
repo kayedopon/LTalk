@@ -5,8 +5,10 @@ from django.db.models.functions import Coalesce, Greatest
 
 from .models import WordSet, Exercise, WordProgress
 
-import time
+import time, json
 from datetime import datetime
+
+from LTalk.settings import LANGUAGE_CHOICES
 
 
 @login_required()
@@ -27,7 +29,10 @@ def home(request):
 def create_set(request):
     if request.method == 'POST':
             return redirect('home')
-    return render(request, "create_set.html")
+    
+    context = {"lang_choices": LANGUAGE_CHOICES,
+               "lang_choices_json": json.dumps(LANGUAGE_CHOICES)}
+    return render(request, "create_set.html", context)
 
 @login_required()
 def flashcard_practice(request, wordset_id):
