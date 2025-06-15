@@ -7,7 +7,7 @@
     <title>LTalk - Master Lithuanian, Your Way!</title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="{% static 'main/js/check_theme.js' %}" defer></script>
+    <!-- <script src="{% static 'main/js/check_theme.js' %}" defer></script> -->
     <style>
         /* Landing page specific styles */
         .landing-navbar {
@@ -53,6 +53,14 @@
             margin-right: auto;
         }
 
+        .hero .btn {
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .cta-section .btn {
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
         .feature-section {
             padding: 4rem 2rem;
             background-color: var(--card);
@@ -215,18 +223,27 @@
                 <p>Go beyond memorization! Our fill-in-the-gap exercises challenge you to write words in their correct grammatical case based on sentence context. This powerfully trains both your vocabulary and Lithuanian grammar skills.</p>
             </div>
             <div class="feature-image">
-                <img src="{% static 'main/images/placeholder.jpg' %}" alt="Fill in the gap exercises" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 5rem; color: var(--muted-foreground)\'><i class=\'fas fa-edit\'></i></div>'">
+                <img src="{% static 'main/images/gap.png' %}" alt="Fill in the gap exercises" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 5rem; color: var(--muted-foreground)\'><i class=\'fas fa-edit\'></i></div>'">
             </div>
         </div>
-
-        <!-- Feature 5: Text Exercises -->
+                <!-- Feature 5: Feedback -->
         <div class="feature-container">
+            <div class="feature-text">
+                <h3>Personalized Feedback</h3>
+                <p>LTalk instantly analyzes your exercise answers, clearly explaining mistakes and providing suggestions to improve your Lithuanian skills quickly and efficiently.</p>
+            </div>
+            <div class="feature-image">
+                <img src="{% static 'main/images/feedback.png' %}" alt="Multiple choice quizzes" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 5rem; color: var(--muted-foreground)\'><i class=\'fas fa-check-circle\'></i></div>'">
+            </div>
+        </div>
+        <!-- Feature 6: Text Exercises -->
+        <div class="feature-container reverse">
             <div class="feature-text">
                 <h3>Immersive Text Exercises</h3>
                 <p>Experience Lithuanian in action! LTalk generates unique texts using words from your study sets. Read, comprehend, and then answer questions, boosting immersion and making words stick better.</p>
             </div>
             <div class="feature-image">
-                <img src="{% static 'main/images/placeholder.jpg' %}" alt="Text exercises" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 5rem; color: var(--muted-foreground)\'><i class=\'fas fa-book-reader\'></i></div>'">
+                <img src="{% static 'main/images/text.png' %}" alt="Text exercises" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 5rem; color: var(--muted-foreground)\'><i class=\'fas fa-book-reader\'></i></div>'">
             </div>
         </div>
     </section>
@@ -239,9 +256,6 @@
 
     <footer class="landing-footer">
         <p>&copy; {% now "Y" %} LTalk. All rights reserved. Your partner in learning Lithuanian.</p>
-        <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
-            <i class="fas fa-moon"></i>
-        </button>
     </footer>
 
     <script src="{% static 'main/js/theme.js' %}" defer></script>
