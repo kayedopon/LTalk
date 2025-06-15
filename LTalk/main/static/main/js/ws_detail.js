@@ -1,3 +1,34 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'confirm_delete': 'Are you sure you want to delete this word set?',
+        'public': 'Public',
+        'private': 'Private',
+        'added': 'Added to your word sets!'
+    },
+    'uk': {
+        'confirm_delete': 'Ви впевнені, що хочете видалити цей набір слів?',
+        'public': 'Публічний',
+        'private': 'Приватний',
+        'added': 'Додано до ваших наборів слів!'
+    },
+    'ru': {
+        'confirm_delete': 'Вы уверены, что хотите удалить этот набор слов?',
+        'public': 'Публичный',
+        'private': 'Частный',
+        'added': 'Добавлено в ваши наборы слов!'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: if (confirm(t('confirm_delete')))...
+
 document.addEventListener('DOMContentLoaded', function() {
     const toggleEl = document.getElementById("visibility-toggle");
     const ws_id = document.getElementById("wordset-id").dataset.id;

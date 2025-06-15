@@ -1,55 +1,137 @@
 {% load static %}
 {% load custom_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Exercise History - {{ wordset.title }}</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Історія вправ - {{ wordset.title }}
+        {% elif request.user.language == 'ru' %}
+            История упражнений - {{ wordset.title }}
+        {% else %}
+            Exercise History - {{ wordset.title }}
+        {% endif %}
+    </title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
         <div class="history-header">
             <div class="left-button">
-                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">
+                    {% if request.user.language == 'uk' %}
+                        ← Повернутися
+                    {% elif request.user.language == 'ru' %}
+                        ← Вернуться
+                    {% else %}
+                        ← Go back
+                    {% endif %}
+                </a>
             </div>
-            <h1 class="center-title">Exercise History: {{ wordset.title }}</h1>
+            <h1 class="center-title">
+                {% if request.user.language == 'uk' %}
+                    Історія вправ: {{ wordset.title }}
+                {% elif request.user.language == 'ru' %}
+                    История упражнений: {{ wordset.title }}
+                {% else %}
+                    Exercise History: {{ wordset.title }}
+                {% endif %}
+            </h1>
         </div>
 
         <div class="type-selector" id="type-selector">
             {% for type_code, type_label in exercise_types %}
-                <div class="type-button" data-type="{{ type_code }}">{{ type_label }}</div>
+                <div class="type-button" data-type="{{ type_code }}">
+                    {% if request.user.language == 'uk' %}
+                        {% if type_code == 'flashcard' %}Картки
+                        {% elif type_code == 'multiple_choice' %}Вибір відповіді
+                        {% elif type_code == 'fill_in_gap' %}Заповнення пропусків
+                        {% elif type_code == 'text_exercise' %}Текстова вправа
+                        {% else %}{{ type_label }}{% endif %}
+                    {% elif request.user.language == 'ru' %}
+                        {% if type_code == 'flashcard' %}Карточки
+                        {% elif type_code == 'multiple_choice' %}Выбор ответа
+                        {% elif type_code == 'fill_in_gap' %}Заполнение пропусков
+                        {% elif type_code == 'text_exercise' %}Текстовое упражнение
+                        {% else %}{{ type_label }}{% endif %}
+                    {% else %}
+                        {{ type_label }}
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
         
         {% for type_code, exercises in grouped_exercises.items %}
             <div class="progress-list" data-type="{{ type_code }}">
-                <h3>{{ label_lookup|get:type_code }} Attempts</h3>
+                <h3>
+                    {% if request.user.language == 'uk' %}
+                        {% if type_code == 'flashcard' %}Спроби з картками
+                        {% elif type_code == 'multiple_choice' %}Спроби з вибором відповіді
+                        {% elif type_code == 'fill_in_gap' %}Спроби із заповненням пропусків
+                        {% elif type_code == 'text_exercise' %}Спроби з текстовими вправами
+                        {% else %}{{ label_lookup|get:type_code }} Спроби{% endif %}
+                    {% elif request.user.language == 'ru' %}
+                        {% if type_code == 'flashcard' %}Попытки с карточками
+                        {% elif type_code == 'multiple_choice' %}Попытки с выбором ответа
+                        {% elif type_code == 'fill_in_gap' %}Попытки с заполнением пропусков
+                        {% elif type_code == 'text_exercise' %}Попытки с текстовыми упражнениями
+                        {% else %}{{ label_lookup|get:type_code }} Попытки{% endif %}
+                    {% else %}
+                        {{ label_lookup|get:type_code }} Attempts
+                    {% endif %}
+                </h3>
                 {% for exercise in exercises %}
                     {% for entry in exercise.progress_entries.all %}
                         {% if entry.user == request.user %}
                             <div class="progress-entry">
                                 <strong>{{ entry.answered_at|date:"Y-m-d H:i" }}</strong> -
                                 {{ exercise }}:
-                                    {% if entry.is_correct %}
-                                        <span class="correct">correct</span>
-                                    {% else %}
-                                    <span class="incorrect">incorrect</span>
-                                    {% endif %}
-                                </span>
-                                (Grade: {{ entry.grade }})
+                                {% if entry.is_correct %}
+                                    <span class="correct">
+                                        {% if request.user.language == 'uk' %}
+                                            правильно
+                                        {% elif request.user.language == 'ru' %}
+                                            правильно
+                                        {% else %}
+                                            correct
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="incorrect">
+                                        {% if request.user.language == 'uk' %}
+                                            неправильно
+                                        {% elif request.user.language == 'ru' %}
+                                            неправильно
+                                        {% else %}
+                                            incorrect
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                                (
+                                {% if request.user.language == 'uk' %}
+                                    Оцінка: 
+                                {% elif request.user.language == 'ru' %}
+                                    Оценка: 
+                                {% else %}
+                                    Grade: 
+                                {% endif %}
+                                {{ entry.grade }})
                             </div>
                         {% endif %}
                     {% endfor %}
                 {% endfor %}
             </div>
         {% endfor %}
-        
     </div>
+    
+    <script>
+        const userLanguage = "{{ request.user.language|default:'en' }}";
+    </script>
     <script src="{% static 'main/js/exercise_history.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>

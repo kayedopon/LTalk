@@ -2,9 +2,14 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 
+from LTalk.settings import LANGUAGE_CHOICES
+
 
 class CustomUserManager(UserManager):
     def _create_user(self, email, username, password, **extra_fields):
+        if not email:
+            raise ValueError("The Email field is required")
+        
         if not username:
             raise ValueError("You must have a username")
         
@@ -21,6 +26,18 @@ class CustomUserManager(UserManager):
         
         return self._create_user(email, username, password, **extra_fields)
     
+    def create_superuser(self, email, username=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(email, username, password, **extra_fields)
+    
 
 class User(AbstractUser):
     username = models.CharField(unique=False, max_length=30)
@@ -30,6 +47,11 @@ class User(AbstractUser):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)
+    language = models.CharField(
+        max_length=5,
+        choices=LANGUAGE_CHOICES,
+        default='en',
+    )
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'

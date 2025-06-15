@@ -3,11 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Value, DateTimeField
 from django.db.models.functions import Coalesce, Greatest
 
-from .models import WordSet, Exercise, WordProgress
+from .models import WordSet, Exercise
 
 import time
 from datetime import datetime
 
+def set_language(request):
+    if request.method == 'POST':
+        language = request.POST.get('language', 'en')
+        if request.user.is_authenticated:
+            request.user.language = language
+            request.user.save()
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required()
 def home(request):
@@ -32,6 +39,7 @@ def landing_page(request):
 def create_set(request):
     if request.method == 'POST':
             return redirect('home')
+    
     return render(request, "create_set.html")
 
 @login_required()

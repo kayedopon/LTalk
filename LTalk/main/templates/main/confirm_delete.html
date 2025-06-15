@@ -1,12 +1,46 @@
-{% extends 'wordset_detail.html' %}
+{% extends 'main/wordset_detail.html' %}
 {% block content %}
 <div class="container">
-    <h1>Delete Word Set</h1>
-    <p>Are you sure you want to delete the word set "{{ wordset.title }}"? This action cannot be undone.</p>
+    <h1>
+        {% if request.user.language == 'uk' %}
+            Видалення набору слів
+        {% elif request.user.language == 'ru' %}
+            Удаление набора слов
+        {% else %}
+            Delete Word Set
+        {% endif %}
+    </h1>
+    
+    <p>
+        {% if request.user.language == 'uk' %}
+            Ви впевнені, що хочете видалити набір слів "{{ wordset.title }}"? Цю дію неможливо скасувати.
+        {% elif request.user.language == 'ru' %}
+            Вы уверены, что хотите удалить набор слов "{{ wordset.title }}"? Это действие нельзя отменить.
+        {% else %}
+            Are you sure you want to delete the word set "{{ wordset.title }}"? This action cannot be undone.
+        {% endif %}
+    </p>
+    
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, delete</button>
-        <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger">
+            {% if request.user.language == 'uk' %}
+                Так, видалити
+            {% elif request.user.language == 'ru' %}
+                Да, удалить
+            {% else %}
+                Yes, delete
+            {% endif %}
+        </button>
+        <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">
+            {% if request.user.language == 'uk' %}
+                Скасувати
+            {% elif request.user.language == 'ru' %}
+                Отмена
+            {% else %}
+                Cancel
+            {% endif %}
+        </a>
     </form>
 </div>
-{% endblock %} 
+{% endblock %}

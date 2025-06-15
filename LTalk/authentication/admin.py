@@ -5,14 +5,24 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(UserAdmin) : 
-    list_display = ("email" , "id", "username" , "date_joined", "last_login" , "is_active" , "is_staff", "is_superuser" )
-    search_fields = ("email" , "username", "id")
+    list_display = ("email" , "id", "username", "language", "date_joined", "last_login" , "is_active" , "is_staff", "is_superuser" )
+    search_fields = ("email" , "username", "id", "language")
     readonly_fields = ("id" , "date_joined" , "last_login")
     filter_horizontal = ()
     list_filter = ()
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (("Personal info"), {"fields": ("first_name", "last_name", "email")}),
+        (   
+            ("Personal info"), 
+            {   
+                "fields": (
+                    "first_name", 
+                    "last_name", 
+                    "email", 
+                    "language",
+                ),
+            },
+        ),
         (
             ("Permissions"),
             {

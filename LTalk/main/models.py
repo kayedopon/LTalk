@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 from authentication.models import User
 
+
 class WordSet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wordsets')
     title = models.CharField(max_length=35, blank=False, null=False)

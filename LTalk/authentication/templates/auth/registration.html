@@ -30,6 +30,16 @@
                     <label class="input-label" for="id_email">Email</label>
                     <input class="input-field" type="email" name="email" maxlength="50" required id="id_email" placeholder="youremail@gmail.com">
                 </div>
+
+                <div class="input-box">
+                    <label class="input-label" for="language-select">Your first language</label>
+                    <select class="input-field" name="language" id="language-select" required>
+                        <option value="" disabled selected>Select a language</option>
+                        {% for code, name in lang_choices %}
+                            <option value="{{ code }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 
                 <div class="input-box">
                     <label class="input-label" for="id_password1">Password</label>

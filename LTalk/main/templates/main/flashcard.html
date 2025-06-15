@@ -1,38 +1,85 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flashcard Practice</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Картки для вивчення
+        {% elif request.user.language == 'ru' %}
+            Карточки для изучения
+        {% else %}
+            Flashcard Practice
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
-        <h1>Flashcards</h1>
-        <div id="flashcard-area">
-            <div class="loading">Loading flashcards...</div>
-            <!-- Flashcard will be inserted here by JS -->
-        </div>
-        <div id="controls-area" class="controls" style="display: none;">
-             <button id="incorrect-btn" class="incorrect-btn">Incorrect</button>
-             <button id="correct-btn" class="correct-btn">Correct</button>
-        </div>
-         <div id="summary" class="finished" style="display: none;">
-            Practice Complete!
-            <p>Correct: <span id="correct-count">0</span></p>
-            <p>Incorrect: <span id="incorrect-count">0</span></p>
-            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
-            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-primary">Try again</a>
-        </div>
+        {% if request.user.language == 'uk' %}
+            <!-- Ukrainian version -->
+            <h1>Картки</h1>
+            <div id="flashcard-area">
+                <div class="loading">Завантаження карток...</div>
+                <!-- Flashcard will be inserted here by JS -->
+            </div>
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="incorrect-btn" class="incorrect-btn">Неправильно</button>
+                <button id="correct-btn" class="correct-btn">Правильно</button>
+            </div>
+            <div id="summary" class="finished" style="display: none;">
+                Практику завершено!
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Повернутися</a>
+                <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-primary">Спробувати знову</a>
+            </div>
+        {% elif request.user.language == 'ru' %}
+            <!-- Russian version -->
+            <h1>Карточки</h1>
+            <div id="flashcard-area">
+                <div class="loading">Загрузка карточек...</div>
+                <!-- Flashcard will be inserted here by JS -->
+            </div>
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="incorrect-btn" class="incorrect-btn">Неправильно</button>
+                <button id="correct-btn" class="correct-btn">Правильно</button>
+            </div>
+            <div id="summary" class="finished" style="display: none;">
+                Практика завершена!
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Вернуться</a>
+                <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-primary">Попробовать снова</a>
+            </div>
+        {% else %}
+            <!-- Default English version -->
+            <h1>Flashcards</h1>
+            <div id="flashcard-area">
+                <div class="loading">Loading flashcards...</div>
+                <!-- Flashcard will be inserted here by JS -->
+            </div>
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="incorrect-btn" class="incorrect-btn">Incorrect</button>
+                <button id="correct-btn" class="correct-btn">Correct</button>
+            </div>
+            <div id="summary" class="finished" style="display: none;">
+                Practice Complete!
+                <p>Correct: <span id="correct-count">0</span></p>
+                <p>Incorrect: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+                <a href="{% url 'flashcard_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Pass data to JavaScript -->
     <script>
         const wordsetId = "{{ wordset_id }}";
-        const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
+        const csrfToken = "{{ csrf_token }}";
     </script>
     <script src="{% static 'main/js/flashcard.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>

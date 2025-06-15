@@ -249,3 +249,10 @@ AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
 AXES_RESET_ON_SUCCESS = True
 AXES_LOCKOUT_CALLABLE = 'authentication.views.axes_lockout_handler'
 AXES_ENABLE_ADMIN = True
+
+
+LANGUAGE_CHOICES = [
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('uk', 'Ukrainian'),
+]

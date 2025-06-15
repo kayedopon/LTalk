@@ -1,3 +1,30 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'correct': 'Correct!',
+        'incorrect': 'Incorrect. The correct answer is:',
+        'loading': 'Loading questions...'
+    },
+    'uk': {
+        'correct': 'Правильно!',
+        'incorrect': 'Неправильно. Правильна відповідь:',
+        'loading': 'Завантаження питань...'
+    },
+    'ru': {
+        'correct': 'Правильно!',
+        'incorrect': 'Неправильно. Правильный ответ:',
+        'loading': 'Загрузка вопросов...'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: feedback.textContent = t('correct');
 document.addEventListener('DOMContentLoaded', () => {
     const choiceArea = document.getElementById('m_choice-area');
     const summaryArea = document.getElementById('summary');

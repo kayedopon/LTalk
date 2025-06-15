@@ -12,6 +12,7 @@ urlpatterns = [
     path('wordset/<int:id>/', views.wordset_detail, name='wordset_detail'),
     path('wordset/<int:id>/edit', views.wordset_edit, name='wordset_edit'),
     path('wordset/<int:id>/history', views.exercise_history, name='exercise_history'),
-    path('explore', views.explore_sets, name="explore_sets")
+    path('explore', views.explore_sets, name="explore_sets"),
+    path('set-language/', views.set_language, name='set_language'),
     
 ]

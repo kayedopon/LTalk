@@ -1,55 +1,129 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fill in the Gap</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Заповніть пропуски: {{ wordset.title }}
+        {% elif request.user.language == 'ru' %}
+            Заполните пропуски: {{ wordset.title }}
+        {% else %}
+            Fill in the Gap: {{ wordset.title }}
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
-        <h1>Fill in the Gap Practice: {{ wordset.title }}</h1>
-        
-        <p class="instructions">Complete each sentence by filling in the blank with the correct form of the given Lithuanian word.</p>
-        
-        <div class="progress-container">
-            <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-        </div>
-        
-        <div id="exercise-area">
-            <div class="loading">Loading exercise...</div>
-            <!-- Question will be inserted here by JS -->
-        </div>
-        
-        <div id="feedback-area" style="display: none;">
-            <!-- Feedback will be inserted here by JS -->
-        </div>
-        
-        <div id="controls-area" class="controls" style="display: none;">
-            <button id="submit-btn" class="btn btn-primary">Submit Answer</button>
-            <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question</button>
-        </div>
-        
-        <div id="summary" class="finished" style="display: none;">
-            <h2>Practice Complete!</h2>
-            <p>Correct: <span id="correct-count">0</span></p>
-            <p>Incorrect: <span id="incorrect-count">0</span></p>
-            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
-            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-primary">Try again</a>
-        </div>
+        {% if request.user.language == 'uk' %}
+            <!-- Ukrainian version -->
+            <h1>Вправа на заповнення пропусків: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Заповніть кожне речення, вставляючи правильну форму литовського слова у пропуск.</p>
+            
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+            
+            <div id="exercise-area">
+                <div class="loading">Завантаження вправи...</div>
+                <!-- Question will be inserted here by JS -->
+            </div>
+            
+            <div id="feedback-area" style="display: none;">
+                <!-- Feedback will be inserted here by JS -->
+            </div>
+            
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="submit-btn" class="btn btn-primary">Перевірити</button>
+                <button id="next-btn" class="btn btn-primary" style="display: none;">Наступне питання</button>
+            </div>
+            
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Вправу завершено!</h2>
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Повернутися</a>
+                <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-primary">Спробувати знову</a>
+            </div>
+        {% elif request.user.language == 'ru' %}
+            <!-- Russian version -->
+            <h1>Упражнение на заполнение пропусков: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Заполните каждое предложение, вставляя правильную форму литовского слова в пропуск.</p>
+            
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+            
+            <div id="exercise-area">
+                <div class="loading">Загрузка упражнения...</div>
+                <!-- Question will be inserted here by JS -->
+            </div>
+            
+            <div id="feedback-area" style="display: none;">
+                <!-- Feedback will be inserted here by JS -->
+            </div>
+            
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="submit-btn" class="btn btn-primary">Проверить</button>
+                <button id="next-btn" class="btn btn-primary" style="display: none;">Следующий вопрос</button>
+            </div>
+            
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Упражнение завершено!</h2>
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Вернуться</a>
+                <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-primary">Попробовать снова</a>
+            </div>
+        {% else %}
+            <!-- English version -->
+            <h1>Fill in the Gap Practice: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Complete each sentence by filling in the blank with the correct form of the given Lithuanian word.</p>
+            
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+            
+            <div id="exercise-area">
+                <div class="loading">Loading exercise...</div>
+                <!-- Question will be inserted here by JS -->
+            </div>
+            
+            <div id="feedback-area" style="display: none;">
+                <!-- Feedback will be inserted here by JS -->
+            </div>
+            
+            <div id="controls-area" class="controls" style="display: none;">
+                <button id="submit-btn" class="btn btn-primary">Submit Answer</button>
+                <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question</button>
+            </div>
+            
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Practice Complete!</h2>
+                <p>Correct: <span id="correct-count">0</span></p>
+                <p>Incorrect: <span id="incorrect-count">0</span></p>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Go back</a>
+                <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Pass data to JavaScript -->
     <script>
         const wordsetId = "{{ wordset_id }}";
-        const csrfToken = "{{ csrf_token }}"; // Pass CSRF token
-        const timestamp = "{{ timestamp }}"; // Pass timestamp for uniqueness
+        const csrfToken = "{{ csrf_token }}";
+        const timestamp = "{{ timestamp }}";
+        const userLanguage = "{{ request.user.language }}";
     </script>
     <script src="{% static 'main/js/fill_in_gap.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>
 </body>
-</html> 
+</html>

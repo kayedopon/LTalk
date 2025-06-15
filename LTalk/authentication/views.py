@@ -9,6 +9,9 @@ from axes.utils import reset_request
 from django.urls import reverse
 import logging
 
+from LTalk.settings import LANGUAGE_CHOICES
+
+
 auth_logger = logging.getLogger('authentication')
 
 def clean_passwords(request, ps1, ps2):
@@ -30,14 +33,15 @@ def registrationPage(request):
             username = request.POST["username"]
             password1 = request.POST["password1"]
             password2 = request.POST["password2"]
-
+            selected_language = request.POST.get('language')
+            print(selected_language)
             if clean_passwords(request, password1, password2):
                 if not User.objects.filter(email=email).exists():
                     try:
                         # This will run ALL validators in AUTH_PASSWORD_VALIDATORS
                         validate_password(password1)
                         # Only create user if password validation passes
-                        user = User.objects.create_user(email=email, username=username, password=password1)
+                        user = User.objects.create_user(email=email, username=username, password=password1, language=selected_language)
                         user = authenticate(request, email=email, password=password1)
                         login(request, user)
                         return redirect("home")
@@ -49,7 +53,7 @@ def registrationPage(request):
         else:
             messages.error(request, "You need to fill all fields")
 
-    context = {"page": page, "title": page.title()}
+    context = {"page": page, "title": page.title(), "lang_choices": LANGUAGE_CHOICES}
     return render(request, "auth/registration.html", context=context)
 
 

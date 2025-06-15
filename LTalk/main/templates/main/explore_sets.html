@@ -1,26 +1,78 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Explore Word Sets</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Огляд наборів слів
+        {% elif request.user.language == 'ru' %}
+            Обзор наборов слов
+        {% else %}
+            Explore Word Sets
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="home-container">
-        <a href="{% url 'home' %}" class="btn btn-primary upload-button">← Back to My Sets</a>
-        <h1 class="home-title">Explore Public Word Sets</h1>
-        <input type="text" id="search-input" class="search-input" placeholder="Search word sets by title...">
+        <a href="{% url 'home' %}" class="btn btn-primary upload-button">
+            {% if request.user.language == 'uk' %}
+                ← Повернутися до моїх наборів
+            {% elif request.user.language == 'ru' %}
+                ← Вернуться к моим наборам
+            {% else %}
+                ← Back to My Sets
+            {% endif %}
+        </a>
+        <h1 class="home-title">
+            {% if request.user.language == 'uk' %}
+                Огляд публічних наборів слів
+            {% elif request.user.language == 'ru' %}
+                Обзор публичных наборов слов
+            {% else %}
+                Explore Public Word Sets
+            {% endif %}
+        </h1>
+        <input type="text" id="search-input" class="search-input" placeholder="
+            {% if request.user.language == 'uk' %}
+                Пошук наборів слів за назвою...
+            {% elif request.user.language == 'ru' %}
+                Поиск наборов слов по названию...
+            {% else %}
+                Search word sets by title...
+            {% endif %}
+        ">
         
         <div class="wordsets-wrapper">
             <ul id="wordsets-list" class="wordsets-list"></ul>
-            <div id="loading" class="loading" style="display: none;">Loading...</div>
-            <p class="no-wordsets" style="display: none;">No public word sets found.</p>
+            <div id="loading" class="loading" style="display: none;">
+                {% if request.user.language == 'uk' %}
+                    Завантаження...
+                {% elif request.user.language == 'ru' %}
+                    Загрузка...
+                {% else %}
+                    Loading...
+                {% endif %}
+            </div>
+            <p class="no-wordsets" style="display: none;">
+                {% if request.user.language == 'uk' %}
+                    Публічних наборів слів не знайдено.
+                {% elif request.user.language == 'ru' %}
+                    Публичных наборов слов не найдено.
+                {% else %}
+                    No public word sets found.
+                {% endif %}
+            </p>
         </div>
     </div>
+    
+    <script>
+        const userLanguage = "{{ request.user.language }}";
+    </script>
     <script src="{% static 'main/js/explore_sets.js' %}"></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>

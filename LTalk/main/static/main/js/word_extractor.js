@@ -10,6 +10,55 @@ function prepareWordsJSON() {
     document.getElementById('words-json').value = JSON.stringify(words);
 }
 
+// Add this to word_extractor.js
+const translations = {
+    'en': {
+        'word': 'Word',
+        'infinitive': 'Infinitive',
+        'translation': 'Translation',
+        'add_word': 'Add Word',
+        'remove': 'Remove',
+        'file_selected': 'file selected',
+        'files_selected': 'files selected',
+        'no_files': 'No files selected',
+        'processing': 'Processing...',
+        'save_word_set': 'Save Word Set'
+    },
+    'uk': {
+        'word': 'Слово',
+        'infinitive': 'Інфінітив',
+        'translation': 'Переклад',
+        'add_word': 'Додати слово',
+        'remove': 'Видалити',
+        'file_selected': 'файл вибрано',
+        'files_selected': 'файлів вибрано',
+        'no_files': 'Файли не вибрані',
+        'processing': 'Обробка...',
+        'save_word_set': 'Зберегти набір слів'
+    },
+    'ru': {
+        'word': 'Слово',
+        'infinitive': 'Инфинитив',
+        'translation': 'Перевод',
+        'add_word': 'Добавить слово',
+        'remove': 'Удалить',
+        'file_selected': 'файл выбран',
+        'files_selected': 'файлов выбрано',
+        'no_files': 'Файлы не выбраны',
+        'processing': 'Обработка...',
+        'save_word_set': 'Сохранить набор слов'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: removeButton.textContent = t('remove');
+
 // This function send data to endpoint where wordset will be created
 async function sendWordSet() {
     const csrfToken = getCSRFToken();
@@ -94,12 +143,13 @@ function displayResult(result) {
 
     /* CSRF hidden field + title/description */
     const csrfToken = getCSRFToken();
+
     form.innerHTML = `
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
         <input type="hidden" name="words_json" id="words-json">
-        <input type="text"   name="wordset_title" id="wordset-title"
+        <input type="text" name="wordset_title" id="wordset-title"
             class="wordset-input" placeholder="Enter word set title" required>
-        <input type="text"   name="wordset_description" id="wordset-description"
+        <input type="text" name="wordset_description" id="wordset-description"
             class="wordset-input" placeholder="Short description (optional)">
         <label class="privacy-toggle">
             <input type="checkbox" id="wordset-public">
@@ -108,7 +158,6 @@ function displayResult(result) {
         <div class="words-container" id="words-container"></div>
         <button type="button" class="new-word" id="new-word">Add new word</button>
     `;
-
     let container = form.querySelector("#words-container");
     const newWord = form.querySelector("#new-word");
     newWord.addEventListener('click', addNewWord);
@@ -319,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // on success you might want to clear files
             chosenFiles.length = 0;
             renderFileList();
-            console.log('aboba')
         } catch (err) {
             console.log(err)
             displayResult({ error: 'An error occurred while processing your request.' });
