@@ -338,6 +338,20 @@ document.addEventListener('DOMContentLoaded', function() {
         imageInput.value = '';
     });
 
+    document.addEventListener("paste", function(e){
+        let items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            if (item.kind === 'file') {
+                const file = item.getAsFile();
+                console.log(file);
+                chosenFiles.push(file); 
+            }
+        }
+       renderFileList();
+    });
+
     // ---------- when the form is submitted ----------
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
