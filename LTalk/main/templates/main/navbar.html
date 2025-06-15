@@ -1,6 +1,16 @@
 <nav class="navbar">
     <div class="navbar-container">
       <a href="{% url 'home' %}" class="navbar-logo">LTalk</a>
+      <div class="language-selector">
+        <form action="{% url 'set_language' %}" method="post" class="language-form">
+          {% csrf_token %}
+          <select name="language" onchange="this.form.submit()">
+            <option value="en" {% if request.user.language == 'en' %}selected{% endif %}>English</option>
+            <option value="uk" {% if request.user.language == 'uk' %}selected{% endif %}>Українська</option>
+            <option value="ru" {% if request.user.language == 'ru' %}selected{% endif %}>Русский</option>
+          </select>
+        </form>
+      </div>
       <div class="menu-toggle" id="menuToggle">
         <span></span>
         <span></span>
@@ -9,7 +19,15 @@
       <div class="navbar-menu" id="navbar-menu">
         <form action="{% url 'logout' %}" method="post" class="logout-form">
           {% csrf_token %}
-          <button type="submit" class="nav-button">Logout</button>
+          <button type="submit" class="nav-button">
+            {% if request.user.language == 'uk' %}
+              Вийти
+            {% elif request.user.language == 'ru' %}
+              Выйти
+            {% else %}
+              Logout
+            {% endif %}
+          </button>
         </form>
       </div>
     </div>
@@ -20,3 +38,15 @@
     this.classList.toggle('active');
   });
 </script>
+<style>
+  .language-selector {
+    margin-right: 1rem;
+  }
+  .language-form select {
+    padding: 0.25rem;
+    border-radius: var(--radius);
+    background-color: var(--card);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+</style>

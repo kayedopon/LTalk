@@ -1,47 +1,136 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
-{% block title %}Your Word Sets{% endblock %}
+{% block title %}
+    {% if request.user.language == 'uk' %}
+        Ваші набори слів
+    {% elif request.user.language == 'ru' %}
+        Ваши наборы слов
+    {% else %}
+        Your Word Sets
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1 class="home-title">Your Word Sets</h1>
-    
-    <div class="button-group">
-        <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
-        <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore Sets</a>
-    </div>
-    
-    <div class="wordsets-wrapper">
-        {% if wordsets %}
-            <ul class="wordsets-list">
-                {% for ws in wordsets %}
-                    <li class="word-set">
-                        <div class="word-set-content" data-id="{{ ws.pk }}">
-                            <div>
-                                <div class="word-set-title">{{ ws.title }}</div>
-                                <div class="word-count">{{ ws.words.count }} words</div>
+    {% if request.user.language == 'uk' %}
+        <!-- Ukrainian version -->
+        <h1 class="home-title">Ваші набори слів</h1>
+        
+        <div class="button-group">
+            <a href="{% url 'create_set' %}" class="btn btn-primary">Додати набір</a>
+            <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Огляд наборів</a>
+        </div>
+        
+        <div class="wordsets-wrapper">
+            {% if wordsets %}
+                <ul class="wordsets-list">
+                    {% for ws in wordsets %}
+                        <li class="word-set">
+                            <div class="word-set-content" data-id="{{ ws.pk }}">
+                                <div>
+                                    <div class="word-set-title">{{ ws.title }}</div>
+                                    <div class="word-count">{{ ws.words.count }} слів</div>
+                                </div>
+                                <div
+                                    class="progress-circle"
+                                    style="--progress: {{ ws.progress }}%;"
+                                    aria-label="Вивчено {{ ws.progress }} відсотків"
+                                    title="Вивчено {{ ws.progress }}% слів"
+                                    data-progress="{{ ws.progress }}"
+                                >
+                                    <span>{{ ws.progress }}%</span>
+                                </div>
                             </div>
-                            <div
-                                class="progress-circle"
-                                style="--progress: {{ ws.progress }}%;"
-                                aria-label="Learned {{ ws.progress }} percent"
-                                title="Learned {{ ws.progress }}% of words"
-                                data-progress="{{ ws.progress }}"
-                            >
-                                <span>{{ ws.progress }}%</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="card text-center">
+                    <p class="mb-3">У вас ще немає наборів слів.</p>
+                    <a href="{% url 'create_set' %}" class="btn btn-primary">Створіть свій перший набір</a>
+                </div>
+            {% endif %}
+        </div>
+    {% elif request.user.language == 'ru' %}
+        <!-- Russian version -->
+        <h1 class="home-title">Ваши наборы</h1>
+        
+        <div class="button-group">
+            <a href="{% url 'create_set' %}" class="btn btn-primary">Добавить набор слов</a>
+            <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Обзор наборов</a>
+        </div>
+        
+        <div class="wordsets-wrapper">
+            {% if wordsets %}
+                <ul class="wordsets-list">
+                    {% for ws in wordsets %}
+                        <li class="word-set">
+                            <div class="word-set-content" data-id="{{ ws.pk }}">
+                                <div>
+                                    <div class="word-set-title">{{ ws.title }}</div>
+                                    <div class="word-count">{{ ws.words.count }} слов</div>
+                                </div>
+                                <div
+                                    class="progress-circle"
+                                    style="--progress: {{ ws.progress }}%;"
+                                    aria-label="Изучено {{ ws.progress }} процентов"
+                                    title="Изучено {{ ws.progress }}% слов"
+                                    data-progress="{{ ws.progress }}"
+                                >
+                                    <span>{{ ws.progress }}%</span>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="card text-center">
-                <p class="mb-3">You have no word sets yet.</p>
-                <a href="{% url 'create_set' %}" class="btn btn-primary">Create Your First Set</a>
-            </div>
-        {% endif %}
-    </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="card text-center">
+                    <p class="mb-3">У вас еще нет наборов слов.</p>
+                    <a href="{% url 'create_set' %}" class="btn btn-primary">Создайте свой первый набор</a>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- English version -->
+        <h1 class="home-title">Your Word Sets</h1>
+        
+        <div class="button-group">
+            <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
+            <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore Sets</a>
+        </div>
+        
+        <div class="wordsets-wrapper">
+            {% if wordsets %}
+                <ul class="wordsets-list">
+                    {% for ws in wordsets %}
+                        <li class="word-set">
+                            <div class="word-set-content" data-id="{{ ws.pk }}">
+                                <div>
+                                    <div class="word-set-title">{{ ws.title }}</div>
+                                    <div class="word-count">{{ ws.words.count }} words</div>
+                                </div>
+                                <div
+                                    class="progress-circle"
+                                    style="--progress: {{ ws.progress }}%;"
+                                    aria-label="Learned {{ ws.progress }} percent"
+                                    title="Learned {{ ws.progress }}% of words"
+                                    data-progress="{{ ws.progress }}"
+                                >
+                                    <span>{{ ws.progress }}%</span>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="card text-center">
+                    <p class="mb-3">You have no word sets yet.</p>
+                    <a href="{% url 'create_set' %}" class="btn btn-primary">Create Your First Set</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
 

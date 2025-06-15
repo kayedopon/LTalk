@@ -1,3 +1,43 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'word': 'word',
+        'words': 'words', 
+        'no_sets_found': 'No public word sets found.',
+        'loading': 'Loading...',
+        'add_to_my_sets': 'Add to My Sets',
+        'added': 'Added!',
+        'error': 'Error'
+    },
+    'uk': {
+        'word': 'слово', 
+        'words': 'слів',
+        'no_sets_found': 'Публічних наборів слів не знайдено.',
+        'loading': 'Завантаження...',
+        'add_to_my_sets': 'Додати до моїх наборів',
+        'added': 'Додано!',
+        'error': 'Помилка'
+    },
+    'ru': {
+        'word': 'слово', 
+        'words': 'слов',
+        'no_sets_found': 'Публичных наборов слов не найдено.',
+        'loading': 'Загрузка...',
+        'add_to_my_sets': 'Добавить в мои наборы',
+        'added': 'Добавлено!',
+        'error': 'Ошибка'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: loadingElement.textContent = t('loading');
+
 document.addEventListener('DOMContentLoaded', () => {
     let apiUrl = `/api/wordset/?page=1&scope=others`;
     let searchQuery = '';

@@ -8,6 +8,13 @@ from .models import WordSet, Exercise
 import time
 from datetime import datetime
 
+def set_language(request):
+    if request.method == 'POST':
+        language = request.POST.get('language', 'en')
+        if request.user.is_authenticated:
+            request.user.language = language
+            request.user.save()
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required()
 def home(request):

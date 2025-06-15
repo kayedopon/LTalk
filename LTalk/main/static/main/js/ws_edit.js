@@ -1,3 +1,70 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'edit_word_set': 'Edit Word Set',
+        'title': 'Title',
+        'description': 'Description (optional)',
+        'public_set': 'Public set',
+        'words': 'Words',
+        'word': 'Word',
+        'infinitive': 'Infinitive',
+        'translation': 'Translation',
+        'add_word': 'Add Word',
+        'add_from_image': 'Add Words from Image',
+        'select_image': 'Select image to extract text from',
+        'upload_image': 'Upload Image',
+        'save_changes': 'Save Changes',
+        'remove': 'Remove',
+        'changes_saved': 'Changes saved successfully!',
+        'error_saving': 'Error saving changes'
+    },
+    'uk': {
+        'edit_word_set': 'Редагувати набір слів',
+        'title': 'Назва',
+        'description': 'Опис (необов\'язково)',
+        'public_set': 'Публічний набір',
+        'words': 'Слова',
+        'word': 'Слово',
+        'infinitive': 'Інфінітив',
+        'translation': 'Переклад',
+        'add_word': 'Додати слово',
+        'add_from_image': 'Додати слова з зображення',
+        'select_image': 'Виберіть зображення для розпізнавання тексту',
+        'upload_image': 'Завантажити зображення',
+        'save_changes': 'Зберегти зміни',
+        'remove': 'Видалити',
+        'changes_saved': 'Зміни успішно збережено!',
+        'error_saving': 'Помилка при збереженні змін'
+    },
+    'ru': {
+        'edit_word_set': 'Редактировать набор слов',
+        'title': 'Название',
+        'description': 'Описание (необязательно)',
+        'public_set': 'Публичный набор',
+        'words': 'Слова',
+        'word': 'Слово',
+        'infinitive': 'Инфинитив',
+        'translation': 'Перевод',
+        'add_word': 'Добавить слово',
+        'add_from_image': 'Добавить слова из изображения',
+        'select_image': 'Выберите изображение для распознавания текста',
+        'upload_image': 'Загрузить изображение',
+        'save_changes': 'Сохранить изменения',
+        'remove': 'Удалить',
+        'changes_saved': 'Изменения успешно сохранены!',
+        'error_saving': 'Ошибка при сохранении изменений'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: editTitle.textContent = t('edit_word_set');
+
 // This function send data to endpoint where wordset will be created
 async function sendWordSet() {
     const wordsetId = document.getElementById('wordset-id').getAttribute('data-id');

@@ -10,6 +10,55 @@ function prepareWordsJSON() {
     document.getElementById('words-json').value = JSON.stringify(words);
 }
 
+// Add this to word_extractor.js
+const translations = {
+    'en': {
+        'word': 'Word',
+        'infinitive': 'Infinitive',
+        'translation': 'Translation',
+        'add_word': 'Add Word',
+        'remove': 'Remove',
+        'file_selected': 'file selected',
+        'files_selected': 'files selected',
+        'no_files': 'No files selected',
+        'processing': 'Processing...',
+        'save_word_set': 'Save Word Set'
+    },
+    'uk': {
+        'word': 'Слово',
+        'infinitive': 'Інфінітив',
+        'translation': 'Переклад',
+        'add_word': 'Додати слово',
+        'remove': 'Видалити',
+        'file_selected': 'файл вибрано',
+        'files_selected': 'файлів вибрано',
+        'no_files': 'Файли не вибрані',
+        'processing': 'Обробка...',
+        'save_word_set': 'Зберегти набір слів'
+    },
+    'ru': {
+        'word': 'Слово',
+        'infinitive': 'Инфинитив',
+        'translation': 'Перевод',
+        'add_word': 'Добавить слово',
+        'remove': 'Удалить',
+        'file_selected': 'файл выбран',
+        'files_selected': 'файлов выбрано',
+        'no_files': 'Файлы не выбраны',
+        'processing': 'Обработка...',
+        'save_word_set': 'Сохранить набор слов'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: removeButton.textContent = t('remove');
+
 // This function send data to endpoint where wordset will be created
 async function sendWordSet() {
     const csrfToken = getCSRFToken();

@@ -381,6 +381,7 @@ class ExerciseViewSet(ModelViewSet):
 
             General Instructions:
             - Generate 1-2 connected, beginner-friendly sentences that provide a clear and natural context for the word.
+            - Ensure the complete grammar and lexical correctness of the sentences
             - The word must appear only once in the text and must be replaced with a gap marked "___".
             - Do not use placeholder sentences or fragments.
             - Return a JSON object with fields:
@@ -397,6 +398,7 @@ class ExerciseViewSet(ModelViewSet):
             If the word is a verb:
             - Use the verb in a conjugated form (not infinitive).
             - indicate the needed tense clearly and gramatically correctly based on the sentence (present, past, or future tense) in the parenthesis in the end of the sentence.
+            - ensure the correctness of you grammar. Even if the sentence is in the past or present tense, and the target verbs use helper verbs like mėgo, paprašė etc the target words are still supposed to be infinitive: mėgo skaityti, paprašė eiti
             - Match with a clear subject (e.g., “Aš”, “Jis”, etc.).
             - Avoid using the verb together with verbs like "mėgsti", "norėti", "turėti", "galėti" "privalau",  etc., because these require the infinitive form.
             - Ensure the sentence shows a real-life situation or action in context.
@@ -680,12 +682,15 @@ class SubmitExerciseAPIView(APIView):
             The correct form to fill the gap is '{correct_answer}'.
             User answered: '{user_answer}'
 
+            The first paragraph should be: Correct answer: {correct_answer}.
+
             Please provide a short and helpful explanation (1-2 sentences) about:
             1. Why their answer is incorrect 
             2. What grammatical rules apply here
-            3. How to correctly form this word from the infinitive
+            3. What is the context of the word (if the user provided a completely different word)
+            4. How to correctly form this word from the infinitive
 
-            Focus on Lithuanian grammar and word form. Be clear and educational. Divide your answer in paragraphs.
+            Focus on Lithuanian grammar and word form. Be clear and educational. Divide your answer in structured paragraphs.
             """
             response = model.generate_content(prompt)
             return response.text.strip()
@@ -833,6 +838,7 @@ class ProcessPhotoAPIView(APIView):
         "If you see that the word forms a collocation lexically with another on the photo  and they are very close to one another on the photo, put those words together in the field. Example: word: labas rytas, word: dantų šepetėlis, etc"
         "Do NOT convert nouns into verbs. For example, do NOT convert 'stalas' (a noun) into 'stalauti' (a verb). "
         "Preserve the original part of speech. "
+        "When generating a translation for verbs, give only the translation of the infinitive form"
         "Format the output as a JSON array of objects with the following fields: "
         "'word' (original form),'infinitive' (basic form) and 'translation' (`language` meaning of the basic form)." 
         "Example: [{\"word\": \"stalo\", \"infinitive\": \"stalas\", \"translation\": \"table\"}, "

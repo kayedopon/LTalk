@@ -1,9 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTalk - Image Word Extractor</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            LTalk - Редагування набору слів
+        {% elif request.user.language == 'ru' %}
+            LTalk - Редактирование набора слов
+        {% else %}
+            LTalk - Edit Word Set
+        {% endif %}
+    </title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
@@ -38,23 +47,33 @@
             font-size: 1rem;
             cursor: pointer;
         }
-
     </style>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <span id="wordset-id" data-id="{{wordset.id}}" style="display: none;"></span>
 
     <div class="container" id="container">
         <div class="wordset-header" style="justify-content: flex-start;">
-            <a href="{% url 'wordset_detail' wordset.id %}" class="upload-button">← Cancel</a>
+            <a href="{% url 'wordset_detail' wordset.id %}" class="upload-button">
+                {% if request.user.language == 'uk' %}
+                    ← Скасувати
+                {% elif request.user.language == 'ru' %}
+                    ← Отменить
+                {% else %}
+                    ← Cancel
+                {% endif %}
+            </a>
         </div>
         
         <div class="wordset-edit" id="wordset-edit">
-
+            <!-- Content is generated dynamically by ws_edit.js -->
         </div>
     </div>
 
+    <script>
+        const userLanguage = "{{ request.user.language }}";
+    </script>
     <script src="{% static 'main/js/ws_edit.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>

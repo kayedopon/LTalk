@@ -1,57 +1,122 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{{ wordset.title }} - Details</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            {{ wordset.title }} - Деталі
+        {% elif request.user.language == 'ru' %}
+            {{ wordset.title }} - Детали
+        {% else %}
+            {{ wordset.title }} - Details
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
         <div class="wordset-header" style="justify-content: flex-start;">
-            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">← Back to Word Sets</a>
+            <a href="{% if request.GET.from_explore %}{% url 'explore_sets' %}{% else %}{% url 'home' %}{% endif %}" class="upload-button">
+                {% if request.user.language == 'uk' %}
+                    ← Повернутися
+                {% elif request.user.language == 'ru' %}
+                    ← Вернуться
+                {% else %}
+                    ← Back to Word Sets
+                {% endif %}
+            </a>
         </div>
         <h1 class="section-title" style="text-align:center; margin-bottom: 10px;">{{ wordset.title }}</h1>
         {% if wordset.description %}
             <p class="wordset-description">{{ wordset.description }}</p>
         {% endif %}
-        <p><strong>Created:</strong> {{ wordset.created|date:"F j, Y" }}</p>
+        <p>
+            <strong>
+                {% if request.user.language == 'uk' %}
+                    Створено:
+                {% elif request.user.language == 'ru' %}
+                    Создано:
+                {% else %}
+                    Created:
+                {% endif %}
+            </strong> 
+            {{ wordset.created|date:"F j, Y" }}
+        </p>
 
         <span id="wordset-id" data-id="{{wordset.id}}" style="display: none;"></span>
 
-
         {% if user == wordset.user %}
         <p>
-            <strong>Visibility:</strong>
+            <strong>
+                {% if request.user.language == 'uk' %}
+                    Видимість:
+                {% elif request.user.language == 'ru' %}
+                    Видимость:
+                {% else %}
+                    Visibility:
+                {% endif %}
+            </strong>
             <span id="visibility-toggle" 
                 data-id="{{ wordset.id }}"
                 data-current="{{ wordset.public }}"
                 class="clickable"
                 style="cursor:pointer; color: #007bff;">
-              {{ wordset.public|yesno:"Public,Private" }}
+                {% if request.user.language == 'uk' %}
+                    {{ wordset.public|yesno:"Публічний,Приватний" }}
+                {% elif request.user.language == 'ru' %}
+                    {{ wordset.public|yesno:"Публичный,Частный" }}
+                {% else %}
+                    {{ wordset.public|yesno:"Public,Private" }}
+                {% endif %}
             </span>
         </p>
         <div class="word-set-actions-horizontal">
-            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn-exercise">Flashcards</a>
-            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn-exercise">Fill in the Gap</a>
-            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn-exercise">Multiple Choice</a>
-            <a href="{% url 'text_exercise' wordset.id %}" class="btn-exercise">Text Exercise</a>
-            <a href="{% url 'exercise_history' wordset.id %}" class="btn-exercise">History</a>
+            <a href="{% url 'flashcard_practice' wordset.id %}" class="btn-exercise">
+                {% if request.user.language == 'uk' %}Картки{% elif request.user.language == 'ru' %}Карточки{% else %}Flashcards{% endif %}
+            </a>
+            <a href="{% url 'fill_in_gap_practice' wordset.id %}" class="btn-exercise">
+                {% if request.user.language == 'uk' %}Заповніть пропуски{% elif request.user.language == 'ru' %}Заполните пропуски{% else %}Fill in the Gap{% endif %}
+            </a>
+            <a href="{% url 'm_choice_practice' wordset.id %}" class="btn-exercise">
+                {% if request.user.language == 'uk' %}Вибір відповіді{% elif request.user.language == 'ru' %}Выбор ответа{% else %}Multiple Choice{% endif %}
+            </a>
+            <a href="{% url 'text_exercise' wordset.id %}" class="btn-exercise">
+                {% if request.user.language == 'uk' %}Текстова вправа{% elif request.user.language == 'ru' %}Текстовое упражнение{% else %}Text Exercise{% endif %}
+            </a>
+            <a href="{% url 'exercise_history' wordset.id %}" class="btn-exercise">
+                {% if request.user.language == 'uk' %}Історія{% elif request.user.language == 'ru' %}История{% else %}History{% endif %}
+            </a>
         </div>
         {% else %}
         <div class="word-set-actions-horizontal">
             <button class="btn-exercise" id="add-wordset" onclick="addWordSet('{{ wordset.id }}')">
-                <i class="fa-solid fa-plus"></i> Add to My Word Sets
+                <i class="fa-solid fa-plus"></i> 
+                {% if request.user.language == 'uk' %}
+                    Додати до моїх наборів слів
+                {% elif request.user.language == 'ru' %}
+                    Добавить в мои наборы слов
+                {% else %}
+                    Add to My Word Sets
+                {% endif %}
             </button>
         </div>
         {% endif %}
     
-        <h2 class="section-subtitle">Words in this Set</h2>
+        <h2 class="section-subtitle">
+            {% if request.user.language == 'uk' %}
+                Слова в цьому наборі
+            {% elif request.user.language == 'ru' %}
+                Слова в этом наборе
+            {% else %}
+                Words in this Set
+            {% endif %}
+        </h2>
     
         {% if wordset.words.all %}
         <div class="words-grid">
@@ -64,26 +129,49 @@
             {% endfor %}
         </div>
         {% else %}
-            <p class="no-words">No words in this set.</p>
+            <p class="no-words">
+                {% if request.user.language == 'uk' %}
+                    Немає слів у цьому наборі.
+                {% elif request.user.language == 'ru' %}
+                    Нет слов в этом наборе.
+                {% else %}
+                    No words in this set.
+                {% endif %}
+            </p>
         {% endif %}
 
         {% if user == wordset.user %}
         <div class="options" style="margin-top: 32px; text-align:center;">
             <button class="btn btn-danger" id="delete-wordset" style="background-color: #dc3545; border: none;">
-                <i class="fas fa-trash"></i> Delete Word Set
+                <i class="fas fa-trash"></i> 
+                {% if request.user.language == 'uk' %}
+                    Видалити набір слів
+                {% elif request.user.language == 'ru' %}
+                    Удалить набор слов
+                {% else %}
+                    Delete Word Set
+                {% endif %}
             </button>
 
             <a href="{% url 'wordset_edit' wordset.id %}" class="edit-wordset-link">
                 <button class="btn btn-info" id="edit-wordset" style="background-color: #27303e; border: none;">
-                    <i class="fas fa-edit"></i> Edit Word Set
+                    <i class="fas fa-edit"></i> 
+                    {% if request.user.language == 'uk' %}
+                        Редагувати набір слів
+                    {% elif request.user.language == 'ru' %}
+                        Редактировать набор слов
+                    {% else %}
+                        Edit Word Set
+                    {% endif %}
                 </button>
             </a>
         </div>
-        
         {% endif %}
-
     </div>
 
+    <script>
+        const userLanguage = "{{ request.user.language }}";
+    </script>
     <script src="{% static 'main/js/ws_detail.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>

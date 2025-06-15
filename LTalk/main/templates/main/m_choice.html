@@ -1,47 +1,103 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Multiple Choice</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Вибір відповіді: {{ wordset.title }}
+        {% elif request.user.language == 'ru' %}
+            Выбор ответа: {{ wordset.title }}
+        {% else %}
+            Multiple Choice: {{ wordset.title }}
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
-        <h1>Multiple Choice Practice: {{ wordset.title }}</h1>
+        {% if request.user.language == 'uk' %}
+            <!-- Ukrainian version -->
+            <h1>Вправа на вибір відповіді: {{ wordset.title }}</h1>
 
-        <div id="m_choice-area">
-            <div class="loading">Loading Questions...</div>
-            
-            <div id="question-block" style="display: none;">
-                <div id="question-text" class="question-text"></div>
-                <div id="options" class="options-container"></div>
-                <div id="feedback" class="feedback" style="display: none;"></div>
-                <button id="next-btn" class="next-btn" style="display: none;">Next</button>
+            <div id="m_choice-area">
+                <div class="loading">Завантаження питань...</div>
+                
+                <div id="question-block" style="display: none;">
+                    <div id="question-text" class="question-text"></div>
+                    <div id="options" class="options-container"></div>
+                    <div id="feedback" class="feedback" style="display: none;"></div>
+                    <button id="next-btn" class="next-btn" style="display: none;">Далі</button>
+                </div>
             </div>
-        </div>
 
-        <!-- <div id="controls-area" class="controls" style="display: none;">
-            
-        </div> -->
-
-        <div id="summary" class="finished" style="display: none;">
-            <h2>Practice Complete!</h2>
-            <p>Correct: <span id="correct-count">0</span></p>
-            <p>Incorrect: <span id="incorrect-count">0</span></p>
-            <div class="button-group">
-                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Go back</a>
-                <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Вправу завершено!</h2>
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <div class="button-group">
+                    <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Повернутися</a>
+                    <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Спробувати знову</a>
+                </div>
             </div>
-        </div>
+        {% elif request.user.language == 'ru' %}
+            <!-- Russian version -->
+            <h1>Упражнение на выбор ответа: {{ wordset.title }}</h1>
+
+            <div id="m_choice-area">
+                <div class="loading">Загрузка вопросов...</div>
+                
+                <div id="question-block" style="display: none;">
+                    <div id="question-text" class="question-text"></div>
+                    <div id="options" class="options-container"></div>
+                    <div id="feedback" class="feedback" style="display: none;"></div>
+                    <button id="next-btn" class="next-btn" style="display: none;">Далее</button>
+                </div>
+            </div>
+
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Упражнение завершено!</h2>
+                <p>Правильно: <span id="correct-count">0</span></p>
+                <p>Неправильно: <span id="incorrect-count">0</span></p>
+                <div class="button-group">
+                    <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Вернуться</a>
+                    <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Попробовать снова</a>
+                </div>
+            </div>
+        {% else %}
+            <!-- English version -->
+            <h1>Multiple Choice Practice: {{ wordset.title }}</h1>
+
+            <div id="m_choice-area">
+                <div class="loading">Loading Questions...</div>
+                
+                <div id="question-block" style="display: none;">
+                    <div id="question-text" class="question-text"></div>
+                    <div id="options" class="options-container"></div>
+                    <div id="feedback" class="feedback" style="display: none;"></div>
+                    <button id="next-btn" class="next-btn" style="display: none;">Next</button>
+                </div>
+            </div>
+
+            <div id="summary" class="finished" style="display: none;">
+                <h2>Practice Complete!</h2>
+                <p>Correct: <span id="correct-count">0</span></p>
+                <p>Incorrect: <span id="incorrect-count">0</span></p>
+                <div class="button-group">
+                    <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-secondary">← Go back</a>
+                    <a href="{% url 'm_choice_practice' wordset.id %}" class="btn btn-primary">Try again</a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <script>
         const wordsetId = "{{ wordset_id }}";
         const csrfToken = "{{ csrf_token }}";
+        const userLanguage = "{{ request.user.language }}";
     </script>
     <script src="{% static 'main/js/m_choice.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>

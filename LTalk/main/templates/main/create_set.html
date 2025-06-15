@@ -1,17 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Word Set</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Новий набір слів
+        {% elif request.user.language == 'ru' %}
+            Новый набор слов
+        {% else %}
+            New Word Set
+        {% endif %}
+    </title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
-        <h1>New Word Set</h1>
+        <h1>
+            {% if request.user.language == 'uk' %}
+                Новий набір слів
+            {% elif request.user.language == 'ru' %}
+                Новый набор слов
+            {% else %}
+                New Word Set
+            {% endif %}
+        </h1>
 
         <div class="upload-section">
             <form id="form1" method="post" enctype="multipart/form-data">
@@ -25,16 +42,30 @@
                         multiple            
                         class="hidden-input">
 
-                <label for="image-input" class="upload-button">Choose image(s)</label>
+                <label for="image-input" class="upload-button">
+                    {% if request.user.language == 'uk' %}
+                        Вибрати зображення
+                    {% elif request.user.language == 'ru' %}
+                        Выбрать изображения
+                    {% else %}
+                        Choose image(s)
+                    {% endif %}
+                </label>
 
-                <!-- tiny summary: “3 file(s) selected” -->
+                <!-- tiny summary: "3 file(s) selected" -->
                 <span id="file-name"></span>
 
                 <!-- full list under the button -->
                 <ul id="file-list" class="file-list"></ul>
 
                 <button type="submit" class="upload-button" style="margin-top:10px;">
-                    Process image(s)
+                    {% if request.user.language == 'uk' %}
+                        Обробити зображення
+                    {% elif request.user.language == 'ru' %}
+                        Обработать изображения
+                    {% else %}
+                        Process image(s)
+                    {% endif %}
                 </button>
             </form>
         </div>
@@ -43,25 +74,44 @@
             <form action="" id="word-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="words_json" id="words-json">
-                <input type="text"   name="wordset_title" id="wordset-title"
-                    class="wordset-input" placeholder="Enter word set title" required>
-                <input type="text"   name="wordset_description" id="wordset-description"
-                    class="wordset-input" placeholder="Short description (optional)">
+                <input type="text" name="wordset_title" id="wordset-title"
+                    class="wordset-input" placeholder="{% if request.user.language == 'uk' %}Введіть назву набору слів{% elif request.user.language == 'ru' %}Введите название набора слов{% else %}Enter word set title{% endif %}" required>
+                <input type="text" name="wordset_description" id="wordset-description"
+                    class="wordset-input" placeholder="{% if request.user.language == 'uk' %}Короткий опис (необов'язково){% elif request.user.language == 'ru' %}Краткое описание (необязательно){% else %}Short description (optional){% endif %}">
                 <label class="privacy-toggle">
                     <input type="checkbox" id="wordset-public">
-                    <span>Make&nbsp;public</span>
+                    <span>
+                        {% if request.user.language == 'uk' %}
+                            Зробити публічним
+                        {% elif request.user.language == 'ru' %}
+                            Сделать публичным
+                        {% else %}
+                            Make public
+                        {% endif %}
+                    </span>
                 </label>
                 <div class="words-container" id="words-container"></div>
-                <button type="button" class="new-word" id="new-word">Add new word</button>
+                <button type="button" class="new-word" id="new-word">
+                    {% if request.user.language == 'uk' %}
+                        Додати нове слово
+                    {% elif request.user.language == 'ru' %}
+                        Добавить новое слово
+                    {% else %}
+                        Add new word
+                    {% endif %}
+                </button>
             </form>
             {% if error %}
                 <div class="error-message">{{ error }}</div>
             {% endif %}
         </div>
+    </div>
 
+    <script>
+        const userLanguage = "{{ request.user.language|default:'en' }}";
+    </script>
     <script src="{% static 'main/js/word_extractor.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>
-
 </body>
 </html>

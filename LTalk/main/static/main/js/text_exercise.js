@@ -1,3 +1,36 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'loading': 'Loading exercise...',
+        'question': 'Question',
+        'submit_answers': 'Submit Answers',
+        'your_answer': 'Your answer:',
+        'correct_answer': 'Correct answer:'
+    },
+    'uk': {
+        'loading': 'Завантаження вправи...',
+        'question': 'Питання',
+        'submit_answers': 'Відправити відповіді',
+        'your_answer': 'Ваша відповідь:',
+        'correct_answer': 'Правильна відповідь:'
+    },
+    'ru': {
+        'loading': 'Загрузка упражнения...',
+        'question': 'Вопрос',
+        'submit_answers': 'Отправить ответы',
+        'your_answer': 'Ваш ответ:',
+        'correct_answer': 'Правильный ответ:'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: questionTitle.textContent = `${t('question')} ${i+1}`;
 document.addEventListener('DOMContentLoaded', () => {
     const exerciseArea = document.getElementById('exercise-area');
     const resultsArea = document.getElementById('results-area');

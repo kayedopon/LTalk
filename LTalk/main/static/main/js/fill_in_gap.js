@@ -1,3 +1,46 @@
+// Add at the beginning of the file
+const translations = {
+    'en': {
+        'loading': 'Loading exercise...',
+        'correct': 'Correct!',
+        'incorrect': 'Incorrect. The correct answer is:',
+        'your_answer': 'Your answer:',
+        'submit_answer': 'Submit Answer',
+        'next_question': 'Next Question',
+        'question': 'Question',
+        'of': 'of'
+    },
+    'uk': {
+        'loading': 'Завантаження вправи...',
+        'correct': 'Правильно!',
+        'incorrect': 'Неправильно. Правильна відповідь:',
+        'your_answer': 'Ваша відповідь:',
+        'submit_answer': 'Перевірити відповідь',
+        'next_question': 'Наступне питання',
+        'question': 'Питання',
+        'of': 'з'
+    },
+    'ru': {
+        'loading': 'Загрузка упражнения...',
+        'correct': 'Правильно!',
+        'incorrect': 'Неправильно. Правильный ответ:',
+        'your_answer': 'Ваш ответ:',
+        'submit_answer': 'Проверить ответ',
+        'next_question': 'Следующий вопрос',
+        'question': 'Вопрос',
+        'of': 'из'
+    }
+};
+
+function t(key) {
+    return translations[userLanguage] && translations[userLanguage][key] 
+           ? translations[userLanguage][key] 
+           : translations['en'][key] || key;
+}
+
+// Then use t() in your code:
+// Example: document.querySelector(".loading").textContent = t('loading');
+
 document.addEventListener('DOMContentLoaded', () => {
     const exerciseArea = document.getElementById('exercise-area');
     const controlsArea = document.getElementById('controls-area');

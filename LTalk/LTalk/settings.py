@@ -254,5 +254,5 @@ AXES_ENABLE_ADMIN = True
 LANGUAGE_CHOICES = [
     ('en', 'English'),
     ('ru', 'Russian'),
-    ('ua', 'Ukrainian'),
+    ('uk', 'Ukrainian'),
 ]

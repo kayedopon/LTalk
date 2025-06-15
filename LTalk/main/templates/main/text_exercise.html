@@ -1,10 +1,18 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.user.language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lithuanian Text Exercise</title>
+    <title>
+        {% if request.user.language == 'uk' %}
+            Текстова вправа: {{ wordset.title }}
+        {% elif request.user.language == 'ru' %}
+            Текстовое упражнение: {{ wordset.title }}
+        {% else %}
+            Lithuanian Text Exercise: {{ wordset.title }}
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
     <script src="{% static 'main/js/check_theme.js' %}"></script>
     <style>
@@ -65,24 +73,63 @@
     </style>
 </head>
 <body>
-    {% include 'navbar.html' %}
+    {% include 'main/navbar.html' %}
     <div class="container">
-        <h1>Lithuanian Text Exercise: {{ wordset.title }}</h1>
-        
-        <p class="instructions">Read the Lithuanian text generated with words from your vocabulary set, then answer the multiple choice questions.</p>
-        
-        <div id="exercise-area">
-            <div class="loading">Loading exercise...</div>
-            <!-- Text and questions will be inserted here by JS -->
-        </div>
-        
-        <div id="results-area" style="display: none;">
-            <h2>Exercise Results</h2>
-            <p>Correct answers: <span id="correct-count">0</span> / 5</p>
-            <div id="results-details"></div>
-            <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Back to Word Set</a>
-            <a href="{% url 'text_exercise' wordset.id %}" class="btn btn-primary">Try Again</a>
-        </div>
+        {% if request.user.language == 'uk' %}
+            <!-- Ukrainian version -->
+            <h1>Литовська текстова вправа: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Прочитайте литовський текст, створений зі слів вашого набору, а потім дайте відповідь на запитання з варіантами відповідей.</p>
+            
+            <div id="exercise-area">
+                <div class="loading">Завантаження вправи...</div>
+                <!-- Text and questions will be inserted here by JS -->
+            </div>
+            
+            <div id="results-area" style="display: none;">
+                <h2>Результати вправи</h2>
+                <p>Правильні відповіді: <span id="correct-count">0</span> / 5</p>
+                <div id="results-details"></div>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Повернутися до набору слів</a>
+                <a href="{% url 'text_exercise' wordset.id %}" class="btn btn-primary">Спробувати знову</a>
+            </div>
+        {% elif request.user.language == 'ru' %}
+            <!-- Russian version -->
+            <h1>Литовское текстовое упражнение: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Прочитайте литовский текст, созданный из слов вашего набора, а затем ответьте на вопросы с вариантами ответов.</p>
+            
+            <div id="exercise-area">
+                <div class="loading">Загрузка упражнения...</div>
+                <!-- Text and questions will be inserted here by JS -->
+            </div>
+            
+            <div id="results-area" style="display: none;">
+                <h2>Результаты упражнения</h2>
+                <p>Правильные ответы: <span id="correct-count">0</span> / 5</p>
+                <div id="results-details"></div>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Вернуться к набору слов</a>
+                <a href="{% url 'text_exercise' wordset.id %}" class="btn btn-primary">Попробовать снова</a>
+            </div>
+        {% else %}
+            <!-- English version -->
+            <h1>Lithuanian Text Exercise: {{ wordset.title }}</h1>
+            
+            <p class="instructions">Read the Lithuanian text generated with words from your vocabulary set, then answer the multiple choice questions.</p>
+            
+            <div id="exercise-area">
+                <div class="loading">Loading exercise...</div>
+                <!-- Text and questions will be inserted here by JS -->
+            </div>
+            
+            <div id="results-area" style="display: none;">
+                <h2>Exercise Results</h2>
+                <p>Correct answers: <span id="correct-count">0</span> / 5</p>
+                <div id="results-details"></div>
+                <a href="{% url 'wordset_detail' wordset.id %}" class="btn btn-primary">← Back to Word Set</a>
+                <a href="{% url 'text_exercise' wordset.id %}" class="btn btn-primary">Try Again</a>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Pass data to JavaScript -->
@@ -90,9 +137,10 @@
         const wordsetId = "{{ wordset_id }}";
         const csrfToken = "{{ csrf_token }}";
         const timestamp = "{{ timestamp }}";
+        const userLanguage = "{{ request.user.language }}";
     </script>
     <script src="{% static 'main/js/text_exercise.js' %}" defer></script>
     <script src="{% static 'main/js/theme.js' %}"></script>
     <script src="{% static 'main/js/touch.js' %}"></script>
 </body>
-</html> 
+</html>
