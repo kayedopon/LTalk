@@ -32,6 +32,9 @@
                     <button type="submit">Login</button>
                 </div>
             </form>
+
+            {% load socialaccount %}
+            <a href="{% provider_login_url 'google' %}">Sign In with Google</a>
         </div>
         <div class="link-block">
             <p>Don't have an account? <a href="{% url 'registration' %}">Register</a></p>
