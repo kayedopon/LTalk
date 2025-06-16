@@ -96,7 +96,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Change from 'mandatory' to 'optional'
 # Additionally, configure social account specific settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Skip email verification for social accounts
-
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'home'
 # Google OAuth settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

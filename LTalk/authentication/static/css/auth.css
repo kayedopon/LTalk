@@ -93,28 +93,34 @@ body {
     text-decoration: none;
 }
 
-.link-block a:hover {
+link-block a:hover {
     text-decoration: underline;
 }
 
 .google-login-btn {
-    display: block;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically align icon and text */
+    justify-content: center; /* Horizontally center content */
     width: 100%;
-    padding: 12px;
-    background-color: white;
-    color: #444;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 500;
-    text-align: center;
+    height: 40px; /* Explicit height for consistency */
+    padding: 0 12px; /* Adjust padding as needed, vertical padding handled by align-items */
+    background-color: #ffffff; /* Standard Google Button White */
+    color: #3c4043; /* Standard Google Button Text Color */
+    border: 1px solid #dadce0; /* Standard Google Button Border Color */
+    border-radius: 4px; /* Standard Google Button Border Radius */
+    font-family: "Roboto", "Helvetica Neue", Arial, sans-serif; /* Google's preferred font stack */
+    font-size: 14px; /* Common font size for Google buttons */
+    font-weight: 500; /* Medium weight */
+    text-align: center; /* Fallback if flex not supported, or for text within span */
     margin-top: 10px;
     text-decoration: none;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    box-sizing: border-box;
 }
-
 .google-login-btn:hover {
-    background-color: #f5f5f5;
+    background-color: #f8f9fa; /* Lighter shade for hover */
+    border-color: #dadce0; /* Keep border or use a slightly darker one like #c6c6c6 */
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302); /* Subtle shadow on hover */
 }
 
 /* Media queries for responsive design */
