@@ -33,7 +33,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-LOGIN_URL = 'registration'
+LOGIN_URL = 'landing_page'
 # Application definition
 
 INSTALLED_APPS = [
