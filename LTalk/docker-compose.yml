@@ -37,6 +37,22 @@ services:
     depends_on: [web]
     networks: [backend]
 
+  backup:
+    image: postgres:16
+    env_file: .env
+    volumes:
+      - ./backups:/backups
+    networks: [backend]
+    depends_on: [db]
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+      apt-get update && apt-get install -y cron
+      echo "0 0 * * * pg_dump -h db -U $$POSTGRES_USER $$POSTGRES_DB | gzip > /backups/backup_\$$(date +\%Y\%m\%d_\%H\%M\%S).sql.gz" > /etc/cron.d/backup-cron
+      chmod 0644 /etc/cron.d/backup-cron
+      crontab /etc/cron.d/backup-cron
+      cron -f
+      EOF'
+
 volumes:
   db_data:
   static_volume:
