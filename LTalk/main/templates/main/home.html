@@ -96,7 +96,7 @@
         <h1 class="home-title">Your Word Sets</h1>
         
         <div class="button-group">
-            <a href="{% url 'create_set' %}" class="btn btn-primary">Add Word Set</a>
+            <a href="{% url 'create_set' %}" class="btn btn-primary">Add a Word Set</a>
             <a href="{% url 'explore_sets' %}" class="btn btn-secondary">Explore Sets</a>
         </div>
         
@@ -126,7 +126,6 @@
             {% else %}
                 <div class="card text-center">
                     <p class="mb-3">You have no word sets yet.</p>
-                    <a href="{% url 'create_set' %}" class="btn btn-primary">Create Your First Set</a>
                 </div>
             {% endif %}
         </div>
