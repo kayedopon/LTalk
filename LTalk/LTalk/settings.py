@@ -90,7 +90,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# In settings.py
+
 ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Change from 'mandatory' to 'optional'
 
 # Additionally, configure social account specific settings

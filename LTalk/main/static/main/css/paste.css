@@ -1,0 +1,30 @@
+.upload-wrapper {
+  display: flex;
+  flex-direction:row;
+  align-items: center;;
+  gap: 20px; /* space between form and drop area */
+  flex-wrap: wrap;
+}
+
+#drop-area {
+  width: 250px;
+  height: 200px;
+  border: 2px dashed #999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #004d40;
+  text-align: center;
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
