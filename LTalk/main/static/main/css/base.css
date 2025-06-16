@@ -93,7 +93,7 @@ a:hover {
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background-color: var(--chart-2);
   color: var(--primary-foreground);
 }
 
@@ -102,7 +102,7 @@ a:hover {
 }
 
 .btn-secondary {
-  background-color: var(--secondary);
+  background-color: var(--chart-2);
   color: var(--secondary-foreground);
 }
 
@@ -319,7 +319,7 @@ label {
 }
 
 .btn-primary:hover, .upload-button:hover {
-    background-color: #45a049;
+    background-color: hsl(173, 58%, 35%);
 }
 
 .button-group {
@@ -386,21 +386,21 @@ label {
 }
 
 .btn-primary, .upload-button {
-    background: #4CAF50;
+    background: hsl(173, 58%, 39%);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: #388e3c;
+    background: hsl(173, 58%, 35%);
 }
 
 .btn-secondary {
-    background: #e0e0e0;
-    color: #333;
+    background: hsl(173, 58%, 39%);
+    color: #fff;
 }
 
 .btn-secondary:hover {
-    background: #bdbdbd;
+    background: hsl(173, 58%, 35%);
 } 
 
 .new-word {
@@ -424,7 +424,7 @@ label {
 }
 
 .new-word:hover {
-    background-color: #388e3c; /* matches .btn-primary:hover in base.css */
+    background-color: hsl(173, 58%, 39%); /* matches .btn-primary:hover in base.css */
     transform: translateY(-2px);
     filter: brightness(1.1);
 }
@@ -454,7 +454,7 @@ label {
 }
 .word-edit-row input{ width:100%; }
 .remove-btn {
-    background: red;
+    background: rgb(210, 13, 13);
     border: none;
     font-size: 1rem;
     cursor: pointer;
