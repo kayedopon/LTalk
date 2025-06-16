@@ -80,7 +80,7 @@
 }
 
 .incorrect-btn:hover {
-    background-color: hsl(0, 84.2%, 55%);
+    background-color: rgb(210, 13, 13);
     transform: translateY(-2px);
 }
 
@@ -228,7 +228,7 @@
 .btn {
     padding: 8px 16px;
     margin-right: 8px;
-    background-color: var(--primary);
+    background-color: var(--chart-2);
     color: var(--primary-foreground);
     border: none;
     border-radius: var(--radius);

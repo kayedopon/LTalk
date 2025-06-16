@@ -107,7 +107,7 @@
 
 /* Create set button */
 .create-set-button {
-  background-color: var(--primary);
+  background-color: var(--chart-2);
   color: var(--primary-foreground);
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius);
@@ -153,12 +153,12 @@
     padding: 5px 10px;
     font-size: 14px;
     text-decoration: none;
-    background-color: #6c757d; /* Example secondary color */
+    background-color: var(--chart-2); /* Example secondary color */
     color: white;
     border-radius: 4px;
     margin-left: 10px; /* Space between buttons if multiple */
 }
 
 .word-set-actions .btn:hover {
-     background-color: #5a6268;
+     background-color: hsl(173, 58%, 35%);
 } 

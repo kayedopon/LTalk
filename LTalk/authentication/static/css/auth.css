@@ -47,7 +47,7 @@ body {
 }
 
 .input-field:focus {
-    border-color: #4CAF50;
+    border-color: hsl(173, 58%, 39%);
     outline: none;
 }
 
@@ -69,7 +69,7 @@ body {
 #login-button button {
     width: 100%;
     padding: 12px;
-    background-color: #4CAF50;
+    background-color: hsl(173, 58%, 39%);
     color: white;
     font-weight: bold;
     border: none;
@@ -79,7 +79,7 @@ body {
 }
 
 #login-button button:hover {
-    background-color: #45a049;
+    background-color: hsl(173, 58%, 35%);
 }
 
 .link-block {
@@ -89,7 +89,7 @@ body {
 }
 
 .link-block a {
-    color: #4CAF50;
+    color: hsl(173, 58%, 39%);
     text-decoration: none;
 }
 
