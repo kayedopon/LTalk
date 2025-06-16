@@ -67,7 +67,13 @@
                         </button>
                     </form>
                     <div id="drop-area" class="desktop-only">
-                        Paste your file here
+                        {% if request.user.language == 'uk' %}
+                            Вставте сюди свій файл
+                        {% elif request.user.language == 'ru' %}
+                            Вставьте ваш файл здесь
+                        {% else %}
+                            Paste your file here
+                        {% endif %}
                     </div>
                 </div>
             </div>
