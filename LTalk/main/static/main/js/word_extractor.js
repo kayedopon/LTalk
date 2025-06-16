@@ -114,11 +114,38 @@ function getCSRFToken() {
     return '';
 }
 
+function saveFormState() {
+    const state = {
+        title: document.getElementById('wordset-title')?.value || '',
+        description: document.getElementById('wordset-description')?.value || '',
+        isPublic: document.getElementById('wordset-public')?.checked || false,
+        words: []
+    };
+    
+    // Save any manually added words
+    const wordItems = document.querySelectorAll('.word-item');
+    if (wordItems.length) {
+        wordItems.forEach(item => {
+            const wordInputs = item.querySelectorAll('input[data-field]');
+            const word = {};
+            wordInputs.forEach(input => {
+                word[input.dataset.field] = input.value.trim();
+            });
+            
+            // Only add if at least one field has a value
+            if (word.word || word.infinitive || word.translation) {
+                state.words.push(word);
+            }
+        });
+    }
+    
+    return state;
+}
 // This function sends the form data and displays the result
 // ---------------------------------------------------------------------------
 // REPLACEMENT displayResult – now renders editable <input> fields
 // ---------------------------------------------------------------------------
-function displayResult(result) {
+function displayResult(result, savedState = null) {
     console.log(result)
     const resultDiv = document.getElementById('result');
 
@@ -133,10 +160,8 @@ function displayResult(result) {
     form.id = 'word-form';
     form.method = 'post';
     
-    
-    
     form.onsubmit = (e) => {
-        e.preventDefault();           // we’ll handle submit manually
+        e.preventDefault();           // we'll handle submit manually
         prepareWordsJSON();           // collects values from inputs
         sendWordSet();                // your existing POST /api/wordset/
     };
@@ -176,16 +201,24 @@ function displayResult(result) {
     const list = document.createElement('ul');
     list.className = 'words-list';
 
-    result.words.forEach((item, idx) => {
+    // Combine words from API result with any previously saved words
+    let words = result.words || [];
+    
+    // If we have saved words, append them to the result words
+    if (savedState && savedState.words && savedState.words.length) {
+        words = [...words, ...savedState.words];
+    }
+
+    words.forEach((item, idx) => {
         const li = document.createElement('li');
         li.className = 'word-item';
 
         li.innerHTML = `
-            <input type="text" class="word-input"        value="${item.word}"
+            <input type="text" class="word-input" value="${item.word || ''}"
                    data-field="word" required>
-            <input type="text" class="infinitive-input" value="${item.infinitive}"
+            <input type="text" class="infinitive-input" value="${item.infinitive || ''}"
                    data-field="infinitive" required>
-            <input type="text" class="translation-input"value="${item.translation}"
+            <input type="text" class="translation-input" value="${item.translation || ''}"
                    data-field="translation" required>
             <button type="button" class="remove-btn" onclick="removeWord(this)">
                 Delete
@@ -207,6 +240,13 @@ function displayResult(result) {
     /* ----- 3. render the whole thing in #result ------------------------- */
     resultDiv.innerHTML = '';
     resultDiv.appendChild(form);
+    
+    // Restore saved form values
+    if (savedState) {
+        document.getElementById('wordset-title').value = savedState.title;
+        document.getElementById('wordset-description').value = savedState.description;
+        document.getElementById('wordset-public').checked = savedState.isPublic;
+    }
 }
 
 /* --------------------------------------------------------------------- */
@@ -353,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ---------- when the form is submitted ----------
-    form.addEventListener('submit', async (e) => {
+   form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (chosenFiles.length === 0) {
@@ -361,9 +401,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Save the current form state
+        const savedState = saveFormState();
+
         const formData = new FormData();
         for (const file of chosenFiles) {
-            formData.append('image', file);            // same field name as before
+            formData.append('image', file);
         }
         formData.append('csrfmiddlewaretoken', getCSRFToken());
 
@@ -377,14 +420,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'same-origin'
             });
             const result = await response.json();
-            displayResult(result);
+            
+            // Pass the saved state to displayResult
+            displayResult(result, savedState);
 
             // on success you might want to clear files
             chosenFiles.length = 0;
             renderFileList();
         } catch (err) {
             console.log(err)
-            displayResult({ error: 'An error occurred while processing your request.' });
+            displayResult({ error: 'An error occurred while processing your request.' }, savedState);
         }
     });
 });
