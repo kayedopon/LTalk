@@ -334,6 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileNameSpan = document.getElementById('file-name');
     const fileListUl   = document.getElementById('file-list');
 
+    const dropArea = document.getElementById("drop-area");
+
     const addWord = document.getElementById('new-word');
 
     addWord.addEventListener('click', addNewWord)
@@ -378,6 +380,25 @@ document.addEventListener('DOMContentLoaded', function() {
         imageInput.value = '';
     });
 
+    dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.style.borderColor = "#00796b";
+    });
+
+    dropArea.addEventListener("dragleave", () => {
+        dropArea.style.borderColor = "#999";
+    });
+
+    dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            chosenFiles.push(file); 
+        }
+        renderFileList();
+    });
+
     document.addEventListener("paste", function(e){
         let items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
@@ -385,7 +406,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (item.kind === 'file') {
                 const file = item.getAsFile();
-                console.log(file);
                 chosenFiles.push(file); 
             }
         }

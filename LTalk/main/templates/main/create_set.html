@@ -31,44 +31,54 @@
         </h1>
 
         <div class="upload-section">
-            <form id="form1" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+            <div class="upload-center">
+                <div class="upload-wrapper">
+                    <form id="form1" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                <!-- hidden <input> so we can style the label as a button -->
-                <input  type="file"
-                        id="image-input"
-                        name="image"           
-                        accept="image/*"
-                        multiple            
-                        class="hidden-input">
+                        <input type="file"
+                            id="image-input"
+                            name="image"
+                            accept="image/*"
+                            multiple
+                            class="hidden-input">
 
-                <label for="image-input" class="upload-button">
-                    {% if request.user.language == 'uk' %}
-                        Вибрати зображення
-                    {% elif request.user.language == 'ru' %}
-                        Выбрать изображения
-                    {% else %}
-                        Choose image(s)
-                    {% endif %}
-                </label>
+                        <label for="image-input" class="upload-button">
+                            {% if request.user.language == 'uk' %}
+                                Вибрати зображення
+                            {% elif request.user.language == 'ru' %}
+                                Выбрать изображения
+                            {% else %}
+                                Choose image(s)
+                            {% endif %}
+                        </label>
 
-                <!-- tiny summary: "3 file(s) selected" -->
-                <span id="file-name"></span>
+                        <span id="file-name"></span>
+                        <ul id="file-list" class="file-list"></ul>
 
-                <!-- full list under the button -->
-                <ul id="file-list" class="file-list"></ul>
-
-                <button type="submit" class="upload-button" style="margin-top:10px;">
-                    {% if request.user.language == 'uk' %}
-                        Обробити зображення
-                    {% elif request.user.language == 'ru' %}
-                        Обработать изображения
-                    {% else %}
-                        Process image(s)
-                    {% endif %}
-                </button>
-            </form>
+                        <button type="submit" class="upload-button" style="margin-top:10px;">
+                            {% if request.user.language == 'uk' %}
+                                Обробити зображення
+                            {% elif request.user.language == 'ru' %}
+                                Обработать изображения
+                            {% else %}
+                                Process image(s)
+                            {% endif %}
+                        </button>
+                    </form>
+                    <div id="drop-area" class="desktop-only">
+                        {% if request.user.language == 'uk' %}
+                            Вставте сюди свій файл
+                        {% elif request.user.language == 'ru' %}
+                            Вставьте ваш файл здесь
+                        {% else %}
+                            Paste your file here
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
+
 
         <div id="result">
             <form action="" id="word-form" method="post">

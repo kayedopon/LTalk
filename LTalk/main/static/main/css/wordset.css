@@ -136,6 +136,12 @@
     color: var(--foreground);
 }
 
+.upload-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 /* Wordset header with delete button on top right */
 .wordset-header {
     display: flex;
